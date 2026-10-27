@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#4f46e5"/>
+<meta name="mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/><meta name="apple-mobile-web-app-title" content="سفريات الأمان"/>
+<link rel="manifest" href="manifest.webmanifest"/>
+<link rel="icon" href="icon-192.png"/><link rel="apple-touch-icon" href="icon-192.png"/>
 <title>سفريات الأمان للركوب والنقل</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -215,6 +220,29 @@ body{font-family:'Cairo',sans-serif;background:#f1f5f9;color:#0f172a;min-height:
 .auth-footer b{color:#334155}
 .auth-footer a{color:#2563eb;text-decoration:none;font-weight:600}
 .user-chip{display:flex;align-items:center;gap:8px;background:#f1f5f9;padding:6px 12px;border-radius:999px;font-size:.8rem;font-weight:600}
+/* ===== unified purple header ===== */
+.top-shell{background:linear-gradient(135deg,#4f46e5,#7c3aed 55%,#1e1b4b);margin:12px 16px 16px;border-radius:22px;overflow:hidden;box-shadow:0 10px 30px rgba(79,70,229,.25)}
+.top-shell .c-header{background:transparent;border-bottom:1px solid rgba(255,255,255,.15);box-shadow:none;position:relative;color:#fff}
+.top-shell .logo small{color:rgba(255,255,255,.75)}
+.top-shell .logo-icon{box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.top-shell .hero{background:none;margin:0;border-radius:0;padding:26px 24px 32px}
+.top-shell .btn-ghost{background:rgba(255,255,255,.16);color:#fff}
+.top-shell .btn-ghost:hover{background:rgba(255,255,255,.26)}
+.top-shell .top-nav-btn.active{background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.top-shell .top-nav-btn.active[data-nav="trips"]{color:#4f46e5;background:#fff}
+.top-shell .top-nav-btn.active[data-nav="private"]{color:#059669;background:#fff}
+.top-shell .top-nav-btn.active[data-nav="track"]{color:#ea580c;background:#fff}
+.top-shell .user-chip{background:rgba(255,255,255,.18);color:#fff;cursor:pointer}
+@media(max-width:768px){.top-shell{margin:8px 10px 14px;border-radius:18px}.top-shell .c-header{padding:12px 14px}}
+.user-chip{cursor:pointer}
+/* ===== install banner ===== */
+#pwa-banner{position:fixed;left:12px;right:12px;bottom:16px;z-index:150;background:#fff;border:1px solid #e2e8f0;border-radius:18px;box-shadow:0 12px 40px rgba(15,23,42,.25);padding:14px;display:none;align-items:center;gap:12px;max-width:460px;margin-inline:auto}
+#pwa-banner.on{display:flex}
+body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
+#pwa-banner img{width:48px;height:48px;border-radius:12px;flex-shrink:0}
+#pwa-banner .pb-txt{flex:1;font-size:.82rem;line-height:1.6;color:#334155}
+#pwa-banner .pb-txt b{display:block;font-size:.92rem;color:#0f172a}
+#pwa-banner .pb-x{background:#f1f5f9;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;color:#64748b;font-size:1rem;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -300,6 +328,7 @@ body{font-family:'Cairo',sans-serif;background:#f1f5f9;color:#0f172a;min-height:
 </div>
 
 <div id="view-customer" class="hidden">
+<div class="top-shell">
 <header class="c-header">
 <div class="logo" id="logo-area"><div class="logo-icon car-anim" id="header-logo-icon"><svg viewBox="0 0 140 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
   <defs>
@@ -350,6 +379,7 @@ body{font-family:'Cairo',sans-serif;background:#f1f5f9;color:#0f172a;min-height:
 <button class="btn btn-orange" type="button" onclick="showCust('track')">🔍 متابعة حجز سابق بالكود</button>
 </div>
 </section>
+</div>
 <div class="wrap">
 <div id="cust-trips">
 <div class="sec-head"><h2>الرحلات المجدولة والمنتظمة</h2><span class="badge" id="av-count">متاح للحجز</span></div>
@@ -691,8 +721,64 @@ body{font-family:'Cairo',sans-serif;background:#f1f5f9;color:#0f172a;min-height:
     <button type="button" class="btn btn-green" id="pf-save" onclick="saveProfile()">حفظ ودخول</button>
   </div>
 </div></div></div>
+<div class="overlay" id="m-editprofile">
+<div class="modal" style="max-width:420px" onclick="event.stopPropagation()">
+<div class="modal-head"><button type="button" class="xbtn" data-close onclick="window.closeModals()">×</button><h3>تعديل بياناتي</h3></div>
+<div class="modal-body">
+  <div class="fg"><label>الاسم بالكامل *</label><input id="ep-name" type="text" placeholder="الاسم الكامل"></div>
+  <div class="fg"><label>رقم الموبايل (11 رقم) *</label><input id="ep-phone" type="tel" inputmode="numeric" maxlength="11" placeholder="01xxxxxxxxx" style="direction:ltr;text-align:right" oninput="this.value=this.value.replace(/[^0-9]/g,'')" onkeydown="if(event.key==='Enter')saveEditProfile()"></div>
+  <div class="fg"><label>البريد الإلكتروني</label><input id="ep-email" type="email" disabled style="background:#f1f5f9;color:#64748b"></div>
+  <div class="modal-acts">
+    <button type="button" class="btn btn-ghost" data-close onclick="window.closeModals()">إلغاء</button>
+    <button type="button" class="btn btn-green" id="ep-save" onclick="saveEditProfile()">حفظ التعديلات</button>
+  </div>
+</div></div></div>
+<div id="pwa-banner" role="dialog" aria-label="تثبيت التطبيق">
+  <img src="icon-192.png" alt="">
+  <div class="pb-txt"><b>ثبّت التطبيق على شاشتك الرئيسية</b><span id="pwa-text">للدخول السريع في أي وقت بضغطة واحدة.</span></div>
+  <button type="button" class="btn btn-indigo btn-sm" id="pwa-install-btn" style="display:none">تثبيت</button>
+  <button type="button" class="pb-x" id="pwa-close" aria-label="إغلاق">✕</button>
+</div>
 <div class="toast" id="toast"></div>
 
+<script>
+(function(){
+  var ua=navigator.userAgent||"";
+  var isIOS=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  var isAndroid=/android/i.test(ua);
+  var standalone=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||window.navigator.standalone===true;
+  var KEY="pwaDismissedAt",deferred=null,shown=false;
+  function dismissed(){try{var t=+localStorage.getItem(KEY)||0;return t&&(Date.now()-t)<3*86400000}catch(e){return false}}
+  function remember(){try{localStorage.setItem(KEY,String(Date.now()))}catch(e){}}
+  var b=function(){return document.getElementById("pwa-banner")};
+  function show(mode){
+    if(shown||standalone||dismissed()||!(isIOS||isAndroid))return;
+    var el=b();if(!el)return;shown=true;
+    var txt=document.getElementById("pwa-text"),btn=document.getElementById("pwa-install-btn");
+    if(mode==="prompt"){btn.style.display="";txt.textContent="للدخول السريع في أي وقت بضغطة واحدة."}
+    else if(mode==="ios"){txt.innerHTML="اضغط زر المشاركة <b style='display:inline;font-size:1rem'>⬆️</b> ثم اختر <b style='display:inline'>إضافة إلى الشاشة الرئيسية</b>."}
+    else{txt.innerHTML="من قائمة المتصفح <b style='display:inline;font-size:1rem'>⋮</b> اختر <b style='display:inline'>تثبيت التطبيق</b> أو <b style='display:inline'>إضافة إلى الشاشة الرئيسية</b>."}
+    el.classList.add("on");
+  }
+  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;setTimeout(function(){show("prompt")},800)});
+  window.addEventListener("appinstalled",function(){var el=b();if(el)el.classList.remove("on");remember()});
+  window.addEventListener("load",function(){
+    var btn=document.getElementById("pwa-install-btn"),x=document.getElementById("pwa-close");
+    if(btn)btn.addEventListener("click",function(){
+      if(!deferred)return;deferred.prompt();
+      deferred.userChoice.then(function(){deferred=null;var el=b();if(el)el.classList.remove("on");remember()});
+    });
+    if(x)x.addEventListener("click",function(){var el=b();if(el)el.classList.remove("on");remember()});
+    setTimeout(function(){
+      if(shown||standalone)return;
+      if(isIOS)show("ios");else if(isAndroid&&!deferred)show("manual");
+    },2500);
+    if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol)){
+      navigator.serviceWorker.register("sw.js").catch(function(){});
+    }
+  });
+})();
+</script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getFirestore, collection, getDocs, addDoc, query, where, doc, updateDoc, deleteDoc, getDoc, runTransaction, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
@@ -1014,6 +1100,42 @@ window.saveProfile=async function(){
   }finally{btn.disabled=false}
 };
 
+window.openEditProfile=async function(){
+  if(!currentUser)return showAuthScreen();
+  document.getElementById("ep-name").value=currentUser.displayName||"";
+  document.getElementById("ep-phone").value="";
+  document.getElementById("ep-email").value=currentUser.email||"";
+  document.getElementById("m-editprofile").classList.add("on");
+  try{
+    const sn=await getDoc(doc(db,"users",currentUser.uid));
+    if(sn.exists()){
+      const d=sn.data();
+      if(d.name)document.getElementById("ep-name").value=d.name;
+      if(d.phone)document.getElementById("ep-phone").value=normalizePhone(d.phone);
+    }
+  }catch(e){}
+};
+window.saveEditProfile=async function(){
+  const user=auth.currentUser;
+  if(!user)return toast("سجّل الدخول أولًا","err");
+  const name=(document.getElementById("ep-name").value||"").trim();
+  const phone=normalizePhone(document.getElementById("ep-phone").value||"");
+  if(name.length<3)return toast("أدخل الاسم بالكامل","err");
+  if(!isValidEgPhone(phone))return toast("رقم الموبايل يجب أن يكون 11 رقم ويبدأ بـ 01","err");
+  const btn=document.getElementById("ep-save");btn.disabled=true;
+  try{
+    await setDoc(doc(db,"users",user.uid),{name,phone,updatedAt:new Date().toISOString()},{merge:true});
+    try{await updateProfile(user,{displayName:name})}catch(e){}
+    currentUser=user;
+    updateUserChip();
+    window.closeModals();
+    if(typeof loadMyBookings==="function")loadMyBookings();
+    toast("تم حفظ بياناتك","ok");
+  }catch(e){
+    console.error(e);
+    toast("تعذر حفظ التعديلات، حاول مرة أخرى","err");
+  }finally{btn.disabled=false}
+};
 window.logoutCustomer=async function(){
   try{await signOut(auth)}catch(e){}
   currentUser=null;isGuest=false;
@@ -1026,7 +1148,7 @@ function updateUserChip(){
   if(!wrap||!btn)return;
   if(currentUser){
     wrap.classList.remove("hidden");
-    wrap.innerHTML=`<span class="user-chip">👤 ${currentUser.displayName||currentUser.email||"حسابي"}</span>
+    wrap.innerHTML=`<span class="user-chip" title="حسابي وتعديل بياناتي" onclick="onAccountNav()">👤 ${currentUser.displayName||currentUser.email||"حسابي"} ✏️</span>
       <button class="btn btn-ghost btn-sm" type="button" onclick="logoutCustomer()">خروج</button>`;
     btn.classList.add("hidden");
   }else{
@@ -1050,7 +1172,11 @@ window.loadMyBookings=async function(){
     const ab=document.getElementById("account-bar");
     if(ab){
       const who=currentUser.displayName||"حسابي";
-      ab.innerHTML=`<div class="panel" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px"><div><b>👤 ${who}</b><div class="card-meta">${currentUser.email||""}</div></div><button class="btn btn-ghost btn-sm" type="button" style="color:#dc2626" onclick="logoutCustomer()">🚪 تسجيل الخروج / تغيير الحساب</button></div>`;
+      ab.innerHTML=`<div class="panel" style="margin-bottom:14px"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><b>👤 ${who}</b><div class="card-meta">${currentUser.email||""}</div><div class="card-meta" id="ab-phone" style="direction:ltr;text-align:right"></div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-indigo btn-sm" type="button" onclick="openEditProfile()">✏️ تعديل بياناتي</button><button class="btn btn-ghost btn-sm" type="button" style="color:#dc2626" onclick="logoutCustomer()">🚪 خروج / تغيير الحساب</button></div></div></div>`;
+      getDoc(doc(db,"users",currentUser.uid)).then(sn=>{
+        const el=document.getElementById("ab-phone");
+        if(el&&sn.exists()&&sn.data().phone)el.textContent="📱 "+normalizePhone(sn.data().phone);
+      }).catch(()=>{});
     }
   }else{
     if(userPanel)userPanel.classList.add("hidden");
