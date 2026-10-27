@@ -158,9 +158,10 @@ body{font-family:'Cairo',sans-serif;background:#f1f5f9;color:#0f172a;min-height:
 .top-nav-btn.active[data-nav="track"]{background:#f97316;color:#fff;box-shadow:0 4px 12px rgba(249,115,22,.35)}
 .bottom-nav button.active[data-nav="private"]{color:#10b981}
 .bottom-nav button.active[data-nav="track"]{color:#f97316}
-.otp-hint{font-size:.8rem;color:#64748b;text-align:center;margin:6px 0 10px}
-#otp-input{direction:ltr;text-align:center;letter-spacing:10px;font-weight:800;font-size:1.5rem}
-#phone-input{direction:ltr;text-align:center;letter-spacing:2px;font-weight:700;font-size:1.1rem}
+.btn-google{width:100%;padding:13px;margin-bottom:8px;background:#fff;color:#334155;border:1px solid #e2e8f0;border-radius:12px;font-family:inherit;font-weight:800;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.btn-google:hover{background:#f8fafc}
+.or-sep{display:flex;align-items:center;gap:10px;color:#94a3b8;font-size:.78rem;margin:6px 0 10px}
+.or-sep::before,.or-sep::after{content:"";flex:1;height:1px;background:#e2e8f0}
 .bottom-nav button span.ic{font-size:1.25rem}
 .wa-float{position:fixed;bottom:24px;left:16px;width:54px;height:54px;border-radius:50%;background:#25d366;color:#fff;display:none;align-items:center;justify-content:center;font-size:1.6rem;box-shadow:0 6px 20px rgba(37,211,102,.45);z-index:85;text-decoration:none;border:none;cursor:pointer}
 .wa-float.is-visible{display:flex}
@@ -258,45 +259,30 @@ body{font-family:'Cairo',sans-serif;background:#f1f5f9;color:#0f172a;min-height:
 </svg></div>
     </div>
     <h1 id="auth-app-name">سفريات الأمان</h1>
-    <p class="sub" id="auth-welcome">أهلاً بك، سجّل دخولك برقم الموبايل.</p>
+    <p class="sub" id="auth-welcome">أهلاً بك، يرجى تسجيل الدخول بحسابك المعتمد.</p>
     <div class="auth-tabs">
-      <button type="button" class="on" id="tab-phone" onclick="setAuthTab('phone')">📱 رقم الموبايل</button>
-      <button type="button" id="tab-login" onclick="setAuthTab('login')">البريد</button>
-      <button type="button" id="tab-register" onclick="setAuthTab('register')">حساب بريد جديد</button>
+      <button type="button" class="on" id="tab-login" onclick="setAuthTab('login')">تسجيل الدخول</button>
+      <button type="button" id="tab-register" onclick="setAuthTab('register')">إنشاء حساب</button>
     </div>
-    <div id="auth-form-phone">
-      <div id="phone-step-1">
-        <p class="otp-hint">أدخل رقم موبايلك وسنرسل لك كود تأكيد من 6 أرقام عبر رسالة SMS.</p>
-        <div class="fg"><label>الاسم</label><input id="phone-name" type="text" placeholder="الاسم الكامل (لأول مرة فقط)" autocomplete="name"></div>
-        <div class="fg"><label>الموبايل</label><input id="phone-input" type="tel" inputmode="numeric" placeholder="01xxxxxxxxx" autocomplete="tel" onkeydown="if(event.key==='Enter')sendOTP()"></div>
-        <button type="button" class="btn-login-main" id="btn-send-otp" onclick="sendOTP()">إرسال كود التأكيد 📱</button>
-      </div>
-      <div id="phone-step-2" class="hidden">
-        <p class="otp-hint" id="otp-sent-to">تم إرسال الكود إلى هاتفك.</p>
-        <div class="fg"><label>الكود</label><input id="otp-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="······" oninput="onOtpInput(this)"></div>
-        <button type="button" class="btn-login-main" id="btn-verify-otp" onclick="verifyOTP()">تأكيد ودخول ✓</button>
-        <button type="button" class="link-forgot" id="btn-resend-otp" onclick="resendOTP()" disabled style="display:block;width:100%;text-align:center">إعادة إرسال الكود</button>
-        <button type="button" class="link-forgot" onclick="backToPhone()" style="display:block;width:100%;text-align:center;color:#64748b">تعديل رقم الموبايل</button>
-      </div>
-      <div id="recaptcha-container"></div>
-      <button type="button" class="btn-guest" onclick="enterAsGuest()" style="margin-top:8px">👤 الدخول كضيف</button>
-      <button type="button" class="link-forgot" onclick="document.getElementById('m-staff-login').classList.add('on')" style="margin-top:12px; display:block; width:100%; text-align:center; color:#475569;">👨‍✈️ تسجيل دخول السائقين (بوابة الكباتن)</button>
-    </div>
-    <div id="auth-form-login" class="hidden">
-      <div class="fg"><label>البريد</label><input id="auth-email" type="email" placeholder="رقم الهاتف المحمول (أو البريد الإلكتروني)" autocomplete="email"></div>
+    <div id="auth-form-login">
+      <div class="fg"><label>البريد</label><input id="auth-email" type="email" placeholder="البريد الإلكتروني" autocomplete="email"></div>
       <div class="fg" style="margin-bottom:4px"><label>كلمة المرور</label><input id="auth-pass" type="password" placeholder="كلمة المرور" autocomplete="current-password"></div>
       <button type="button" class="btn-login-main" onclick="doLogin()">تسجيل الدخول</button>
       <button type="button" class="link-forgot" onclick="forgotPassword()">نسيت كلمة المرور؟</button>
+      <div class="or-sep">أو</div>
+      <button type="button" class="btn-google" onclick="googleLogin()"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>الدخول بحساب Google</button>
       <button type="button" class="btn-guest" onclick="enterAsGuest()">👤 الدخول كضيف</button>
       <button type="button" class="link-forgot" onclick="document.getElementById('m-staff-login').classList.add('on')" style="margin-top:12px; display:block; width:100%; text-align:center; color:#475569;">👨‍✈️ تسجيل دخول السائقين (بوابة الكباتن)</button>
     </div>
     <div id="auth-form-register" class="hidden">
-      <div class="fg"><label>الاسم</label><input id="reg-name" type="text" placeholder="الاسم الكامل"></div>
-      <div class="fg"><label>موبايل</label><input id="reg-phone" type="tel" placeholder="رقم الهاتف المحمول"></div>
-      <div class="fg"><label>بريد</label><input id="reg-email" type="email" placeholder="البريد الإلكتروني"></div>
+      <div class="fg"><label>الاسم</label><input id="reg-name" type="text" placeholder="الاسم الكامل *"></div>
+      <div class="fg"><label>موبايل</label><input id="reg-phone" type="tel" inputmode="numeric" maxlength="11" placeholder="رقم الموبايل (11 رقم) 01xxxxxxxxx" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></div>
+      <div class="fg"><label>بريد</label><input id="reg-email" type="email" placeholder="البريد الإلكتروني *"></div>
       <div class="fg"><label>مرور</label><input id="reg-pass" type="password" placeholder="كلمة المرور (6 أحرف على الأقل)"></div>
       <div class="fg"><label>تأكيد</label><input id="reg-pass2" type="password" placeholder="تأكيد كلمة المرور"></div>
       <button type="button" class="btn-login-main" onclick="doRegister()">إنشاء الحساب</button>
+      <div class="or-sep">أو</div>
+      <button type="button" class="btn-google" onclick="googleLogin()"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>إنشاء حساب بواسطة Google</button>
       <button type="button" class="btn-guest" onclick="enterAsGuest()">👤 الدخول كضيف</button>
       <button type="button" class="link-forgot" onclick="document.getElementById('m-staff-login').classList.add('on')" style="margin-top:12px; display:block; width:100%; text-align:center; color:#475569;">👨‍✈️ تسجيل دخول السائقين (بوابة الكباتن)</button>
     </div>
@@ -308,7 +294,7 @@ body{font-family:'Cairo',sans-serif;background:#f1f5f9;color:#0f172a;min-height:
           01112221764
         </a>
       </div>
-      <div style="margin-top:4px;color:#94a3b8">الإصدار: V2.8</div>
+      <div style="margin-top:4px;color:#94a3b8">الإصدار: V2.9</div>
     </div>
   </div>
 </div>
@@ -693,16 +679,29 @@ body{font-family:'Cairo',sans-serif;background:#f1f5f9;color:#0f172a;min-height:
 </div>
 </div>
 
+<div class="overlay" id="m-profile">
+<div class="modal" style="max-width:420px">
+<div class="modal-head"><h3>استكمال بيانات الحساب</h3></div>
+<div class="modal-body">
+  <p style="font-size:.85rem;color:#64748b;margin-bottom:14px;line-height:1.7">أدخل اسمك ورقم موبايلك (11 رقم) لإتمام إنشاء الحساب. هذه البيانات تُستخدم لتأكيد حجوزاتك.</p>
+  <div class="fg"><label>الاسم بالكامل *</label><input id="pf-name" type="text" placeholder="الاسم الكامل"></div>
+  <div class="fg"><label>رقم الموبايل (11 رقم) *</label><input id="pf-phone" type="tel" inputmode="numeric" maxlength="11" placeholder="01xxxxxxxxx" style="direction:ltr;text-align:right" oninput="this.value=this.value.replace(/[^0-9]/g,'')" onkeydown="if(event.key==='Enter')saveProfile()"></div>
+  <div class="modal-acts">
+    <button type="button" class="btn btn-ghost" onclick="logoutCustomer();document.getElementById('m-profile').classList.remove('on')">إلغاء وخروج</button>
+    <button type="button" class="btn btn-green" id="pf-save" onclick="saveProfile()">حفظ ودخول</button>
+  </div>
+</div></div></div>
 <div class="toast" id="toast"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getFirestore, collection, getDocs, addDoc, query, where, doc, updateDoc, deleteDoc, getDoc, runTransaction, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile, GoogleAuthProvider, signInWithPopup, signInWithRedirect } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 const firebaseConfig={apiKey:"AIzaSyAsBftTHVS1DLUypVHD33F_SN-kNeUz_KY",authDomain:"booking-6adaf.firebaseapp.com",projectId:"booking-6adaf",storageBucket:"booking-6adaf.firebasestorage.app",messagingSenderId:"612487831903",appId:"1:612487831903:web:621db120123e12644756ea",measurementId:"G-JDB27JZ0WD"};
 const app=initializeApp(firebaseConfig);const db=getFirestore(app);const auth=getAuth(app);
 let currentUser=null; // Firebase user
+let registering=false;
 let isGuest=false;
 
 
@@ -863,10 +862,10 @@ function applyBranding(){
 
 // ========== CUSTOMER AUTH ==========
 window.setAuthTab=function(tab){
-  ["phone","login","register"].forEach(t=>{
-    const b=document.getElementById("tab-"+t);if(b)b.classList.toggle("on",tab===t);
-    const f=document.getElementById("auth-form-"+t);if(f)f.classList.toggle("hidden",tab!==t);
-  });
+  document.getElementById("tab-login").classList.toggle("on",tab==="login");
+  document.getElementById("tab-register").classList.toggle("on",tab==="register");
+  document.getElementById("auth-form-login").classList.toggle("hidden",tab!=="login");
+  document.getElementById("auth-form-register").classList.toggle("hidden",tab!=="register");
 };
 window.showAuthScreen=function(){
   document.getElementById("view-auth").classList.remove("hidden");
@@ -917,6 +916,8 @@ window.doRegister=async function(){
   if(!email||!email.includes("@"))return toast("بريد إلكتروني غير صالح","err");
   if(pass.length<6)return toast("كلمة المرور 6 أحرف على الأقل","err");
   if(pass!==pass2)return toast("تأكيد كلمة المرور غير متطابق","err");
+  if(name.length<3)return toast("أدخل الاسم بالكامل","err");
+  registering=true;
   try{
     const cred=await createUserWithEmailAndPassword(auth,email,pass);
     await updateProfile(cred.user,{displayName:name});
@@ -932,7 +933,7 @@ window.doRegister=async function(){
       e.code==="auth/weak-password"?"كلمة المرور ضعيفة":
       e.code==="auth/invalid-email"?"بريد غير صالح":"تعذر إنشاء الحساب";
     toast(msg,"err");
-  }
+  }finally{registering=false}
 };
 window.doLogin=async function(){
   const email=(document.getElementById("auth-email").value||"").trim();
@@ -960,117 +961,57 @@ window.forgotPassword=async function(){
     toast(e.code==="auth/user-not-found"?"لا يوجد حساب بهذا البريد":"تعذر إرسال الرابط — تحقق من البريد","err");
   }
 };
-// ========== PHONE (SMS OTP) AUTH ==========
-let confirmationResult=null,recaptchaVerifier=null,pendingName="",pendingPhoneE164="",otpBusy=false,resendTimer=null;
-function toE164(p){const n=normalizePhone(p);return "+20"+n.slice(1)}
-function getRecaptcha(){
-  if(!recaptchaVerifier){
-    recaptchaVerifier=new RecaptchaVerifier(auth,"recaptcha-container",{size:"invisible"});
-  }
-  return recaptchaVerifier;
-}
-function resetRecaptcha(){
-  try{if(recaptchaVerifier)recaptchaVerifier.clear()}catch(e){}
-  recaptchaVerifier=null;
-  const c=document.getElementById("recaptcha-container");
-  if(c)c.innerHTML="";
-}
-function startResendCountdown(sec=60){
-  const btn=document.getElementById("btn-resend-otp");
-  if(!btn)return;
-  clearInterval(resendTimer);
-  let left=sec;btn.disabled=true;
-  const tick=()=>{
-    if(left<=0){clearInterval(resendTimer);btn.disabled=false;btn.textContent="إعادة إرسال الكود";return}
-    btn.textContent="إعادة الإرسال بعد "+left+" ثانية";left--;
-  };
-  tick();resendTimer=setInterval(tick,1000);
-}
-window.sendOTP=async function(){
-  if(otpBusy)return;
-  const phone=normalizePhone(document.getElementById("phone-input").value||"");
-  if(!isValidEgPhone(phone))return toast("أدخل رقم موبايل مصري صحيح (01xxxxxxxxx)","err");
-  pendingName=(document.getElementById("phone-name").value||"").trim();
-  pendingPhoneE164=toE164(phone);
-  const btn=document.getElementById("btn-send-otp");
-  otpBusy=true;btn.disabled=true;btn.textContent="جاري الإرسال...";
+// ========== GOOGLE + PROFILE COMPLETION ==========
+window.googleLogin=async function(){
+  const provider=new GoogleAuthProvider();
+  provider.setCustomParameters({prompt:"select_account"});
   try{
-    confirmationResult=await signInWithPhoneNumber(auth,pendingPhoneE164,getRecaptcha());
-    document.getElementById("phone-step-1").classList.add("hidden");
-    document.getElementById("phone-step-2").classList.remove("hidden");
-    document.getElementById("otp-sent-to").textContent="تم إرسال كود من 6 أرقام إلى "+phone;
-    const oi=document.getElementById("otp-input");oi.value="";oi.focus();
-    startResendCountdown(60);
-    toast("تم إرسال الكود","ok");
-  }catch(e){
-    console.error(e);
-    resetRecaptcha();
-    const c=e.code||"";
-    const map={
-      "auth/invalid-phone-number":"رقم الموبايل غير صالح",
-      "auth/too-many-requests":"محاولات كثيرة — حاول لاحقًا",
-      "auth/quota-exceeded":"تم تجاوز حد رسائل SMS اليومي",
-      "auth/operation-not-allowed":"الدخول بالهاتف غير مفعّل في Firebase، أو مصر غير مسموحة في SMS region policy",
-      "auth/billing-not-enabled":"إرسال SMS يحتاج تفعيل الفوترة (خطة Blaze) في Firebase",
-      "auth/unauthorized-domain":"النطاق غير مضاف في Authorized domains",
-      "auth/captcha-check-failed":"فشل التحقق من reCAPTCHA — تأكد من إضافة النطاق في Authorized domains",
-      "auth/invalid-app-credential":"فشل التحقق من التطبيق (reCAPTCHA) — أعد تحميل الصفحة وحاول",
-      "auth/missing-client-identifier":"فشل التحقق من التطبيق — أعد تحميل الصفحة",
-      "auth/network-request-failed":"مشكلة في الاتصال بالإنترنت",
-      "auth/web-storage-unsupported":"المتصفح يمنع التخزين — افتح الرابط في Chrome أو Safari مباشرة"
-    };
-    const msg=(map[c]||"تعذر إرسال الكود")+(c?" ["+c+"]":"");
-    toast(msg,"err");
-  }finally{
-    otpBusy=false;btn.disabled=false;btn.textContent="إرسال كود التأكيد 📱";
-  }
-};
-window.resendOTP=function(){
-  document.getElementById("phone-step-2").classList.add("hidden");
-  document.getElementById("phone-step-1").classList.remove("hidden");
-  resetRecaptcha();
-  sendOTP();
-};
-window.backToPhone=function(){
-  clearInterval(resendTimer);
-  document.getElementById("phone-step-2").classList.add("hidden");
-  document.getElementById("phone-step-1").classList.remove("hidden");
-  resetRecaptcha();
-  confirmationResult=null;
-};
-window.onOtpInput=function(el){
-  el.value=el.value.replace(/[^0-9٠-٩]/g,"").replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).slice(0,6);
-  if(el.value.length===6)verifyOTP();
-};
-window.verifyOTP=async function(){
-  if(otpBusy)return;
-  const code=(document.getElementById("otp-input").value||"").trim();
-  if(code.length!==6)return toast("أدخل الكود المكوّن من 6 أرقام","err");
-  if(!confirmationResult)return toast("أعد إرسال الكود أولًا","err");
-  otpBusy=true;
-  const btn=document.getElementById("btn-verify-otp");
-  btn.disabled=true;btn.textContent="جاري التحقق...";
-  try{
-    const cred=await confirmationResult.confirm(code);
+    await signInWithPopup(auth,provider);
     isGuest=false;
-    if(pendingName&&!cred.user.displayName){
-      try{await updateProfile(cred.user,{displayName:pendingName})}catch(e){}
-      currentUser=cred.user;
-    }
-    clearInterval(resendTimer);
-    toast("تم تسجيل الدخول","ok");
-    // onAuthStateChanged opens the app immediately
   }catch(e){
     console.error(e);
     const c=e.code||"";
-    const msg=(c==="auth/invalid-verification-code"?"الكود غير صحيح":
-      c==="auth/code-expired"?"انتهت صلاحية الكود — أعد الإرسال":
-      c==="auth/missing-verification-code"?"أدخل الكود":"تعذر التحقق من الكود")+(c?" ["+c+"]":"");
-    toast(msg,"err");
-    const oi=document.getElementById("otp-input");oi.value="";oi.focus();
-  }finally{
-    otpBusy=false;btn.disabled=false;btn.textContent="تأكيد ودخول ✓";
+    if(c==="auth/popup-blocked"||c==="auth/operation-not-supported-in-this-environment"){
+      try{await signInWithRedirect(auth,provider);return}catch(e2){console.error(e2)}
+    }
+    if(c==="auth/popup-closed-by-user"||c==="auth/cancelled-popup-request")return;
+    const map={
+      "auth/operation-not-allowed":"فعّل Google في Authentication ثم Sign-in method",
+      "auth/unauthorized-domain":"النطاق غير مضاف في Authorized domains",
+      "auth/network-request-failed":"مشكلة في الاتصال بالإنترنت"
+    };
+    toast((map[c]||"تعذر الدخول بحساب Google")+(c?" ["+c+"]":""),"err");
   }
+};
+function showProfileModal(user,ud){
+  document.getElementById("view-auth").classList.add("hidden");
+  document.getElementById("pf-name").value=(ud&&ud.name)||user.displayName||"";
+  document.getElementById("pf-phone").value=(ud&&ud.phone)?normalizePhone(ud.phone):"";
+  document.getElementById("m-profile").classList.add("on");
+}
+window.saveProfile=async function(){
+  const user=auth.currentUser;
+  if(!user)return toast("سجّل الدخول أولًا","err");
+  const name=(document.getElementById("pf-name").value||"").trim();
+  const phone=normalizePhone(document.getElementById("pf-phone").value||"");
+  if(name.length<3)return toast("أدخل الاسم بالكامل","err");
+  if(!isValidEgPhone(phone))return toast("رقم الموبايل يجب أن يكون 11 رقم ويبدأ بـ 01","err");
+  const btn=document.getElementById("pf-save");btn.disabled=true;
+  try{
+    const ref=doc(db,"users",user.uid);
+    const snap=await getDoc(ref);
+    const data={name,phone,email:user.email||"",updatedAt:new Date().toISOString()};
+    if(!snap.exists()){data.createdAt=new Date().toISOString();data.role="customer"}
+    await setDoc(ref,data,{merge:true});
+    try{await updateProfile(user,{displayName:name})}catch(e){}
+    currentUser=user;
+    document.getElementById("m-profile").classList.remove("on");
+    enterAppAsCustomer();
+    toast("تم حفظ بياناتك — أهلاً بك","ok");
+  }catch(e){
+    console.error(e);
+    toast("تعذر حفظ البيانات، حاول مرة أخرى","err");
+  }finally{btn.disabled=false}
 };
 
 window.logoutCustomer=async function(){
@@ -1085,7 +1026,7 @@ function updateUserChip(){
   if(!wrap||!btn)return;
   if(currentUser){
     wrap.classList.remove("hidden");
-    wrap.innerHTML=`<span class="user-chip">👤 ${currentUser.displayName||currentUser.phoneNumber||currentUser.email||"حسابي"}</span>
+    wrap.innerHTML=`<span class="user-chip">👤 ${currentUser.displayName||currentUser.email||"حسابي"}</span>
       <button class="btn btn-ghost btn-sm" type="button" onclick="logoutCustomer()">خروج</button>`;
     btn.classList.add("hidden");
   }else{
@@ -1109,8 +1050,7 @@ window.loadMyBookings=async function(){
     const ab=document.getElementById("account-bar");
     if(ab){
       const who=currentUser.displayName||"حسابي";
-      const ph=currentUser.phoneNumber?("0"+currentUser.phoneNumber.replace(/^\+20/,"")):(currentUser.email||"");
-      ab.innerHTML=`<div class="panel" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px"><div><b>👤 ${who}</b><div class="card-meta" style="direction:ltr;text-align:right">${ph}</div></div><button class="btn btn-ghost btn-sm" type="button" style="color:#dc2626" onclick="logoutCustomer()">🚪 تسجيل الخروج / تغيير الحساب</button></div>`;
+      ab.innerHTML=`<div class="panel" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px"><div><b>👤 ${who}</b><div class="card-meta">${currentUser.email||""}</div></div><button class="btn btn-ghost btn-sm" type="button" style="color:#dc2626" onclick="logoutCustomer()">🚪 تسجيل الخروج / تغيير الحساب</button></div>`;
     }
   }else{
     if(userPanel)userPanel.classList.add("hidden");
@@ -2543,29 +2483,24 @@ function init(){
       isGuest=false;
       try{
         const us=await getDoc(doc(db,"users",user.uid));
-        if(us.exists()){
-          const userData = us.data();
-          if(userData.role === "admin" || userData.role === "superadmin"){
-            document.getElementById("view-auth").classList.add("hidden");
-            document.getElementById("view-customer").classList.add("hidden");
-            document.getElementById("view-driver").classList.add("hidden");
-            document.getElementById("view-admin").classList.remove("hidden");
-            showAppChrome(false);
-            adminTab("dash");
-            toast("مرحباً بك في لوحة الأدمن","ok");
-          } else {
-            enterAppAsCustomer();
-          }
+        const ud=us.exists()?us.data():null;
+        if(ud&&(ud.role==="admin"||ud.role==="superadmin")){
+          document.getElementById("view-auth").classList.add("hidden");
+          document.getElementById("view-customer").classList.add("hidden");
+          document.getElementById("view-driver").classList.add("hidden");
+          document.getElementById("view-admin").classList.remove("hidden");
+          showAppChrome(false);
+          adminTab("dash");
+          toast("مرحباً بك في لوحة الأدمن","ok");
+        }else if(registering){
+          enterAppAsCustomer();
+        }else if(!ud||!isValidEgPhone(ud.phone)||!String(ud.name||"").trim()){
+          showProfileModal(user,ud);
         }else{
-          await setDoc(doc(db,"users",user.uid),{
-            name:user.displayName||pendingName||"",email:user.email||"",
-            phone:user.phoneNumber?normalizePhone(user.phoneNumber):"",
-            createdAt:new Date().toISOString(),role:"customer"
-          },{merge:true});
           enterAppAsCustomer();
         }
       }catch(e){
-         enterAppAsCustomer();
+        enterAppAsCustomer();
       }
     }else if(!isGuest){
       // stay on auth unless guest chose guest
