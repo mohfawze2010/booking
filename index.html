@@ -288,31 +288,18 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
     </div>
     <h1 id="auth-app-name">سفريات الأمان</h1>
     <p class="sub" id="auth-welcome">أهلاً بك، يرجى تسجيل الدخول بحسابك المعتمد.</p>
-    <div class="auth-tabs">
-      <button type="button" class="on" id="tab-login" onclick="setAuthTab('login')">تسجيل الدخول</button>
-      <button type="button" id="tab-register" onclick="setAuthTab('register')">إنشاء حساب</button>
-    </div>
+    <button type="button" class="btn-google" onclick="googleLogin()" style="padding:15px;font-size:1.02rem;margin-top:6px;margin-bottom:10px"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>المتابعة بحساب Google</button>
+    <p style="font-size:.78rem;color:#94a3b8;text-align:center;margin:0 0 14px;line-height:1.6">اختر حسابك من القائمة — بدون كلمة مرور، وإنشاء الحساب يتم تلقائيًا في أول مرة.</p>
+    <button type="button" class="btn-guest" onclick="enterAsGuest()">👤 المتابعة كضيف</button>
+    <p style="font-size:.74rem;color:#94a3b8;text-align:center;margin:0 0 6px">كضيف: احجز وتابع حجزك بالكود فقط، بدون حساب.</p>
+    <div id="auth-admin-area" class="hidden" style="margin-top:14px;padding-top:12px;border-top:1px dashed #e2e8f0">
     <div id="auth-form-login">
       <div class="fg"><label>البريد</label><input id="auth-email" type="email" placeholder="البريد الإلكتروني" autocomplete="email"></div>
-      <div class="fg" style="margin-bottom:4px"><label>كلمة المرور</label><input id="auth-pass" type="password" placeholder="كلمة المرور" autocomplete="current-password"></div>
+      <div class="fg" style="margin-bottom:4px"><label>كلمة المرور</label><input id="auth-pass" type="password" placeholder="كلمة المرور" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <button type="button" class="btn-login-main" onclick="doLogin()">تسجيل الدخول</button>
       <button type="button" class="link-forgot" onclick="forgotPassword()">نسيت كلمة المرور؟</button>
-      <div class="or-sep">أو</div>
-      <button type="button" class="btn-google" onclick="googleLogin()"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>الدخول بحساب Google</button>
-      <button type="button" class="btn-guest" onclick="enterAsGuest()">👤 الدخول كضيف</button>
-      <button type="button" class="link-forgot" onclick="document.getElementById('m-staff-login').classList.add('on')" style="margin-top:12px; display:block; width:100%; text-align:center; color:#475569;">👨‍✈️ تسجيل دخول السائقين (بوابة الكباتن)</button>
     </div>
-    <div id="auth-form-register" class="hidden">
-      <div class="fg"><label>الاسم</label><input id="reg-name" type="text" placeholder="الاسم الكامل *"></div>
-      <div class="fg"><label>موبايل</label><input id="reg-phone" type="tel" inputmode="numeric" maxlength="11" placeholder="رقم الموبايل (11 رقم) 01xxxxxxxxx" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></div>
-      <div class="fg"><label>بريد</label><input id="reg-email" type="email" placeholder="البريد الإلكتروني *"></div>
-      <div class="fg"><label>مرور</label><input id="reg-pass" type="password" placeholder="كلمة المرور (6 أحرف على الأقل)"></div>
-      <div class="fg"><label>تأكيد</label><input id="reg-pass2" type="password" placeholder="تأكيد كلمة المرور"></div>
-      <button type="button" class="btn-login-main" onclick="doRegister()">إنشاء الحساب</button>
-      <div class="or-sep">أو</div>
-      <button type="button" class="btn-google" onclick="googleLogin()"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>إنشاء حساب بواسطة Google</button>
-      <button type="button" class="btn-guest" onclick="enterAsGuest()">👤 الدخول كضيف</button>
-      <button type="button" class="link-forgot" onclick="document.getElementById('m-staff-login').classList.add('on')" style="margin-top:12px; display:block; width:100%; text-align:center; color:#475569;">👨‍✈️ تسجيل دخول السائقين (بوابة الكباتن)</button>
+    <button type="button" class="link-forgot" onclick="document.getElementById('m-staff-login').classList.add('on')" style="margin-top:8px; display:block; width:100%; text-align:center; color:#475569;">👨‍✈️ تسجيل دخول السائقين (بوابة الكباتن)</button>
     </div>
     <div class="auth-footer">
       <div>اعداد وتنفيذ: <b>محمد فوزى</b></div>
@@ -947,12 +934,24 @@ function applyBranding(){
 }
 
 // ========== CUSTOMER AUTH ==========
-window.setAuthTab=function(tab){
-  document.getElementById("tab-login").classList.toggle("on",tab==="login");
-  document.getElementById("tab-register").classList.toggle("on",tab==="register");
-  document.getElementById("auth-form-login").classList.toggle("hidden",tab!=="login");
-  document.getElementById("auth-form-register").classList.toggle("hidden",tab!=="register");
-};
+// إظهار دخول الأدمن/السائقين بالضغط 3 مرات متتالية على الشعار أو اسم التطبيق
+(function(){
+  let taps=0,timer=null;
+  function onTap(){
+    taps++;clearTimeout(timer);
+    timer=setTimeout(()=>{taps=0},1200);
+    if(taps>=3){
+      taps=0;
+      const area=document.getElementById("auth-admin-area");
+      const open=area.classList.toggle("hidden")===false;
+      if(open)setTimeout(()=>{const e=document.getElementById("auth-email");if(e)e.focus()},50);
+    }
+  }
+  ["auth-logo-wrap","auth-app-name"].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.addEventListener("click",onTap);el.style.userSelect="none";el.style.webkitTapHighlightColor="transparent"}
+  });
+})();
 window.showAuthScreen=function(){
   document.getElementById("view-auth").classList.remove("hidden");
   document.getElementById("view-customer").classList.add("hidden");
