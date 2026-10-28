@@ -279,62 +279,22 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 #pwa-help .steps li{counter-increment:s;position:relative;padding:10px 44px 10px 6px;font-size:.9rem;line-height:1.7;color:#334155;border-bottom:1px solid #f1f5f9}
 #pwa-help .steps li::before{content:counter(s);position:absolute;right:6px;top:10px;width:28px;height:28px;border-radius:50%;background:#5b6e22;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.85rem}
 .install-link{display:block;width:100%;text-align:center;background:none;border:none;font-family:inherit;color:#5b6e22;font-weight:700;font-size:.85rem;margin-top:10px;cursor:pointer}
-/* ===== ADMIN UI ===== */
-#view-admin{background:#f5f7fb;min-height:100vh}
-#view-admin .main{background:#f5f7fb}
-.admin-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#0f172a;color:#fff;padding:12px 14px;position:sticky;top:0;z-index:60;flex-wrap:wrap}
-.admin-topbar .atb-right{display:flex;align-items:center;gap:10px}
-.admin-topbar .atb-left{display:flex;align-items:center;gap:8px;margin-right:auto}
-.admin-topbar .atb-menu{width:40px;height:40px;border-radius:12px;border:none;background:#1e293b;color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.15rem}
-.admin-topbar .atb-shield{width:40px;height:40px;border-radius:12px;background:#6366f1;display:flex;align-items:center;justify-content:center;font-size:1.15rem}
-.admin-topbar .atb-title strong{display:block;line-height:1.2;font-size:.95rem}
-.admin-topbar .atb-title small{opacity:.65;font-size:.72rem}
-.admin-topbar .atb-pill{background:#1e293b;color:#e2e8f0;border:none;border-radius:999px;padding:8px 14px;font-family:inherit;font-weight:600;font-size:.82rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
-.admin-topbar .atb-exit{width:40px;height:40px;border-radius:50%;border:none;background:#ef4444;color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;font-weight:700}
-#view-admin .back-btn{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;border:none;background:#ef4444;color:#fff;font-size:1.1rem;cursor:pointer;margin-bottom:14px;padding:0}
-.back-row{display:flex;justify-content:flex-end;width:100%}
-#view-admin .stats{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px;margin-bottom:18px}
-@media(min-width:900px){#view-admin .stats{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
-#view-admin .stat{background:#fff;border-radius:18px;padding:16px 14px;border:1.5px solid #e8ecf4;box-shadow:0 2px 10px rgba(15,23,42,.04);cursor:pointer}
-#view-admin .stat.s-all{border-color:#e2e8f0;background:linear-gradient(180deg,#fff,#f8fafc)}
-#view-admin .stat.s-ok{border-color:#a7f3d0;background:linear-gradient(180deg,#fff,#ecfdf5)}
-#view-admin .stat.s-ok .n,#view-admin .stat.s-ok .t{color:#047857}
-#view-admin .stat.s-wait{border-color:#fdba74;background:linear-gradient(180deg,#fff,#fff7ed)}
-#view-admin .stat.s-wait .n,#view-admin .stat.s-wait .t{color:#c2410c}
-#view-admin .stat.s-new{border-color:#fde68a;background:linear-gradient(180deg,#fff,#fffbeb)}
-#view-admin .stat.s-new .n,#view-admin .stat.s-new .t{color:#b45309}
-/* تبويبات — الأيقونة يمين النص في RTL */
-.admin-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;justify-content:flex-start}
-.admin-tab{border:1.5px solid #e2e8f0;background:#fff;color:#475569;border-radius:999px;padding:9px 16px;font-family:inherit;font-weight:700;font-size:.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:8px;flex-direction:row}
-.admin-tab .tab-ic{order:-1;font-size:1rem}
-.admin-tab.active{background:#0f172a;color:#fff;border-color:#0f172a}
-.filt-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:flex-start;margin-top:14px;padding:12px;background:#fff;border-radius:16px;border:1.5px solid #e8ecf4}
-.filt-btn{border:1px solid #e2e8f0!important;background:#f8fafc!important;color:#64748b!important;border-radius:999px!important;padding:7px 14px!important;font-weight:700!important;font-size:.8rem!important}
-.filt-btn.active{background:#6366f1!important;color:#fff!important;border-color:#6366f1!important}
-#admin-bookings-list,#admin-trips-list,#admin-drivers-list,#admin-cars-list{display:flex;flex-direction:column;gap:12px;align-items:stretch}
-/* كرت الحجز بدون أزرار داخله */
-.admin-trip-wrap{display:flex;flex-direction:column;gap:0}
-.admin-trip{margin-bottom:0;background:#fff;border:1.5px solid #e8ecf4;border-radius:18px 18px 0 0;box-shadow:0 2px 12px rgba(15,23,42,.04);padding:16px 18px;position:relative}
-.admin-trip.bk{border-right:4px solid #f59e0b}
-.admin-trip.bk-confirmed{border-right-color:#10b981}
-.admin-trip.bk-cancelled{border-right-color:#ef4444}
-.admin-trip.bk-payment,.admin-trip.bk-payment_pending{border-right-color:#f97316}
-/* أزرار الحالة خارج الكرت من الأسفل */
-.bk-actions-out{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px 12px;background:#f8fafc;border:1.5px solid #e8ecf4;border-top:none;border-radius:0 0 18px 18px;margin-bottom:4px}
-.bk-actions-out .btn-indigo{background:#6366f1;color:#fff;border-radius:14px;flex:1;justify-content:center;padding:12px;min-width:160px}
-#view-admin .btn-indigo{background:#6366f1;color:#fff}
-#view-admin .side-link.active{background:#6366f1!important}
-/* إخفاء الهيرو — الإبقاء على الهيدر فقط */
-.top-shell .hero{display:none!important}
-.top-shell{padding-bottom:4px}
+/* ===== admin cards: 2x2 grid, framed ===== */
+#admin-bookings-list,#admin-trips-list,#admin-drivers-list,#admin-cars-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+#admin-bookings-list>div:not(.admin-trip),#admin-trips-list>div:not(.admin-trip),#admin-drivers-list>div:not(.admin-trip),#admin-cars-list>div:not(.admin-trip){grid-column:1/-1}
+.admin-trip{margin-bottom:0;border:1.5px solid #cbd5e1;border-radius:18px;box-shadow:0 3px 12px rgba(15,23,42,.07);background:#fff;position:relative;overflow:hidden}
+.admin-trip.bk{border-top:5px solid #f59e0b}
+.admin-trip.bk-confirmed{border-top-color:#10b981}
+.admin-trip.bk-cancelled{border-top-color:#ef4444}
+.admin-trip.bk-payment,.admin-trip.bk-payment_pending{border-top-color:#f97316}
+#at-dash .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:560px){#admin-bookings-list,#admin-trips-list,#admin-drivers-list,#admin-cars-list{grid-template-columns:1fr}}
 /* ===== header user + trip card ===== */
 .hdr-user{display:flex;align-items:center;gap:8px}
 .user-chip{border:none;font-family:inherit;cursor:pointer;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .th-main{flex:1;min-width:0}
 .th-side{display:flex;align-items:center;gap:16px}
 .trip-title .chev{font-size:.8rem}
-#btn-logout-header{display:none}
-#btn-logout-header.show{display:inline-flex}
 </style>
 </head>
 <body>
@@ -454,12 +414,15 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 </div>
 </div>
 <div class="hdr-user"><span id="user-chip-wrap" class="hidden"></span>
-<button class="btn btn-ghost btn-sm" type="button" id="btn-auth-header" onclick="showAuthScreen()">دخول</button>
-<button class="btn btn-ghost btn-sm" type="button" id="btn-logout-header" onclick="logoutCustomer()">خروج</button>
-</div>
+<button class="btn btn-ghost btn-sm" type="button" id="btn-auth-header" onclick="showAuthScreen()">دخول</button></div>
 </header>
-<!-- الهيرو مخفي — الإبقاء على الهيدر العلوي فقط -->
-<section class="hero" id="hero" hidden aria-hidden="true"></section>
+<section class="hero" id="hero">
+<h1>احجز مقعدك في أحدث أسطول سيارات برحلات يومية بين المحافظات والمطارات</h1>
+<div class="hero-actions">
+<button class="hero-card" type="button" onclick="openPrivate()"><span class="hc-ic">🚗</span><span class="hc-t"><b>حجز سيارة خاصة</b><small>سيارة لك وحدك للمشوار كامل</small></span><span class="hc-go">‹</span></button>
+<button class="hero-card" type="button" onclick="showCust('track')"><span class="hc-ic">🔍</span><span class="hc-t"><b class="track-lbl">متابعة حجز</b><small class="track-sub">ابحث برقم الحجز</small></span><span class="hc-go">‹</span></button>
+</div>
+</section>
 </div>
 <div class="wrap">
 <div id="cust-trips">
@@ -562,15 +525,22 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 <a class="wa-float" id="wa-float" href="#" target="_blank" title="واتساب الدعم" aria-label="واتساب الدعم">💬</a>
 
 <div id="view-admin" class="hidden">
-<div class="admin-topbar">
-  <div class="atb-right">
-    <button type="button" class="atb-menu" onclick="toggleSidebar()" aria-label="القائمة">☰</button>
-    <div class="atb-shield">🛡️</div>
-    <div class="atb-title"><strong>لوحة الأدمن</strong><small>إدارة الحجوزات والأسطول</small></div>
+<div class="mobile-bar" style="background:#0f172a;justify-content:space-between;gap:10px;flex-wrap:wrap">
+  <!-- في RTL العنصر الأول يظهر يميناً -->
+  <button type="button" class="hamburger" onclick="toggleSidebar()" aria-label="القائمة" style="width:42px;height:42px;justify-content:center;border-radius:10px;order:0">
+    <div><span></span><span></span><span></span></div>
+  </button>
+  <div style="display:flex;align-items:center;gap:10px;order:1">
+    <div style="width:36px;height:36px;background:#5b6e22;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem">🛡️</div>
+    <div>
+      <strong style="display:block;line-height:1.2">لوحة الأدمن</strong>
+      <small style="opacity:.7;font-size:.72rem">إدارة الحجوزات والأسطول</small>
+    </div>
   </div>
-  <div class="atb-left">
-    <button type="button" class="atb-pill" onclick="logoutAdmin();showCust('trips')">↗ موقع الركاب</button>
-    <button type="button" class="atb-exit" onclick="logoutAdmin()" title="خروج" aria-label="خروج">→</button>
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;order:2;margin-right:auto">
+    <button type="button" class="btn btn-sm" style="background:#1e293b;color:#e2e8f0;border-radius:10px" onclick="logoutAdmin()">↗ موقع الركاب</button>
+    <button type="button" class="btn btn-sm" style="background:#1e293b;color:#e2e8f0;border-radius:10px" onclick="exportBackup()">↓ نسخ احتياطي</button>
+    <button type="button" class="btn btn-sm" style="background:#dc2626;color:#fff;border-radius:10px;width:38px;height:38px;padding:0;justify-content:center" onclick="logoutAdmin()" title="خروج">→</button>
   </div>
 </div>
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar(false)"></div>
@@ -596,50 +566,52 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
   <div class="stat s-wait" onclick="setBkFilter('payment');adminTab('bookings')"><div class="icon">⏳</div><div class="n" id="s-pending">0</div><div class="t">بانتظار العربون</div><div class="d">في انتظار تأكيد الراكب</div></div>
   <div class="stat s-new" onclick="setBkFilter('pending');adminTab('bookings')"><div class="icon">✦</div><div class="n" id="s-new">0</div><div class="t">طلبات جديدة</div><div class="d">قيد المراجعة والتسعير</div></div>
 </div>
-<div class="admin-tabs">
-  <button type="button" class="admin-tab active" onclick="adminTab('bookings')"><span>الحجوزات والطلبات</span><span class="tab-ic">▦</span></button>
-  <button type="button" class="admin-tab" onclick="adminTab('trips')"><span>الرحلات والخطوط</span><span class="tab-ic">🚌</span></button>
+<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+  <button type="button" class="btn btn-indigo" onclick="adminTab('bookings')">الحجوزات والطلبات</button>
+  <button type="button" class="btn btn-ghost" onclick="adminTab('trips')">الرحلات والخطوط</button>
 </div>
 <div class="panel"><h3>آخر الحجوزات</h3><div id="dash-recent"></div></div>
 </div>
 <div id="at-bookings" class="hidden">
-<div class="back-row"><button type="button" class="back-btn" onclick="adminTab('dash')" title="رجوع">→</button></div>
-<div class="admin-tabs">
-  <button type="button" class="admin-tab active" id="tab-bookings-btn" onclick="adminTab('bookings')"><span>الحجوزات والطلبات</span><span class="tab-ic">▦</span></button>
-  <button type="button" class="admin-tab" onclick="adminTab('trips')"><span>الرحلات والخطوط</span><span class="tab-ic">🚌</span></button>
-  <button class="btn btn-indigo btn-sm" type="button" onclick="openManualBooking()" style="margin-right:auto;border-radius:999px">+ حجز يدوي</button>
+<button type="button" class="btn btn-ghost btn-sm back-btn" onclick="adminTab('dash')">→ رجوع للرئيسية</button>
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button type="button" class="btn btn-indigo btn-sm" id="tab-bookings-btn" onclick="adminTab('bookings')">الحجوزات والطلبات</button>
+    <button type="button" class="btn btn-ghost btn-sm" onclick="adminTab('trips')">الرحلات والخطوط</button>
+  </div>
+  <button class="btn btn-indigo btn-sm" type="button" onclick="openManualBooking()">+ حجز يدوي</button>
 </div>
-<input class="search" id="bk-search" placeholder="بحث بالاسم أو الهاتف أو الكود..." oninput="filterAdminBookings()" style="margin-bottom:12px">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+  <input class="search" id="bk-search" placeholder="بحث بالاسم أو الهاتف أو الكود..." oninput="filterAdminBookings()" style="margin:0;max-width:320px;flex:1">
+  <div style="display:flex;gap:6px;flex-wrap:wrap" id="bk-filters">
+    <button type="button" class="btn btn-indigo btn-sm filt-btn" data-f="all" onclick="setBkFilter('all')">الكل</button>
+    <button type="button" class="btn btn-ghost btn-sm filt-btn" data-f="pending" onclick="setBkFilter('pending')">جديدة</button>
+    <button type="button" class="btn btn-ghost btn-sm filt-btn" data-f="payment" onclick="setBkFilter('payment')">عربون</button>
+    <button type="button" class="btn btn-ghost btn-sm filt-btn" data-f="confirmed" onclick="setBkFilter('confirmed')">مؤكدة</button>
+    <button type="button" class="btn btn-ghost btn-sm filt-btn" data-f="cancelled" onclick="setBkFilter('cancelled')">ملغية</button>
+  </div>
+</div>
 <div id="admin-bookings-list"></div>
-<!-- الاختصارات أسفل الكروت من الخارج -->
-<div class="filt-row" id="bk-filters">
-  <button type="button" class="btn btn-sm filt-btn active" data-f="all" onclick="setBkFilter('all')">الكل</button>
-  <button type="button" class="btn btn-sm filt-btn" data-f="pending" onclick="setBkFilter('pending')">جديدة</button>
-  <button type="button" class="btn btn-sm filt-btn" data-f="payment" onclick="setBkFilter('payment')">عربون</button>
-  <button type="button" class="btn btn-sm filt-btn" data-f="confirmed" onclick="setBkFilter('confirmed')">مؤكدة</button>
-  <button type="button" class="btn btn-sm filt-btn" data-f="cancelled" onclick="setBkFilter('cancelled')">ملغية</button>
-</div>
 </div>
 <div id="at-trips" class="hidden">
-<div class="back-row"><button type="button" class="back-btn" onclick="adminTab('dash')" title="رجوع">→</button></div>
-<div class="admin-tabs">
-  <button type="button" class="admin-tab" onclick="adminTab('bookings')"><span>الحجوزات والطلبات</span><span class="tab-ic">▦</span></button>
-  <button type="button" class="admin-tab active" onclick="adminTab('trips')"><span>الرحلات والخطوط</span><span class="tab-ic">🚌</span></button>
-  <button class="btn btn-indigo btn-sm" type="button" onclick="openTripForm()" style="margin-right:auto;border-radius:999px">+ إضافة رحلة</button>
+<button type="button" class="btn btn-ghost btn-sm back-btn" onclick="adminTab('dash')">→ رجوع للرئيسية</button>
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button type="button" class="btn btn-ghost btn-sm" onclick="adminTab('bookings')">الحجوزات والطلبات</button>
+    <button type="button" class="btn btn-indigo btn-sm" onclick="adminTab('trips')">الرحلات والخطوط</button>
+  </div>
+  <button class="btn btn-indigo btn-sm" type="button" onclick="openTripForm()">+ إضافة رحلة</button>
 </div>
 <div id="admin-trips-list"></div>
 </div>
 <div id="at-drivers" class="hidden">
-<div class="back-row"><button type="button" class="back-btn" onclick="adminTab('dash')" title="رجوع">→</button></div>
-<h1>السائقين</h1><p class="sub">إدارة فريق السائقين</p>
+<button type="button" class="btn btn-ghost btn-sm back-btn" onclick="adminTab('dash')">→ رجوع للرئيسية</button><h1>السائقين</h1><p class="sub">إدارة فريق السائقين</p>
 <div class="panel"><h3>السائقين <button class="btn btn-indigo btn-sm" type="button" onclick="openDriverForm()">+ إضافة سائق</button></h3><div id="admin-drivers-list"></div></div></div>
 <div id="at-cars" class="hidden">
-<div class="back-row"><button type="button" class="back-btn" onclick="adminTab('dash')" title="رجوع">→</button></div>
-<h1>الأسطول</h1><p class="sub">سيارات الشركة</p>
+<button type="button" class="btn btn-ghost btn-sm back-btn" onclick="adminTab('dash')">→ رجوع للرئيسية</button><h1>الأسطول</h1><p class="sub">سيارات الشركة</p>
 <div class="panel"><h3>السيارات <button class="btn btn-indigo btn-sm" type="button" onclick="openCarForm()">+ إضافة سيارة</button></h3><div id="admin-cars-list"></div></div></div>
 <div id="at-settings" class="hidden">
-<div class="back-row"><button type="button" class="back-btn" onclick="adminTab('dash')" title="رجوع">→</button></div>
-<h1>الإعدادات</h1><p class="sub">بيانات الشركة</p>
+<button type="button" class="btn btn-ghost btn-sm back-btn" onclick="adminTab('dash')">→ رجوع للرئيسية</button><h1>الإعدادات</h1><p class="sub">بيانات الشركة</p>
 <div class="panel">
 <div class="fg"><label>اسم التطبيق / الشركة</label><input id="set-name" value="سفريات الأمان للركوب والنقل"></div>
 <div class="fg"><label>رسالة الترحيب</label><textarea id="set-welcome" rows="2">احجز مقعدك في أحدث أسطول سيارات برحلات يومية بين المحافظات والمطارات</textarea></div>
@@ -656,7 +628,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 <hr style="margin:18px 0;border:none;border-top:1px solid #e2e8f0">
 <h3 style="margin-bottom:10px">الصيانة والنسخ الاحتياطي</h3>
 <div style="display:flex;flex-wrap:wrap;gap:8px">
-  <button class="btn btn-indigo" type="button" onclick="exportBackup()">💾 تنزيل نسخة احتياطية</button>
+  <button class="btn btn-ghost" type="button" onclick="exportBackup()">↓ تنزيل نسخة احتياطية</button>
   <label class="btn btn-ghost" style="cursor:pointer">↑ استعادة نسخة
     <input type="file" accept="application/json,.json" style="display:none" onchange="importBackup(this)">
   </label>
@@ -985,6 +957,29 @@ function isValidEgPhone(p) {
     const s = normalizePhone(p);
     return /^01[0125][0-9]{8}$/.test(s);
 }
+/** رقم واتساب دولي لمصر: 20 + الرقم بدون الصفر (مثال: 01112221764 → 201112221764) */
+function toWaNumber(p) {
+    let s = normalizePhone(p).replace(/\D/g, "");
+    if (!s)
+        return "";
+    if (s.startsWith("20") && s.length >= 12)
+        return s;
+    if (s.startsWith("0"))
+        return "20" + s.slice(1);
+    return "20" + s;
+}
+/** رابط واتساب صحيح — كان الخطأ: wa.me/2 بدل wa.me/20 */
+function waHref(phone, text) {
+    const n = toWaNumber(phone);
+    if (!n)
+        return "#";
+    let url = "https://wa.me/" + n;
+    if (text)
+        url += "?text=" + encodeURIComponent(text);
+    return url;
+}
+window.toWaNumber = toWaNumber;
+window.waHref = waHref;
 function getReceiptUrl(b) {
     if (!b)
         return "";
@@ -1419,7 +1414,6 @@ function applyAccountUI() {
 function updateUserChip() {
     const wrap = document.getElementById("user-chip-wrap");
     const btn = document.getElementById("btn-auth-header");
-    const out = document.getElementById("btn-logout-header");
     if (!wrap || !btn)
         return;
     if (currentUser) {
@@ -1433,14 +1427,12 @@ function updateUserChip() {
         b.addEventListener("click", function () { openEditProfile(); });
         wrap.appendChild(b);
         btn.classList.add("hidden");
-        if (out) { out.classList.add("show"); out.textContent = "خروج"; }
     }
     else {
         wrap.classList.add("hidden");
         wrap.textContent = "";
         btn.classList.remove("hidden");
         btn.textContent = isGuest ? "ضيف — دخول" : "دخول";
-        if (out) out.classList.remove("show");
     }
     applyAccountUI();
 }
@@ -1760,8 +1752,8 @@ window.shareWhatsApp = function () {
     if (!lastBooking)
         return;
     const b = lastBooking;
-    const txt = `تم تسجيل حجزك بنجاح ✅%0Aكود الحجز: ${b.code}%0Aالاسم: ${b.name}%0Aالمقاعد: ${b.seats || 1}%0Aالإجمالي: ${b.price || 0} ج.م%0Aالعربون: ${b.deposit || 0} ج.م%0A${b.tripName ? "الرحلة: " + b.tripName : ""}`;
-    window.open("https://wa.me/?text=" + txt, "_blank");
+    const txt = `تم تسجيل حجزك بنجاح ✅\nكود الحجز: ${b.code}\nالاسم: ${b.name}\nالمقاعد: ${b.seats || 1}\nالإجمالي: ${b.price || 0} ج.م\nالعربون: ${b.deposit || 0} ج.م\n${b.tripName ? "الرحلة: " + b.tripName : ""}`;
+    window.open("https://wa.me/?text=" + encodeURIComponent(txt), "_blank");
 };
 // ========== PRIVATE ==========
 let pvTripType = "oneway", pvDriver = "with";
@@ -2022,7 +2014,7 @@ function renderTrackCard(b, docId) {
     ${payBlock}
     ${isOk ? `<div style="background:#ecfdf5;border-radius:12px;padding:12px;margin-bottom:12px;color:#047857">
       <div style="font-weight:800;margin-bottom:8px">✓ حجزك مؤكد</div>
-      ${b.driver ? `<div style="margin-bottom:6px">السائق: <b>${b.driver}</b>${b.driverPhone ? ` — <a href="tel:${b.driverPhone}">${b.driverPhone}</a> · <a href="https://wa.me/2${String(b.driverPhone).replace(/^0/, "")}" target="_blank">واتساب</a>` : ""}</div>` : `<div style="color:#64748b;margin-bottom:6px">السائق سيُحدد قريباً</div>`}
+      ${b.driver ? `<div style="margin-bottom:6px">السائق: <b>${b.driver}</b>${b.driverPhone ? ` — <a href="tel:${b.driverPhone}">${b.driverPhone}</a> · <a href="${waHref(b.driverPhone)}" target="_blank" rel="noopener">واتساب</a>` : ""}</div>` : `<div style="color:#64748b;margin-bottom:6px">السائق سيُحدد قريباً</div>`}
       ${(b.carModel || b.car) ? `<div>السيارة: <b>${b.carCategory || ""} ${b.carModel || b.car || ""}</b></div>` : ""}
       ${b.carImage ? `<img src="${b.carImage}" alt="سيارة" style="margin-top:8px;max-width:100%;max-height:140px;border-radius:12px;object-fit:cover">` : ""}
     </div>` : ""}
@@ -2044,7 +2036,7 @@ function renderTrackCard(b, docId) {
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       ${!isCancel && !isOk ? `<button type="button" class="btn btn-ghost" style="flex:1;justify-content:center;color:#dc2626;border:1px solid #fecaca" onclick="cancelMyBooking('${docId}')">✕ إلغاء هذا الطلب</button>` : ""}
-      <a class="btn btn-ghost" style="flex:1;justify-content:center" href="https://wa.me/2${(pay.phone || "").replace(/^0/, "")}?text=${encodeURIComponent("استفسار عن الحجز " + b.code)}" target="_blank">💬 دعم الإدارة</a>
+      <a class="btn btn-ghost" style="flex:1;justify-content:center" href="${waHref(pay.phone || "", "استفسار عن الحجز " + b.code)}" target="_blank" rel="noopener">💬 دعم الإدارة</a>
       <button type="button" class="btn btn-ghost" style="flex:1;justify-content:center" onclick="shareBookingWA('${b.code}','${b.name || ""}')">↗ مشاركة الكود عبر واتساب</button>
     </div>
   </div>`;
@@ -2189,8 +2181,11 @@ function updateWaFloat() {
     a.classList.add("is-visible");
     a.style.display = "";
     const contact = (window.APP_SETTINGS || {}).contact_name || "أ/ محمد فوزى";
-    a.href = "https://wa.me/2" + phone.replace(/^0/, "") + "?text=" + encodeURIComponent("مرحباً أ/ محمد فوزى، أحتاج مساعدة بخصوص الحجز");
+    const contactMsg = "مرحباً " + contact + "، أحتاج مساعدة بخصوص الحجز";
+    a.href = waHref(phone, contactMsg);
     a.title = "واتساب " + contact;
+    a.target = "_blank";
+    a.rel = "noopener";
 }
 function normalizeBookingCode(raw) {
     let c = String(raw || "").trim().toUpperCase().replace(/\s+/g, "");
@@ -2374,13 +2369,13 @@ window.setBkFilter = function (f) {
     bkFilter = f;
     document.querySelectorAll(".filt-btn").forEach(b => {
         const on = b.dataset.f === f;
-        b.className = "btn btn-sm filt-btn" + (on ? " active" : "");
+        b.className = "btn btn-sm filt-btn " + (on ? "btn-indigo" : "btn-ghost");
     });
     renderFilteredBookings();
 };
 window.filterAdminBookings = function () { renderFilteredBookings(); };
 function statusLabel(st) {
-    return st === "confirmed" ? "مؤكدة" : st === "cancelled" ? "ملغية" : st === "payment" || st === "payment_pending" ? "في انتظار التأكيد وإرسال العربون" : "طلب جديد";
+    return st === "confirmed" ? "مؤكدة" : st === "cancelled" ? "ملغية" : st === "payment" || st === "payment_pending" ? "عربون" : "طلب جديد";
 }
 function statusClass(st) {
     return st === "confirmed" ? "st-confirmed" : st === "cancelled" ? "st-cancelled" : st === "payment" || st === "payment_pending" ? "st-pending" : "st-pending";
@@ -2408,35 +2403,31 @@ function renderFilteredBookings() {
     }
     box.innerHTML = list.map(b => {
         const isPriv = b.type === "private";
-        const st = b.status || "pending";
-        const badgeCls = st === "confirmed" ? "badge-open" : st === "cancelled" ? "badge-closed" : "badge-active";
-        return `<div class="admin-trip-wrap">
-      <div class="admin-trip bk bk-${st}">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:10px">
-          <div style="text-align:right;flex:1;min-width:160px">
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
-              <b style="font-size:.95rem;color:#6366f1">${b.code || ""}</b>
-              <span class="badge-pill ${badgeCls}">${statusLabel(st)}</span>
-            </div>
-            <div style="font-weight:800;font-size:1.08rem">${b.name || "-"}</div>
-            <div class="card-meta">${b.phone || ""}</div>
+        return `<div class="admin-trip bk bk-${b.status || "pending"}">
+      <div class="top-row">
+        <div style="text-align:left">
+          <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+            <span class="badge-pill ${b.status === "confirmed" ? "badge-open" : b.status === "cancelled" ? "badge-closed" : "badge-active"}">${statusLabel(b.status)}</span>
+            <b style="font-size:1rem;color:#5b6e22">${b.code}</b>
           </div>
-          <div style="text-align:left;color:#64748b;font-size:.82rem">
-            <div>${isPriv ? "سيارة خاصة" : ((b.seats || 1) + " فرد")}</div>
-            <div style="font-size:.75rem;margin-top:2px">${b.createdAt ? new Date(b.createdAt).toLocaleString("ar-EG") : ""}</div>
-          </div>
+          <div style="font-weight:800;font-size:1.05rem;margin-top:4px">${b.name}</div>
+          <div class="card-meta">${b.phone}</div>
         </div>
-        <div class="card-meta" style="padding:10px 12px;background:#f8fafc;border-radius:12px;border:1px solid #f1f5f9">
-          ${b.tripName || (b.from ? (b.from + " ↔ " + b.to) : "—")}
-          ${b.price ? " · " + b.price + " ج.م" : ""}${b.deposit ? " · عربون " + b.deposit + " ج" : ""}${b.driver ? " · سائق: " + b.driver : ""}
-          ${b.notes ? "<br>📝 " + b.notes : ""}
-          ${getReceiptUrl(b) ? `<div style="margin-top:8px"><a href="${getReceiptUrl(b)}" target="_blank"><img src="${getReceiptUrl(b)}" alt="إيصال" style="max-height:80px;border-radius:8px;border:1px solid #e2e8f0"></a></div>` : ""}
+        <div style="text-align:right">
+          <div class="card-meta">${isPriv ? "سيارة خاصة" : ((b.seats || 1) + " فرد")}</div>
+          <div class="card-meta" style="font-size:.75rem">${b.createdAt ? new Date(b.createdAt).toLocaleString("ar-EG") : ""}</div>
         </div>
       </div>
-      <div class="bk-actions-out">
-        <a class="icon-btn" href="https://wa.me/2${(b.phone || "").replace(/^0/, "")}" target="_blank" title="واتساب" style="border-radius:12px">↗</a>
-        ${st !== "cancelled" ? `<button type="button" class="btn-seat-rem" style="color:#dc2626;border-color:#fecaca;border-radius:12px" onclick="updStatus('${b.id}','cancelled')">✕ إلغاء</button>` : ""}
-        <button type="button" class="btn btn-indigo" onclick="openStatusDriver('${b.id}')">🔄 تحديث الحالة وتعيين السائق</button>
+      <div class="card-meta" style="margin-bottom:10px;text-align:left">
+        ${b.tripName || ""}${(b.tripName && b.from) ? " · " : ""}${b.from ? (b.from + " ← " + b.to) : ""}
+        ${b.price ? " · " + b.price + " ج.م" : ""}${b.deposit ? " · عربون " + b.deposit + " ج" : ""}${b.driver ? " · سائق: " + b.driver : ""}
+        ${b.notes ? "<br>📝 " + b.notes : ""}
+        ${getReceiptUrl(b) ? `<div style="margin-top:8px"><a href="${getReceiptUrl(b)}" target="_blank"><img src="${getReceiptUrl(b)}" alt="إيصال" style="max-height:80px;border-radius:8px;border:1px solid #e2e8f0"></a> <span style="color:#059669;font-size:.78rem">إيصال مرفوع</span></div>` : ""}
+      </div>
+      <div class="actions-bot" style="justify-content:stretch;gap:8px">
+        <a class="icon-btn" href="${waHref(b.phone || "")}" target="_blank" rel="noopener" title="واتساب">💬</a>
+        ${b.status !== "cancelled" ? `<button type="button" class="btn-seat-rem" style="color:#dc2626;border-color:#fecaca" onclick="updStatus('${b.id}','cancelled')">✕ إلغاء</button>` : ""}
+        <button type="button" class="btn btn-indigo" style="flex:1;justify-content:center;padding:10px" onclick="openStatusDriver('${b.id}')">🔄 تحديث الحالة وتعيين السائق</button>
       </div>
     </div>`;
     }).join("");
@@ -2519,8 +2510,8 @@ window.openStatusDriver = function (id) {
       <div style="font-size:.8rem;color:#64748b;margin-top:4px">اضغط الصورة لفتحها بحجم أكبر</div>
     </div>` : `<div class="fg" style="background:#f8fafc;padding:10px;border-radius:10px;font-size:.85rem;color:#64748b">لم يُرفع إيصال بعد</div>`}
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-      <a class="btn btn-green btn-sm" target="_blank" href="https://wa.me/2${(b.phone || "").replace(/^0/, "")}?text=${encodeURIComponent("مرحباً " + (b.name || "") + "، بخصوص حجزك " + b.code + (b.price ? ("\nالسعر الإجمالي: " + b.price + " ج.م") : "") + (b.deposit ? ("\nالعربون: " + b.deposit + " ج.م") : "") + "\nيرجى تأكيد الموافقة ورفع إيصال التحويل من شاشة متابعة الحجز.")}">💬 إرسال السعر/العربون واتساب</a>
-      <a class="btn btn-ghost btn-sm" target="_blank" href="https://wa.me/2${(b.phone || "").replace(/^0/, "")}?text=${encodeURIComponent("تم تأكيد حجزك " + b.code + " بنجاح ✅" + (b.driver ? ("\nالسائق: " + b.driver) : "") + (b.carModel || b.car ? ("\nالسيارة: " + (b.carModel || b.car)) : ""))}">✅ رسالة تأكيد</a>
+      <a class="btn btn-green btn-sm" target="_blank" rel="noopener" href="${waHref(b.phone || "", "مرحباً " + (b.name || "") + "، بخصوص حجزك " + b.code + (b.price ? ("\nالسعر الإجمالي: " + b.price + " ج.م") : "") + (b.deposit ? ("\nالعربون: " + b.deposit + " ج.م") : "") + "\nيرجى تأكيد الموافقة ورفع إيصال التحويل من شاشة متابعة الحجز.")}">💬 إرسال السعر/العربون واتساب</a>
+      <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="${waHref(b.phone || "", "تم تأكيد حجزك " + b.code + " بنجاح ✅" + (b.driver ? ("\nالسائق: " + b.driver) : "") + (b.carModel || b.car ? ("\nالسيارة: " + (b.carModel || b.car)) : ""))}">✅ رسالة تأكيد</a>
     </div>`;
     document.getElementById("form-save-btn").onclick = async () => {
         var _a, _b, _c;
@@ -2893,7 +2884,7 @@ function renderAdminDrivers() {
         </div>
         <div class="actions-bot" style="margin:0">
           ${d.phone ? `<a class="icon-btn" href="tel:${d.phone}" title="اتصال">📞</a>
-          <a class="icon-btn" href="https://wa.me/2${normalizePhone(d.phone).replace(/^0/, "")}" target="_blank" title="واتساب">💬</a>` : ""}
+          <a class="icon-btn" href="${waHref(d.phone)}" target="_blank" rel="noopener" title="واتساب">💬</a>` : ""}
           <button type="button" class="icon-btn danger" title="حذف" onclick="delDriver(${i})">🗑️</button>
           <button type="button" class="icon-btn edit" title="تعديل" onclick="editDriver(${i})">✏️</button>
         </div>
@@ -3162,7 +3153,7 @@ async function loadDriverTrips() {
         html += confirmed.map(p => `<div class="card" style="margin-bottom:8px"><div class="card-info"><div class="card-title">${p.name} <span class="status st-confirmed">مؤكد</span></div>
     <div class="card-meta">${p.phone} · مقاعد: ${p.seats || 1}${p.tripName ? " · " + p.tripName : ""}${p.notes ? " · 📝 " + p.notes : ""}</div></div>
     <div style="display:flex;gap:6px"><a class="btn btn-ghost btn-sm" href="tel:${p.phone}">📞</a>
-    <a class="btn btn-ghost btn-sm" href="https://wa.me/2${normalizePhone(p.phone).replace(/^0/, "")}" target="_blank">واتساب</a></div></div>`).join("");
+    <a class="btn btn-ghost btn-sm" href="${waHref(p.phone)}" target="_blank" rel="noopener">واتساب</a></div></div>`).join("");
     html += "</div>";
     if (myTrips.length) {
         html += `<div class="panel" style="margin-top:14px"><h3>رحلات مرتبطة</h3>` + myTrips.map(t => `<div class="card-meta" style="margin-bottom:8px"><b>${t.name}</b><br>🕐 ${t.time || "-"} · 📍 ${t.from || ""} ← ${t.to || ""} · مقاعد متاحة: ${t.available || 0}</div>`).join("") + "</div>";
