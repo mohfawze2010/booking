@@ -229,7 +229,8 @@ body{overflow-x:hidden;font-family:'Cairo',sans-serif;background:#f1f5f9;color:#
 .top-shell .c-header{background:transparent;border-bottom:1px solid rgba(255,255,255,.15);box-shadow:none;position:relative;color:#fff}
 .top-shell .logo small{color:rgba(255,255,255,.75)}
 .top-shell .logo-icon{box-shadow:0 4px 12px rgba(0,0,0,.25)}
-.top-shell .hero{background:none;margin:0;border-radius:0;padding:26px 24px 32px}
+.top-shell .hero,.hero,#hero{display:none!important;height:0!important;padding:0!important;margin:0!important;overflow:hidden!important}
+.top-shell{padding-bottom:8px}
 .top-shell .btn-ghost{background:rgba(255,255,255,.16);color:#fff}
 .top-shell .btn-ghost:hover{background:rgba(255,255,255,.26)}
 .top-shell .top-nav-btn.active{background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.2)}
@@ -257,9 +258,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 .top-shell .seg .top-nav-btn.active[data-nav="trips"]{color:#4f5f1a}
 .top-shell .seg .top-nav-btn.active[data-nav="private"]{color:#047857}
 .top-shell .seg .top-nav-btn.active[data-nav="track"]{color:#c2410c}
-.top-shell .hero{text-align:start;padding:22px 24px 26px}
-.top-shell .hero h1{margin:0 0 16px;max-width:560px;margin-inline:0;font-size:1.3rem}
-.hero-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:640px}
+.hero-actions{display:none!important}
 .hero-card{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:16px;padding:14px;font-family:inherit;cursor:pointer;text-align:start;transition:.18s}
 .hero-card:hover{background:rgba(255,255,255,.22);transform:translateY(-1px)}
 .hero-card .hc-ic{width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0}
@@ -416,13 +415,6 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 <div class="hdr-user"><span id="user-chip-wrap" class="hidden"></span>
 <button class="btn btn-ghost btn-sm" type="button" id="btn-auth-header" onclick="showAuthScreen()">دخول</button></div>
 </header>
-<section class="hero" id="hero">
-<h1>احجز مقعدك في أحدث أسطول سيارات برحلات يومية بين المحافظات والمطارات</h1>
-<div class="hero-actions">
-<button class="hero-card" type="button" onclick="openPrivate()"><span class="hc-ic">🚗</span><span class="hc-t"><b>حجز سيارة خاصة</b><small>سيارة لك وحدك للمشوار كامل</small></span><span class="hc-go">‹</span></button>
-<button class="hero-card" type="button" onclick="showCust('track')"><span class="hc-ic">🔍</span><span class="hc-t"><b class="track-lbl">متابعة حجز</b><small class="track-sub">ابحث برقم الحجز</small></span><span class="hc-go">‹</span></button>
-</div>
-</section>
 </div>
 <div class="wrap">
 <div id="cust-trips">
@@ -957,25 +949,18 @@ function isValidEgPhone(p) {
     const s = normalizePhone(p);
     return /^01[0125][0-9]{8}$/.test(s);
 }
-/** رقم واتساب دولي لمصر: 20 + الرقم بدون الصفر (مثال: 01112221764 → 201112221764) */
 function toWaNumber(p) {
     let s = normalizePhone(p).replace(/\D/g, "");
-    if (!s)
-        return "";
-    if (s.startsWith("20") && s.length >= 12)
-        return s;
-    if (s.startsWith("0"))
-        return "20" + s.slice(1);
+    if (!s) return "";
+    if (s.startsWith("20") && s.length >= 12) return s;
+    if (s.startsWith("0")) return "20" + s.slice(1);
     return "20" + s;
 }
-/** رابط واتساب صحيح — كان الخطأ: wa.me/2 بدل wa.me/20 */
 function waHref(phone, text) {
     const n = toWaNumber(phone);
-    if (!n)
-        return "#";
+    if (!n) return "#";
     let url = "https://wa.me/" + n;
-    if (text)
-        url += "?text=" + encodeURIComponent(text);
+    if (text) url += "?text=" + encodeURIComponent(text);
     return url;
 }
 window.toWaNumber = toWaNumber;
@@ -1114,6 +1099,7 @@ function applyBranding() {
     const heroH = document.querySelector("#hero h1");
     if (heroH && welcome)
         heroH.textContent = welcome;
+    /* الهيرو مُزال — لا حاجة لتحديثه */
     document.title = name;
 }
 // ========== CUSTOMER AUTH ==========
@@ -1536,7 +1522,9 @@ window.showCust = function (v) {
     const pv = document.getElementById("cust-private");
     if (pv)
         pv.classList.toggle("hidden", v !== "private");
-    document.getElementById("hero").classList.toggle("hidden", v === "track" || v === "private");
+    const heroEl = document.getElementById("hero");
+    if (heroEl)
+        heroEl.classList.toggle("hidden", true);
     if (v === "trips")
         renderTrips();
     if (v === "private")
@@ -1752,8 +1740,8 @@ window.shareWhatsApp = function () {
     if (!lastBooking)
         return;
     const b = lastBooking;
-    const txt = `تم تسجيل حجزك بنجاح ✅\nكود الحجز: ${b.code}\nالاسم: ${b.name}\nالمقاعد: ${b.seats || 1}\nالإجمالي: ${b.price || 0} ج.م\nالعربون: ${b.deposit || 0} ج.م\n${b.tripName ? "الرحلة: " + b.tripName : ""}`;
-    window.open("https://wa.me/?text=" + encodeURIComponent(txt), "_blank");
+    const txt = `تم تسجيل حجزك بنجاح ✅%0Aكود الحجز: ${b.code}%0Aالاسم: ${b.name}%0Aالمقاعد: ${b.seats || 1}%0Aالإجمالي: ${b.price || 0} ج.م%0Aالعربون: ${b.deposit || 0} ج.م%0A${b.tripName ? "الرحلة: " + b.tripName : ""}`;
+    window.open("https://wa.me/?text=" + txt, "_blank");
 };
 // ========== PRIVATE ==========
 let pvTripType = "oneway", pvDriver = "with";
@@ -2181,11 +2169,8 @@ function updateWaFloat() {
     a.classList.add("is-visible");
     a.style.display = "";
     const contact = (window.APP_SETTINGS || {}).contact_name || "أ/ محمد فوزى";
-    const contactMsg = "مرحباً " + contact + "، أحتاج مساعدة بخصوص الحجز";
-    a.href = waHref(phone, contactMsg);
+    a.href = waHref(phone, "مرحباً " + contact + "، أحتاج مساعدة بخصوص الحجز");
     a.title = "واتساب " + contact;
-    a.target = "_blank";
-    a.rel = "noopener";
 }
 function normalizeBookingCode(raw) {
     let c = String(raw || "").trim().toUpperCase().replace(/\s+/g, "");
@@ -2510,8 +2495,8 @@ window.openStatusDriver = function (id) {
       <div style="font-size:.8rem;color:#64748b;margin-top:4px">اضغط الصورة لفتحها بحجم أكبر</div>
     </div>` : `<div class="fg" style="background:#f8fafc;padding:10px;border-radius:10px;font-size:.85rem;color:#64748b">لم يُرفع إيصال بعد</div>`}
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-      <a class="btn btn-green btn-sm" target="_blank" rel="noopener" href="${waHref(b.phone || "", "مرحباً " + (b.name || "") + "، بخصوص حجزك " + b.code + (b.price ? ("\nالسعر الإجمالي: " + b.price + " ج.م") : "") + (b.deposit ? ("\nالعربون: " + b.deposit + " ج.م") : "") + "\nيرجى تأكيد الموافقة ورفع إيصال التحويل من شاشة متابعة الحجز.")}">💬 إرسال السعر/العربون واتساب</a>
-      <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="${waHref(b.phone || "", "تم تأكيد حجزك " + b.code + " بنجاح ✅" + (b.driver ? ("\nالسائق: " + b.driver) : "") + (b.carModel || b.car ? ("\nالسيارة: " + (b.carModel || b.car)) : ""))}">✅ رسالة تأكيد</a>
+      <a class="btn btn-green btn-sm" target="_blank" href="${waHref(b.phone || "", "مرحباً " + (b.name || "") + "، بخصوص حجزك " + b.code + (b.price ? ("\nالسعر الإجمالي: " + b.price + " ج.م") : "") + (b.deposit ? ("\nالعربون: " + b.deposit + " ج.م") : "") + "\nيرجى تأكيد الموافقة ورفع إيصال التحويل من شاشة متابعة الحجز.")}">💬 إرسال السعر/العربون واتساب</a>
+      <a class="btn btn-ghost btn-sm" target="_blank" href="${waHref(b.phone || "", "تم تأكيد حجزك " + b.code + " بنجاح ✅" + (b.driver ? ("\nالسائق: " + b.driver) : "") + (b.carModel || b.car ? ("\nالسيارة: " + (b.carModel || b.car)) : ""))}">✅ رسالة تأكيد</a>
     </div>`;
     document.getElementById("form-save-btn").onclick = async () => {
         var _a, _b, _c;
