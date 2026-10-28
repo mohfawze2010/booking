@@ -279,115 +279,62 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 #pwa-help .steps li{counter-increment:s;position:relative;padding:10px 44px 10px 6px;font-size:.9rem;line-height:1.7;color:#334155;border-bottom:1px solid #f1f5f9}
 #pwa-help .steps li::before{content:counter(s);position:absolute;right:6px;top:10px;width:28px;height:28px;border-radius:50%;background:#5b6e22;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.85rem}
 .install-link{display:block;width:100%;text-align:center;background:none;border:none;font-family:inherit;color:#5b6e22;font-weight:700;font-size:.85rem;margin-top:10px;cursor:pointer}
-/* ===== ADMIN UI — مطابق للصورة (بنفسجي حديث) ===== */
+/* ===== ADMIN UI ===== */
 #view-admin{background:#f5f7fb;min-height:100vh}
 #view-admin .main{background:#f5f7fb}
-.admin-topbar{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  background:#0f172a;color:#fff;padding:12px 14px;position:sticky;top:0;z-index:60;
-  flex-wrap:wrap
-}
+.admin-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#0f172a;color:#fff;padding:12px 14px;position:sticky;top:0;z-index:60;flex-wrap:wrap}
 .admin-topbar .atb-right{display:flex;align-items:center;gap:10px}
 .admin-topbar .atb-left{display:flex;align-items:center;gap:8px;margin-right:auto}
-.admin-topbar .atb-menu{
-  width:40px;height:40px;border-radius:12px;border:none;background:#1e293b;color:#fff;
-  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.15rem
-}
-.admin-topbar .atb-shield{
-  width:40px;height:40px;border-radius:12px;background:#6366f1;display:flex;align-items:center;justify-content:center;font-size:1.15rem
-}
+.admin-topbar .atb-menu{width:40px;height:40px;border-radius:12px;border:none;background:#1e293b;color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.15rem}
+.admin-topbar .atb-shield{width:40px;height:40px;border-radius:12px;background:#6366f1;display:flex;align-items:center;justify-content:center;font-size:1.15rem}
 .admin-topbar .atb-title strong{display:block;line-height:1.2;font-size:.95rem}
 .admin-topbar .atb-title small{opacity:.65;font-size:.72rem}
-.admin-topbar .atb-pill{
-  background:#1e293b;color:#e2e8f0;border:none;border-radius:999px;padding:8px 14px;
-  font-family:inherit;font-weight:600;font-size:.82rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px
-}
-.admin-topbar .atb-pill:hover{background:#334155}
-.admin-topbar .atb-exit{
-  width:40px;height:40px;border-radius:50%;border:none;background:#ef4444;color:#fff;
-  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;font-weight:700
-}
-.admin-topbar .atb-exit:hover{background:#dc2626}
-/* زر رجوع داخل الشاشات — كالصورة */
-#view-admin .back-btn{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:40px;height:40px;border-radius:50%;border:none;background:#ef4444;color:#fff;
-  font-size:1.1rem;cursor:pointer;margin-bottom:14px;padding:0;box-shadow:0 2px 8px rgba(239,68,68,.35)
-}
-#view-admin .back-btn:hover{background:#dc2626}
+.admin-topbar .atb-pill{background:#1e293b;color:#e2e8f0;border:none;border-radius:999px;padding:8px 14px;font-family:inherit;font-weight:600;font-size:.82rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.admin-topbar .atb-exit{width:40px;height:40px;border-radius:50%;border:none;background:#ef4444;color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;font-weight:700}
+#view-admin .back-btn{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;border:none;background:#ef4444;color:#fff;font-size:1.1rem;cursor:pointer;margin-bottom:14px;padding:0}
 .back-row{display:flex;justify-content:flex-end;width:100%}
-/* إحصائيات كالصورة */
-#view-admin .stats{
-  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px;margin-bottom:18px
-}
-@media(min-width:900px){
-  #view-admin .stats{grid-template-columns:repeat(4,minmax(0,1fr))!important}
-}
-#view-admin .stat{
-  background:#fff;border-radius:18px;padding:16px 14px;border:1.5px solid #e8ecf4;
-  box-shadow:0 2px 10px rgba(15,23,42,.04);cursor:pointer;transition:.2s
-}
-#view-admin .stat:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(15,23,42,.08)}
-#view-admin .stat .icon{width:36px;height:36px;border-radius:12px;margin-bottom:8px;font-size:1rem}
-#view-admin .stat .n{font-size:1.6rem;font-weight:800}
-#view-admin .stat .t{font-size:.82rem;font-weight:700}
-#view-admin .stat .d{font-size:.7rem;color:#94a3b8;margin-top:2px}
+#view-admin .stats{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px;margin-bottom:18px}
+@media(min-width:900px){#view-admin .stats{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+#view-admin .stat{background:#fff;border-radius:18px;padding:16px 14px;border:1.5px solid #e8ecf4;box-shadow:0 2px 10px rgba(15,23,42,.04);cursor:pointer}
 #view-admin .stat.s-all{border-color:#e2e8f0;background:linear-gradient(180deg,#fff,#f8fafc)}
-#view-admin .stat.s-all .icon{background:#f1f5f9}
-#view-admin .stat.s-all .n,#view-admin .stat.s-all .t{color:#0f172a}
 #view-admin .stat.s-ok{border-color:#a7f3d0;background:linear-gradient(180deg,#fff,#ecfdf5)}
-#view-admin .stat.s-ok .icon{background:#d1fae5}
 #view-admin .stat.s-ok .n,#view-admin .stat.s-ok .t{color:#047857}
 #view-admin .stat.s-wait{border-color:#fdba74;background:linear-gradient(180deg,#fff,#fff7ed)}
-#view-admin .stat.s-wait .icon{background:#ffedd5}
 #view-admin .stat.s-wait .n,#view-admin .stat.s-wait .t{color:#c2410c}
 #view-admin .stat.s-new{border-color:#fde68a;background:linear-gradient(180deg,#fff,#fffbeb)}
-#view-admin .stat.s-new .icon{background:#fef3c7}
 #view-admin .stat.s-new .n,#view-admin .stat.s-new .t{color:#b45309}
-/* تبويبات الحجوزات / الرحلات */
-.admin-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;justify-content:flex-end}
-.admin-tab{
-  border:1.5px solid #e2e8f0;background:#fff;color:#475569;border-radius:999px;
-  padding:9px 16px;font-family:inherit;font-weight:700;font-size:.85rem;cursor:pointer;
-  display:inline-flex;align-items:center;gap:6px;transition:.15s
-}
+/* تبويبات — الأيقونة يمين النص في RTL */
+.admin-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;justify-content:flex-start}
+.admin-tab{border:1.5px solid #e2e8f0;background:#fff;color:#475569;border-radius:999px;padding:9px 16px;font-family:inherit;font-weight:700;font-size:.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:8px;flex-direction:row}
+.admin-tab .tab-ic{order:-1;font-size:1rem}
 .admin-tab.active{background:#0f172a;color:#fff;border-color:#0f172a}
-.admin-tab:not(.active):hover{background:#f8fafc}
-/* فلاتر الحالة — حبوب ناعمة */
-.filt-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.filt-btn{
-  border:1px solid #e2e8f0!important;background:#fff!important;color:#64748b!important;
-  border-radius:999px!important;padding:7px 14px!important;font-weight:700!important;font-size:.8rem!important
-}
-.filt-btn.btn-indigo,.filt-btn.active{
-  background:#6366f1!important;color:#fff!important;border-color:#6366f1!important
-}
-/* قوائم عمودية */
-#admin-bookings-list,#admin-trips-list,#admin-drivers-list,#admin-cars-list{
-  display:flex;flex-direction:column;gap:12px;align-items:stretch
-}
-/* كروت الحجوزات — إطار ناعم كالصورة */
-.admin-trip{
-  margin-bottom:0;background:#fff;border:1.5px solid #e8ecf4;border-radius:18px;
-  box-shadow:0 2px 12px rgba(15,23,42,.04);padding:16px 18px;position:relative;overflow:hidden
-}
+.filt-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:flex-start;margin-top:14px;padding:12px;background:#fff;border-radius:16px;border:1.5px solid #e8ecf4}
+.filt-btn{border:1px solid #e2e8f0!important;background:#f8fafc!important;color:#64748b!important;border-radius:999px!important;padding:7px 14px!important;font-weight:700!important;font-size:.8rem!important}
+.filt-btn.active{background:#6366f1!important;color:#fff!important;border-color:#6366f1!important}
+#admin-bookings-list,#admin-trips-list,#admin-drivers-list,#admin-cars-list{display:flex;flex-direction:column;gap:12px;align-items:stretch}
+/* كرت الحجز بدون أزرار داخله */
+.admin-trip-wrap{display:flex;flex-direction:column;gap:0}
+.admin-trip{margin-bottom:0;background:#fff;border:1.5px solid #e8ecf4;border-radius:18px 18px 0 0;box-shadow:0 2px 12px rgba(15,23,42,.04);padding:16px 18px;position:relative}
 .admin-trip.bk{border-right:4px solid #f59e0b}
 .admin-trip.bk-confirmed{border-right-color:#10b981}
-.admin-trip.bk-cancelled{border-right-color:#ef4444;opacity:.88}
+.admin-trip.bk-cancelled{border-right-color:#ef4444}
 .admin-trip.bk-payment,.admin-trip.bk-payment_pending{border-right-color:#f97316}
-.admin-trip.bk-pending{border-right-color:#f59e0b}
+/* أزرار الحالة خارج الكرت من الأسفل */
+.bk-actions-out{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px 12px;background:#f8fafc;border:1.5px solid #e8ecf4;border-top:none;border-radius:0 0 18px 18px;margin-bottom:4px}
+.bk-actions-out .btn-indigo{background:#6366f1;color:#fff;border-radius:14px;flex:1;justify-content:center;padding:12px;min-width:160px}
 #view-admin .btn-indigo{background:#6366f1;color:#fff}
-#view-admin .btn-indigo:hover{background:#4f46e5}
 #view-admin .side-link.active{background:#6366f1!important}
-#view-admin .search{
-  border:1.5px solid #e8ecf4;border-radius:14px;background:#fff;padding:12px 14px
-}
+/* إخفاء الهيرو — الإبقاء على الهيدر فقط */
+.top-shell .hero{display:none!important}
+.top-shell{padding-bottom:4px}
 /* ===== header user + trip card ===== */
 .hdr-user{display:flex;align-items:center;gap:8px}
 .user-chip{border:none;font-family:inherit;cursor:pointer;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .th-main{flex:1;min-width:0}
 .th-side{display:flex;align-items:center;gap:16px}
 .trip-title .chev{font-size:.8rem}
+#btn-logout-header{display:none}
+#btn-logout-header.show{display:inline-flex}
 </style>
 </head>
 <body>
@@ -507,15 +454,12 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 </div>
 </div>
 <div class="hdr-user"><span id="user-chip-wrap" class="hidden"></span>
-<button class="btn btn-ghost btn-sm" type="button" id="btn-auth-header" onclick="showAuthScreen()">دخول</button></div>
-</header>
-<section class="hero" id="hero">
-<h1>احجز مقعدك في أحدث أسطول سيارات برحلات يومية بين المحافظات والمطارات</h1>
-<div class="hero-actions">
-<button class="hero-card" type="button" onclick="openPrivate()"><span class="hc-ic">🚗</span><span class="hc-t"><b>حجز سيارة خاصة</b><small>سيارة لك وحدك للمشوار كامل</small></span><span class="hc-go">‹</span></button>
-<button class="hero-card" type="button" onclick="showCust('track')"><span class="hc-ic">🔍</span><span class="hc-t"><b class="track-lbl">متابعة حجز</b><small class="track-sub">ابحث برقم الحجز</small></span><span class="hc-go">‹</span></button>
+<button class="btn btn-ghost btn-sm" type="button" id="btn-auth-header" onclick="showAuthScreen()">دخول</button>
+<button class="btn btn-ghost btn-sm" type="button" id="btn-logout-header" onclick="logoutCustomer()">خروج</button>
 </div>
-</section>
+</header>
+<!-- الهيرو مخفي — الإبقاء على الهيدر العلوي فقط -->
+<section class="hero" id="hero" hidden aria-hidden="true"></section>
 </div>
 <div class="wrap">
 <div id="cust-trips">
@@ -620,12 +564,9 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 <div id="view-admin" class="hidden">
 <div class="admin-topbar">
   <div class="atb-right">
-    <button type="button" class="atb-menu" onclick="toggleSidebar()" aria-label="القائمة" title="القائمة">☰</button>
+    <button type="button" class="atb-menu" onclick="toggleSidebar()" aria-label="القائمة">☰</button>
     <div class="atb-shield">🛡️</div>
-    <div class="atb-title">
-      <strong>لوحة الأدمن</strong>
-      <small>إدارة الحجوزات والأسطول</small>
-    </div>
+    <div class="atb-title"><strong>لوحة الأدمن</strong><small>إدارة الحجوزات والأسطول</small></div>
   </div>
   <div class="atb-left">
     <button type="button" class="atb-pill" onclick="logoutAdmin();showCust('trips')">↗ موقع الركاب</button>
@@ -656,50 +597,48 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
   <div class="stat s-new" onclick="setBkFilter('pending');adminTab('bookings')"><div class="icon">✦</div><div class="n" id="s-new">0</div><div class="t">طلبات جديدة</div><div class="d">قيد المراجعة والتسعير</div></div>
 </div>
 <div class="admin-tabs">
-  <button type="button" class="admin-tab active" onclick="adminTab('bookings')">📋 الحجوزات والطلبات</button>
-  <button type="button" class="admin-tab" onclick="adminTab('trips')">🚌 الرحلات والخطوط</button>
+  <button type="button" class="admin-tab active" onclick="adminTab('bookings')"><span>الحجوزات والطلبات</span><span class="tab-ic">▦</span></button>
+  <button type="button" class="admin-tab" onclick="adminTab('trips')"><span>الرحلات والخطوط</span><span class="tab-ic">🚌</span></button>
 </div>
 <div class="panel"><h3>آخر الحجوزات</h3><div id="dash-recent"></div></div>
 </div>
 <div id="at-bookings" class="hidden">
-<div class="back-row"><button type="button" class="back-btn" onclick="adminTab('dash')" title="رجوع" aria-label="رجوع">→</button></div>
-<div class="stats" id="bk-stats-clone" style="display:none"></div>
+<div class="back-row"><button type="button" class="back-btn" onclick="adminTab('dash')" title="رجوع">→</button></div>
 <div class="admin-tabs">
-  <button type="button" class="admin-tab active" id="tab-bookings-btn" onclick="adminTab('bookings')">📋 الحجوزات والطلبات</button>
-  <button type="button" class="admin-tab" onclick="adminTab('trips')">🚌 الرحلات والخطوط</button>
+  <button type="button" class="admin-tab active" id="tab-bookings-btn" onclick="adminTab('bookings')"><span>الحجوزات والطلبات</span><span class="tab-ic">▦</span></button>
+  <button type="button" class="admin-tab" onclick="adminTab('trips')"><span>الرحلات والخطوط</span><span class="tab-ic">🚌</span></button>
   <button class="btn btn-indigo btn-sm" type="button" onclick="openManualBooking()" style="margin-right:auto;border-radius:999px">+ حجز يدوي</button>
 </div>
-<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
-  <input class="search" id="bk-search" placeholder="بحث بالاسم أو الهاتف أو الكود..." oninput="filterAdminBookings()" style="margin:0;max-width:320px;flex:1">
-  <div class="filt-row" id="bk-filters">
-    <button type="button" class="btn btn-sm filt-btn active" data-f="all" onclick="setBkFilter('all')">الكل</button>
-    <button type="button" class="btn btn-sm filt-btn" data-f="pending" onclick="setBkFilter('pending')">جديدة</button>
-    <button type="button" class="btn btn-sm filt-btn" data-f="payment" onclick="setBkFilter('payment')">عربون</button>
-    <button type="button" class="btn btn-sm filt-btn" data-f="confirmed" onclick="setBkFilter('confirmed')">مؤكدة</button>
-    <button type="button" class="btn btn-sm filt-btn" data-f="cancelled" onclick="setBkFilter('cancelled')">ملغية</button>
-  </div>
-</div>
+<input class="search" id="bk-search" placeholder="بحث بالاسم أو الهاتف أو الكود..." oninput="filterAdminBookings()" style="margin-bottom:12px">
 <div id="admin-bookings-list"></div>
+<!-- الاختصارات أسفل الكروت من الخارج -->
+<div class="filt-row" id="bk-filters">
+  <button type="button" class="btn btn-sm filt-btn active" data-f="all" onclick="setBkFilter('all')">الكل</button>
+  <button type="button" class="btn btn-sm filt-btn" data-f="pending" onclick="setBkFilter('pending')">جديدة</button>
+  <button type="button" class="btn btn-sm filt-btn" data-f="payment" onclick="setBkFilter('payment')">عربون</button>
+  <button type="button" class="btn btn-sm filt-btn" data-f="confirmed" onclick="setBkFilter('confirmed')">مؤكدة</button>
+  <button type="button" class="btn btn-sm filt-btn" data-f="cancelled" onclick="setBkFilter('cancelled')">ملغية</button>
+</div>
 </div>
 <div id="at-trips" class="hidden">
-<div class="back-row"><button type="button" class="back-btn" onclick="adminTab('dash')" title="رجوع" aria-label="رجوع">→</button></div>
+<div class="back-row"><button type="button" class="back-btn" onclick="adminTab('dash')" title="رجوع">→</button></div>
 <div class="admin-tabs">
-  <button type="button" class="admin-tab" onclick="adminTab('bookings')">📋 الحجوزات والطلبات</button>
-  <button type="button" class="admin-tab active" onclick="adminTab('trips')">🚌 الرحلات والخطوط</button>
+  <button type="button" class="admin-tab" onclick="adminTab('bookings')"><span>الحجوزات والطلبات</span><span class="tab-ic">▦</span></button>
+  <button type="button" class="admin-tab active" onclick="adminTab('trips')"><span>الرحلات والخطوط</span><span class="tab-ic">🚌</span></button>
   <button class="btn btn-indigo btn-sm" type="button" onclick="openTripForm()" style="margin-right:auto;border-radius:999px">+ إضافة رحلة</button>
 </div>
 <div id="admin-trips-list"></div>
 </div>
 <div id="at-drivers" class="hidden">
-<div class="back-row"><button type="button" class="back-btn" onclick="adminTab('dash')" title="رجوع" aria-label="رجوع">→</button></div>
+<div class="back-row"><button type="button" class="back-btn" onclick="adminTab('dash')" title="رجوع">→</button></div>
 <h1>السائقين</h1><p class="sub">إدارة فريق السائقين</p>
 <div class="panel"><h3>السائقين <button class="btn btn-indigo btn-sm" type="button" onclick="openDriverForm()">+ إضافة سائق</button></h3><div id="admin-drivers-list"></div></div></div>
 <div id="at-cars" class="hidden">
-<div class="back-row"><button type="button" class="back-btn" onclick="adminTab('dash')" title="رجوع" aria-label="رجوع">→</button></div>
+<div class="back-row"><button type="button" class="back-btn" onclick="adminTab('dash')" title="رجوع">→</button></div>
 <h1>الأسطول</h1><p class="sub">سيارات الشركة</p>
 <div class="panel"><h3>السيارات <button class="btn btn-indigo btn-sm" type="button" onclick="openCarForm()">+ إضافة سيارة</button></h3><div id="admin-cars-list"></div></div></div>
 <div id="at-settings" class="hidden">
-<div class="back-row"><button type="button" class="back-btn" onclick="adminTab('dash')" title="رجوع" aria-label="رجوع">→</button></div>
+<div class="back-row"><button type="button" class="back-btn" onclick="adminTab('dash')" title="رجوع">→</button></div>
 <h1>الإعدادات</h1><p class="sub">بيانات الشركة</p>
 <div class="panel">
 <div class="fg"><label>اسم التطبيق / الشركة</label><input id="set-name" value="سفريات الأمان للركوب والنقل"></div>
@@ -1480,6 +1419,7 @@ function applyAccountUI() {
 function updateUserChip() {
     const wrap = document.getElementById("user-chip-wrap");
     const btn = document.getElementById("btn-auth-header");
+    const out = document.getElementById("btn-logout-header");
     if (!wrap || !btn)
         return;
     if (currentUser) {
@@ -1493,12 +1433,14 @@ function updateUserChip() {
         b.addEventListener("click", function () { openEditProfile(); });
         wrap.appendChild(b);
         btn.classList.add("hidden");
+        if (out) { out.classList.add("show"); out.textContent = "خروج"; }
     }
     else {
         wrap.classList.add("hidden");
         wrap.textContent = "";
         btn.classList.remove("hidden");
         btn.textContent = isGuest ? "ضيف — دخول" : "دخول";
+        if (out) out.classList.remove("show");
     }
     applyAccountUI();
 }
@@ -2468,31 +2410,33 @@ function renderFilteredBookings() {
         const isPriv = b.type === "private";
         const st = b.status || "pending";
         const badgeCls = st === "confirmed" ? "badge-open" : st === "cancelled" ? "badge-closed" : "badge-active";
-        return `<div class="admin-trip bk bk-${st}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:10px">
-        <div style="text-align:right;flex:1;min-width:160px">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-start;margin-bottom:4px">
-            <b style="font-size:.95rem;color:#6366f1;letter-spacing:.5px">${b.code || ""}</b>
-            <span class="badge-pill ${badgeCls}">${statusLabel(st)}</span>
+        return `<div class="admin-trip-wrap">
+      <div class="admin-trip bk bk-${st}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:10px">
+          <div style="text-align:right;flex:1;min-width:160px">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+              <b style="font-size:.95rem;color:#6366f1">${b.code || ""}</b>
+              <span class="badge-pill ${badgeCls}">${statusLabel(st)}</span>
+            </div>
+            <div style="font-weight:800;font-size:1.08rem">${b.name || "-"}</div>
+            <div class="card-meta">${b.phone || ""}</div>
           </div>
-          <div style="font-weight:800;font-size:1.08rem;color:#0f172a">${b.name || "-"}</div>
-          <div class="card-meta" style="margin-top:2px">${b.phone || ""}</div>
+          <div style="text-align:left;color:#64748b;font-size:.82rem">
+            <div>${isPriv ? "سيارة خاصة" : ((b.seats || 1) + " فرد")}</div>
+            <div style="font-size:.75rem;margin-top:2px">${b.createdAt ? new Date(b.createdAt).toLocaleString("ar-EG") : ""}</div>
+          </div>
         </div>
-        <div style="text-align:left;color:#64748b;font-size:.82rem">
-          <div>${isPriv ? "سيارة خاصة" : ((b.seats || 1) + " فرد")}</div>
-          <div style="font-size:.75rem;margin-top:2px">${b.createdAt ? new Date(b.createdAt).toLocaleString("ar-EG") : ""}</div>
+        <div class="card-meta" style="padding:10px 12px;background:#f8fafc;border-radius:12px;border:1px solid #f1f5f9">
+          ${b.tripName || (b.from ? (b.from + " ↔ " + b.to) : "—")}
+          ${b.price ? " · " + b.price + " ج.م" : ""}${b.deposit ? " · عربون " + b.deposit + " ج" : ""}${b.driver ? " · سائق: " + b.driver : ""}
+          ${b.notes ? "<br>📝 " + b.notes : ""}
+          ${getReceiptUrl(b) ? `<div style="margin-top:8px"><a href="${getReceiptUrl(b)}" target="_blank"><img src="${getReceiptUrl(b)}" alt="إيصال" style="max-height:80px;border-radius:8px;border:1px solid #e2e8f0"></a></div>` : ""}
         </div>
       </div>
-      <div class="card-meta" style="margin-bottom:12px;padding:10px 12px;background:#f8fafc;border-radius:12px;border:1px solid #f1f5f9">
-        ${b.tripName || (b.from ? (b.from + " ↔ " + b.to) : "—")}
-        ${b.price ? " · " + b.price + " ج.م" : ""}${b.deposit ? " · عربون " + b.deposit + " ج" : ""}${b.driver ? " · سائق: " + b.driver : ""}
-        ${b.notes ? "<br>📝 " + b.notes : ""}
-        ${getReceiptUrl(b) ? `<div style="margin-top:8px"><a href="${getReceiptUrl(b)}" target="_blank"><img src="${getReceiptUrl(b)}" alt="إيصال" style="max-height:80px;border-radius:8px;border:1px solid #e2e8f0"></a> <span style="color:#059669;font-size:.78rem">إيصال مرفوع</span></div>` : ""}
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <div class="bk-actions-out">
         <a class="icon-btn" href="https://wa.me/2${(b.phone || "").replace(/^0/, "")}" target="_blank" title="واتساب" style="border-radius:12px">↗</a>
         ${st !== "cancelled" ? `<button type="button" class="btn-seat-rem" style="color:#dc2626;border-color:#fecaca;border-radius:12px" onclick="updStatus('${b.id}','cancelled')">✕ إلغاء</button>` : ""}
-        <button type="button" class="btn btn-indigo" style="flex:1;justify-content:center;padding:12px;border-radius:14px;min-width:180px" onclick="openStatusDriver('${b.id}')">🔄 تحديث الحالة وتعيين السائق</button>
+        <button type="button" class="btn btn-indigo" onclick="openStatusDriver('${b.id}')">🔄 تحديث الحالة وتعيين السائق</button>
       </div>
     </div>`;
     }).join("");
