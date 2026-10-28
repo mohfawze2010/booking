@@ -151,7 +151,10 @@ body{overflow-x:hidden;font-family:'Cairo',sans-serif;background:#f1f5f9;color:#
 .btn-open-trip{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;padding:8px 14px;border-radius:10px;font-family:inherit;font-weight:600;font-size:.82rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
 @media(max-width:768px){
   .hero h1{font-size:1.2rem}
-  .trip-head{flex-direction:column}
+  .trip-head{flex-direction:column;align-items:stretch;padding:14px 14px 12px}
+  .th-side{width:100%;justify-content:space-between;border-top:1px dashed #e2e8f0;padding-top:12px}
+  .price-side{text-align:start;min-width:0}
+  .price-side .p{font-size:1.25rem}
   .c-header .nav-btns{display:none}
 }
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e2e8f0;z-index:90;padding:6px 8px calc(6px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(0,0,0,.06)}
@@ -276,6 +279,22 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 #pwa-help .steps li{counter-increment:s;position:relative;padding:10px 44px 10px 6px;font-size:.9rem;line-height:1.7;color:#334155;border-bottom:1px solid #f1f5f9}
 #pwa-help .steps li::before{content:counter(s);position:absolute;right:6px;top:10px;width:28px;height:28px;border-radius:50%;background:#5b6e22;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.85rem}
 .install-link{display:block;width:100%;text-align:center;background:none;border:none;font-family:inherit;color:#5b6e22;font-weight:700;font-size:.85rem;margin-top:10px;cursor:pointer}
+/* ===== admin cards: 2x2 grid, framed ===== */
+#admin-bookings-list,#admin-trips-list,#admin-drivers-list,#admin-cars-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+#admin-bookings-list>div:not(.admin-trip),#admin-trips-list>div:not(.admin-trip),#admin-drivers-list>div:not(.admin-trip),#admin-cars-list>div:not(.admin-trip){grid-column:1/-1}
+.admin-trip{margin-bottom:0;border:1.5px solid #cbd5e1;border-radius:18px;box-shadow:0 3px 12px rgba(15,23,42,.07);background:#fff;position:relative;overflow:hidden}
+.admin-trip.bk{border-top:5px solid #f59e0b}
+.admin-trip.bk-confirmed{border-top-color:#10b981}
+.admin-trip.bk-cancelled{border-top-color:#ef4444}
+.admin-trip.bk-payment,.admin-trip.bk-payment_pending{border-top-color:#f97316}
+#at-dash .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:560px){#admin-bookings-list,#admin-trips-list,#admin-drivers-list,#admin-cars-list{grid-template-columns:1fr}}
+/* ===== header user + trip card ===== */
+.hdr-user{display:flex;align-items:center;gap:8px}
+.user-chip{border:none;font-family:inherit;cursor:pointer;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.th-main{flex:1;min-width:0}
+.th-side{display:flex;align-items:center;gap:16px}
+.trip-title .chev{font-size:.8rem}
 </style>
 </head>
 <body>
@@ -345,7 +364,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
         </a>
       </div>
       <button type="button" class="install-link" id="install-link" style="display:none" onclick="window.__pwaOpen()">📲 تثبيت التطبيق على الشاشة الرئيسية</button>
-      <div style="margin-top:4px;color:#94a3b8">الإصدار: V3.1</div>
+      <div style="margin-top:4px;color:#94a3b8">الإصدار: V3.2</div>
     </div>
   </div>
 </div>
@@ -391,17 +410,17 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 <div class="seg" role="tablist">
 <button class="top-nav-btn active" data-nav="trips" type="button" onclick="showCust('trips')"><span class="ic">🚌</span>الرحلات</button>
 <button class="top-nav-btn" data-nav="private" type="button" onclick="openPrivate()"><span class="ic">🚗</span>حجز سيارة</button>
-<button class="top-nav-btn" data-nav="track" type="button" onclick="showCust('track')"><span class="ic">🔍</span>متابعة حجز</button>
+<button class="top-nav-btn" data-nav="track" type="button" onclick="showCust('track')"><span class="ic">🔍</span><span class="track-lbl">متابعة حجز</span></button>
 </div>
-<span id="user-chip-wrap" class="hidden"></span>
-<button class="btn btn-ghost btn-sm" type="button" id="btn-auth-header" onclick="showAuthScreen()">دخول</button>
 </div>
+<div class="hdr-user"><span id="user-chip-wrap" class="hidden"></span>
+<button class="btn btn-ghost btn-sm" type="button" id="btn-auth-header" onclick="showAuthScreen()">دخول</button></div>
 </header>
 <section class="hero" id="hero">
 <h1>احجز مقعدك في أحدث أسطول سيارات برحلات يومية بين المحافظات والمطارات</h1>
 <div class="hero-actions">
 <button class="hero-card" type="button" onclick="openPrivate()"><span class="hc-ic">🚗</span><span class="hc-t"><b>حجز سيارة خاصة</b><small>سيارة لك وحدك للمشوار كامل</small></span><span class="hc-go">‹</span></button>
-<button class="hero-card" type="button" onclick="showCust('track')"><span class="hc-ic">🔍</span><span class="hc-t"><b>متابعة حجز</b><small>بالكود أو من حسابك</small></span><span class="hc-go">‹</span></button>
+<button class="hero-card" type="button" onclick="showCust('track')"><span class="hc-ic">🔍</span><span class="hc-t"><b class="track-lbl">متابعة حجز</b><small class="track-sub">ابحث برقم الحجز</small></span><span class="hc-go">‹</span></button>
 </div>
 </section>
 </div>
@@ -415,13 +434,11 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 <div id="cust-track" class="hidden">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
     <button type="button" class="btn btn-ghost btn-sm" onclick="showCust('trips')">→ العودة للرحلة الرئيسية</button>
-    <h2 style="font-size:1.1rem;font-weight:800">🔍 متابعة الحجوزات</h2>
+    <h2 id="track-title" style="font-size:1.1rem;font-weight:800">🔍 متابعة الحجوزات</h2>
   </div>
   <div id="track-user-panel" class="hidden">
-    <div id="account-bar"></div>
     <div class="panel" style="margin-bottom:14px">
-      <h3 style="margin-bottom:8px">حجوزاتي</h3>
-      <p style="font-size:.85rem;color:#64748b;margin-bottom:10px">جميع حجوزاتك المرتبطة بحسابك (جارية وسابقة)</p>
+      <p style="font-size:.85rem;color:#64748b;margin-bottom:10px">جميع حجوزاتك المرتبطة بحسابك (جارية وسابقة) — اضغط على أي حجز لعرض تفاصيله</p>
       <div id="my-bookings-list"></div>
     </div>
   </div>
@@ -502,7 +519,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 <nav class="bottom-nav" id="bottom-nav" aria-label="تنقل الجوال">
   <button type="button" data-nav="trips" onclick="showCust('trips');setBottomNav('trips')"><span class="ic">🚌</span>الرحلات</button>
   <button type="button" data-nav="private" onclick="openPrivate();setBottomNav('private')"><span class="ic">🚗</span>حجز خاص</button>
-  <button type="button" data-nav="track" onclick="showCust('track');setBottomNav('track')"><span class="ic">🔍</span>متابعة</button>
+  <button type="button" data-nav="track" onclick="showCust('track');setBottomNav('track')"><span class="ic">🔍</span><span class="track-lbl-s">متابعة</span></button>
   <button type="button" data-nav="account" onclick="onAccountNav()"><span class="ic">👤</span>حسابي</button>
 </nav>
 <a class="wa-float" id="wa-float" href="#" target="_blank" title="واتساب الدعم" aria-label="واتساب الدعم">💬</a>
@@ -762,6 +779,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
     <button type="button" class="btn btn-ghost" data-close onclick="window.closeModals()">إلغاء</button>
     <button type="button" class="btn btn-green" id="ep-save" onclick="saveEditProfile()">حفظ التعديلات</button>
   </div>
+  <button type="button" class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:12px;color:#dc2626" onclick="window.closeModals();logoutCustomer()">🚪 تسجيل الخروج / تغيير الحساب</button>
 </div></div></div>
 <div class="overlay" id="pwa-help" onclick="if(event.target===this)this.classList.remove('on')">
 <div class="modal" style="max-width:420px">
@@ -1054,7 +1072,7 @@ function applyBranding() {
     const welcome = s.welcome || "";
     const logoText = document.querySelector("#logo-area > div:last-child");
     if (logoText) {
-        logoText.innerHTML = name + `<small>${welcome || "رحلات يومية منتظمة وحجوزات خاصة"}</small>`;
+        logoText.innerHTML = name + `<small>رحلات يومية منتظمة وحجوزات خاصة</small>`;
     }
     if (s.logo_url) {
         const headerIcon = document.getElementById("header-logo-icon");
@@ -1356,6 +1374,20 @@ window.logoutCustomer = async function () {
     showAuthScreen();
     toast("تم تسجيل الخروج", "ok");
 };
+function applyAccountUI() {
+    const li = !!currentUser;
+    document.querySelectorAll(".track-lbl").forEach(e => { e.textContent = li ? "حجوزاتي" : "متابعة حجز"; });
+    document.querySelectorAll(".track-lbl-s").forEach(e => { e.textContent = li ? "حجوزاتي" : "متابعة"; });
+    document.querySelectorAll(".track-sub").forEach(e => { e.textContent = li ? "كل حجوزاتك في مكان واحد" : "ابحث برقم الحجز"; });
+    const h = document.getElementById("track-title");
+    if (h)
+        h.textContent = li ? "📋 حجوزاتي" : "🔍 متابعة حجز";
+    const up = document.getElementById("track-user-panel"), gp = document.getElementById("track-guest-panel");
+    if (up)
+        up.classList.toggle("hidden", !li);
+    if (gp)
+        gp.classList.toggle("hidden", li);
+}
 function updateUserChip() {
     const wrap = document.getElementById("user-chip-wrap");
     const btn = document.getElementById("btn-auth-header");
@@ -1363,22 +1395,27 @@ function updateUserChip() {
         return;
     if (currentUser) {
         wrap.classList.remove("hidden");
-        wrap.innerHTML = `<span class="user-chip" title="حسابي وتعديل بياناتي" onclick="onAccountNav()">👤 ${currentUser.displayName || currentUser.email || "حسابي"} ✏️</span>
-      <button class="btn btn-ghost btn-sm" type="button" onclick="logoutCustomer()">خروج</button>`;
+        wrap.textContent = "";
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "user-chip";
+        b.title = "تعديل بياناتي";
+        b.textContent = "👤 " + (currentUser.displayName || currentUser.email || "حسابي") + " ✏️";
+        b.addEventListener("click", function () { openEditProfile(); });
+        wrap.appendChild(b);
         btn.classList.add("hidden");
     }
     else {
         wrap.classList.add("hidden");
-        wrap.innerHTML = "";
+        wrap.textContent = "";
         btn.classList.remove("hidden");
         btn.textContent = isGuest ? "ضيف — دخول" : "دخول";
     }
+    applyAccountUI();
 }
 window.onAccountNav = function () {
-    if (currentUser) {
-        showCust("track");
-        loadMyBookings();
-    }
+    if (currentUser)
+        openEditProfile();
     else
         showAuthScreen();
 };
@@ -1391,16 +1428,6 @@ window.loadMyBookings = async function () {
             userPanel.classList.remove("hidden");
         if (guestPanel)
             guestPanel.classList.add("hidden");
-        const ab = document.getElementById("account-bar");
-        if (ab) {
-            const who = currentUser.displayName || "حسابي";
-            ab.innerHTML = `<div class="panel" style="margin-bottom:14px"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><b>👤 ${who}</b><div class="card-meta">${currentUser.email || ""}</div><div class="card-meta" id="ab-phone" style="direction:ltr;text-align:right"></div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-indigo btn-sm" type="button" onclick="openEditProfile()">✏️ تعديل بياناتي</button><button class="btn btn-ghost btn-sm" type="button" style="color:#dc2626" onclick="logoutCustomer()">🚪 خروج / تغيير الحساب</button></div></div></div>`;
-            getDoc(doc(db, "users", currentUser.uid)).then(sn => {
-                const el = document.getElementById("ab-phone");
-                if (el && sn.exists() && sn.data().phone)
-                    el.textContent = "📱 " + normalizePhone(sn.data().phone);
-            }).catch(() => { });
-        }
     }
     else {
         if (userPanel)
@@ -1492,6 +1519,7 @@ window.showCust = function (v) {
     if (v === "private")
         initPrivateForm();
     if (v === "track") {
+        applyAccountUI();
         const tr = document.getElementById("track-result");
         if (tr)
             tr.innerHTML = "";
@@ -1526,14 +1554,13 @@ function renderTrips(filter = "") {
             tag = `<span class="tag">متاح ${t.available || 0} مقاعد</span>`;
         return `<div class="trip-card ${closed ? 'closed' : ''}" id="tc-${idx}">
       <div class="trip-head" onclick="toggleTrip(${idx})">
-        <div style="flex:1">
-          <div class="trip-title">${t.name || ((t.from || '') + ' ↔ ' + (t.to || ''))} ${tag}</div>
+        <div class="th-main">
+          <div class="trip-title"><span class="chev">▼</span><span>${t.name || ((t.from || '') + ' ↔ ' + (t.to || ''))}</span> ${tag}</div>
           <div class="trip-meta">📍 ${(t.from || '') + ' – ' + (t.to || '')}<br>🕐 ${t.time || '-'}${(t.days && t.days.length) ? `<br>📅 ${t.days.length >= 7 || (t.repeat && t.days.length >= 6) ? 'طوال الأسبوع' : t.days.join('، ')}` : ''}</div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px">
+        <div class="th-side">
           <div class="price-side"><div class="p">${t.price || 0} ج.م</div><div class="l">سعر المقعد</div></div>
           <button class="book-btn" type="button" ${closed ? 'disabled' : ''} onclick="event.stopPropagation();openBookingById('${t.id}')">حجز مباشر ←</button>
-          <span class="chev">▼</span>
         </div>
       </div>
       <div class="trip-details">
@@ -1832,7 +1859,7 @@ window.setPvDriver = function (v) {
 window.submitPrivate = async function () {
     var _a, _b, _c, _d, _e, _f, _g;
     const name = ((_a = (document.getElementById("pv-name") || {}).value) === null || _a === void 0 ? void 0 : _a.trim()) || "";
-    const phone = ((_b = (document.getElementById("pv-phone") || {}).value) === null || _b === void 0 ? void 0 : _b.trim()) || "";
+    let phone = ((_b = (document.getElementById("pv-phone") || {}).value) === null || _b === void 0 ? void 0 : _b.trim()) || "";
     const from = ((_c = (document.getElementById("pv-from") || {}).value) === null || _c === void 0 ? void 0 : _c.trim()) || "";
     const to = ((_d = (document.getElementById("pv-to") || {}).value) === null || _d === void 0 ? void 0 : _d.trim()) || "";
     const date = ((_e = (document.getElementById("pv-date") || {}).value) === null || _e === void 0 ? void 0 : _e.trim()) || "";
@@ -1871,7 +1898,8 @@ window.submitPrivate = async function () {
         showSuccess(booking);
     }
     catch (e) {
-        toast("خطأ في الإرسال", "err");
+        console.error(e);
+        toast("تعذر إرسال الطلب — تحقق من الاتصال أو من صلاحيات Firestore", "err");
     }
 };
 // ========== TRACK ==========
@@ -2349,7 +2377,7 @@ function renderFilteredBookings() {
     }
     box.innerHTML = list.map(b => {
         const isPriv = b.type === "private";
-        return `<div class="admin-trip">
+        return `<div class="admin-trip bk bk-${b.status || "pending"}">
       <div class="top-row">
         <div style="text-align:left">
           <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-wrap:wrap">
@@ -2365,7 +2393,7 @@ function renderFilteredBookings() {
         </div>
       </div>
       <div class="card-meta" style="margin-bottom:10px;text-align:left">
-        ${b.tripName || ""}${b.from ? (b.from + " ← " + b.to) : ""}
+        ${b.tripName || ""}${(b.tripName && b.from) ? " · " : ""}${b.from ? (b.from + " ← " + b.to) : ""}
         ${b.price ? " · " + b.price + " ج.م" : ""}${b.deposit ? " · عربون " + b.deposit + " ج" : ""}${b.driver ? " · سائق: " + b.driver : ""}
         ${b.notes ? "<br>📝 " + b.notes : ""}
         ${getReceiptUrl(b) ? `<div style="margin-top:8px"><a href="${getReceiptUrl(b)}" target="_blank"><img src="${getReceiptUrl(b)}" alt="إيصال" style="max-height:80px;border-radius:8px;border:1px solid #e2e8f0"></a> <span style="color:#059669;font-size:.78rem">إيصال مرفوع</span></div>` : ""}
