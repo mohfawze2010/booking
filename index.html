@@ -299,6 +299,21 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 .th-main{flex:1;min-width:0}
 .th-side{display:flex;align-items:center;gap:16px}
 .trip-title .chev{font-size:.8rem}
+
+/* mobile: collapsible admin trip actions */
+@media(max-width:768px){
+  .admin-trip .actions-mid,
+  .admin-trip .actions-bot{display:none}
+  .admin-trip.expanded .actions-mid{display:flex}
+  .admin-trip.expanded .actions-bot{display:flex}
+  .admin-trip .top-row{cursor:pointer;user-select:none}
+  .admin-trip .fold-hint{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;color:#64748b;margin-top:6px}
+  .admin-trip.expanded .fold-hint .fh-chev{transform:rotate(180deg)}
+}
+@media(min-width:769px){
+  .admin-trip .fold-hint{display:none!important}
+}
+
 </style>
 </head>
 <body>
@@ -352,8 +367,9 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
     <p style="font-size:.74rem;color:#94a3b8;text-align:center;margin:0 0 6px">كضيف: احجز وتابع حجزك بالكود فقط، بدون حساب.</p>
     <div id="auth-admin-area" class="hidden" style="margin-top:14px;padding-top:12px;border-top:1px dashed #e2e8f0">
     <div id="auth-form-login">
-      <div class="fg"><label>البريد</label><input id="auth-email" type="email" placeholder="" autocomplete="email"></div>
-      <div class="fg" style="margin-bottom:4px"><label>كلمة المرور</label><input id="auth-pass" type="password" placeholder="" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <p style="font-size:.8rem;color:#64748b;text-align:right;margin:0 0 12px;line-height:1.65;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 12px">ℹ️ أدخل <b>البريد الإلكتروني</b> و<b>كلمة المرور</b> الخاصين بحسابك المعتمد للدخول إلى التطبيق.</p>
+      <div class="fg"><label style="display:block!important;text-align:right;margin-bottom:6px;font-weight:700;color:#334155;font-size:.85rem">البريد الإلكتروني</label><input id="auth-email" type="email" placeholder="" autocomplete="email"></div>
+      <div class="fg" style="margin-bottom:4px"><label style="display:block!important;text-align:right;margin-bottom:6px;font-weight:700;color:#334155;font-size:.85rem">كلمة المرور</label><input id="auth-pass" type="password" placeholder="" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <button type="button" class="btn-login-main" onclick="doLogin()">تسجيل الدخول</button>
       <button type="button" class="link-forgot" onclick="forgotPassword()">نسيت كلمة المرور؟</button>
     </div>
@@ -1646,6 +1662,46 @@ window.showCust = function (v) {
         setBottomNav(v === "private" ? "private" : v);
 };
 // ========== TRIP CARDS (expandable) ==========
+
+function formatTripClock(t) {
+    if (!t) return "-";
+    if (t.timeRaw) {
+        try {
+            let [hh, mm] = String(t.timeRaw).split(":").map(Number);
+            if (!isNaN(hh)) {
+                const period = hh >= 12 ? "م" : "ص";
+                let h12 = hh % 12;
+                if (h12 === 0) h12 = 12;
+                return h12 + ":" + String(mm || 0).padStart(2, "0") + " " + period;
+            }
+        } catch (e) {}
+    }
+    const s = String(t.time || "");
+    const m = s.match(/(\d{1,2}:\d{2}\s*[صمAPMapm\.]+)/);
+    if (m) return m[1].trim();
+    // if time looks like pure clock without days words
+    if (s && !/[أحدإثنثلاثأربعخميسجمعسبتون]/.test(s) && !/كل |طوال/.test(s))
+        return s;
+    return s || "-";
+}
+function formatTripSchedule(t) {
+    if (!t) return "";
+    const days = Array.isArray(t.days) ? t.days.filter(Boolean) : [];
+    if (days.length) {
+        if (days.length >= 7 || (t.repeat && days.length >= 6))
+            return t.repeat ? "كل الأسبوع" : "طوال الأسبوع";
+        const joined = days.join(" و ");
+        return t.repeat ? ("كل " + joined) : joined;
+    }
+    // fallback: strip clock from combined time label to leave days part
+    const s = String(t.time || "").trim();
+    if (!s) return "";
+    const stripped = s.replace(/\d{1,2}:\d{2}\s*[صمAPMapm\.]*/g, "").replace(/\s+/g, " ").trim();
+    if (stripped && /[أحدإثنثلاثأربعخميسجمعسبتون]|كل |طوال/.test(stripped))
+        return stripped;
+    return "";
+}
+
 function renderTrips(filter = "") {
     const list = document.getElementById("trips-list");
     const f = trips.filter(t => !filter || (t.name || "").includes(filter) || (t.from || "").includes(filter) || (t.to || "").includes(filter));
@@ -1673,7 +1729,7 @@ function renderTrips(filter = "") {
       <div class="trip-head" onclick="toggleTrip(${idx})">
         <div class="th-main">
           <div class="trip-title"><span class="chev">▼</span><span>${t.name || ((t.from || '') + ' ↔ ' + (t.to || ''))}</span> ${tag}</div>
-          <div class="trip-meta">📍 ${(t.from || '') + ' – ' + (t.to || '')}<br>🕐 ${t.time || '-'}${(t.days && t.days.length) ? `<br>📅 ${t.days.length >= 7 || (t.repeat && t.days.length >= 6) ? 'طوال الأسبوع' : t.days.join('، ')}` : ''}</div>
+          <div class="trip-meta">📍 ${(t.from || '') + ' – ' + (t.to || '')}<br>🕐 ${formatTripClock(t)}${(formatTripSchedule(t) ? `<br>📅 ${formatTripSchedule(t)}` : '')}</div>
         </div>
         <div class="th-side">
           <div class="price-side"><div class="p">${t.price || 0} ج.م</div><div class="l">سعر المقعد</div></div>
@@ -1682,7 +1738,8 @@ function renderTrips(filter = "") {
       </div>
       <div class="trip-details">
         <div class="details-grid">
-          <div class="d-item"><div class="lbl">🕐 موعد الانطلاق</div><div class="val">${t.time || '-'}</div></div>
+          <div class="d-item"><div class="lbl">🕐 وقت التحرك</div><div class="val">${formatTripClock(t)}</div></div>
+          <div class="d-item"><div class="lbl">📅 الأيام المجدولة</div><div class="val">${formatTripSchedule(t) || '—'}</div></div>
           <div class="d-item"><div class="lbl">💰 العربون المطلوب</div><div class="val" style="color:#f97316">${t.deposit || 0} ج.م / مقعد</div></div>
           <div class="d-item"><div class="lbl">🪑 المقاعد المتبقية</div><div class="val">${t.available || 0} من أصل ${t.seats || '-'}</div></div>
           <div class="d-item"><div class="lbl">🚗 نوع السيارة</div><div class="val">${t.car || '-'}</div></div>
@@ -1736,7 +1793,7 @@ window.openBooking = function (t) {
     document.getElementById("m-book-title").textContent = t.name || ((t.from || "") + " ↔ " + (t.to || ""));
     document.getElementById("m-book-info").innerHTML = `
     <span>📍 المسار: ${(t.from || "") + " – " + (t.to || "")}</span>
-    <span>🕐 الموعد: ${t.time || "-"}</span>
+    <span>🕐 الوقت: ${formatTripClock(t)}</span>${formatTripSchedule(t) ? `<span>📅 ${formatTripSchedule(t)}</span>` : ""}
     <span style="color:#059669;font-weight:700">المتاح للحجز: ${t.available || 0} مقاعد</span>`;
     document.getElementById("b-name").value = (currentUser && currentUser.displayName) || "";
     document.getElementById("b-phone").value = "";
@@ -2647,18 +2704,19 @@ function renderDashTrips() {
     }
     box.innerHTML = trips.map((t, i) => {
         const isClosed = typeof isTripClosed === "function" ? isTripClosed(t) : !!t.closed;
-        return `<div class="admin-trip">
-      <div class="top-row">
+        return `<div class="admin-trip" id="dtrip-${i}">
+      <div class="top-row" onclick="toggleAdminTripFold(${i}, this)">
         <div>
           <div class="card-title" style="font-size:1rem">${t.name || ((t.from || "") + " ↔ " + (t.to || ""))}</div>
-          <div class="card-meta">🕐 ${t.time || "-"} · 💰 ${t.price || 0} ج.م · مقاعد: <b>${t.available || 0}</b>/${t.seats || "-"}
-          ${t.driver ? " · 👨‍✈️ " + t.driver : ""}${t.supervisorName ? " · 👤 مشرف: " + t.supervisorName : ""}</div>
+          <div class="card-meta">🕐 ${formatTripClock(t)} · 💰 ${t.price || 0} ج.م · مقاعد: <b>${t.available || 0}</b>/${t.seats || "-"}
+          ${formatTripSchedule(t) ? " · 📅 " + formatTripSchedule(t) : ""}${t.driver ? " · 👨‍✈️ " + t.driver : ""}${t.supervisorName ? " · 👤 مشرف: " + t.supervisorName : ""}</div>
+          <div class="fold-hint"><span class="fh-chev" style="display:inline-block;transition:.2s">▼</span> اضغط لإظهار الإجراءات</div>
         </div>
         <div class="badges">
           ${isClosed ? `<span class="badge-pill badge-closed">🔒 مغلق</span>` : `<span class="badge-pill badge-open">🔓 مفتوح</span>`}
         </div>
       </div>
-      <div class="actions-mid">
+      <div class="actions-mid" onclick="event.stopPropagation()">
         <button type="button" class="btn-seat-add" onclick="adjustSeats(${i},1)">+ حجز مقعد</button>
         <button type="button" class="btn-seat-rem" onclick="adjustSeats(${i},-1)">− إلغاء مقعد</button>
         ${isClosed
@@ -3008,12 +3066,13 @@ function renderAdminTrips() {
     document.getElementById("admin-trips-list").innerHTML = trips.map((t, i) => {
         const isClosed = isTripClosed(t);
         const soldOut = !isFinite(Number(t.available)) || Number(t.available) <= 0;
-        return `<div class="admin-trip">
-      <div class="top-row">
+        return `<div class="admin-trip" id="atrip-${i}">
+      <div class="top-row" onclick="toggleAdminTripFold(${i}, this)">
         <div>
           <div class="card-title" style="font-size:1.05rem;margin-bottom:6px">${t.name || ((t.from || "") + " ↔ " + (t.to || ""))}</div>
-          <div class="card-meta">🕐 ${t.time || "-"} ${t.repeat ? "🔁" : ""} · 💰 ${t.price || 0} ج.م · مقاعد: <b>${t.available || 0}</b>/${t.seats || "-"}
-          ${t.driver ? " · 👨‍✈️ " + t.driver : ""}${t.supervisorName ? " · 👤 مشرف: " + t.supervisorName + (t.supervisorPhone ? " (" + t.supervisorPhone + ")" : "") : ""}</div>
+          <div class="card-meta">🕐 ${formatTripClock(t)} ${t.repeat ? "🔁" : ""} · 💰 ${t.price || 0} ج.م · مقاعد: <b>${t.available || 0}</b>/${t.seats || "-"}
+          ${formatTripSchedule(t) ? " · 📅 " + formatTripSchedule(t) : ""}${t.driver ? " · 👨‍✈️ " + t.driver : ""}${t.supervisorName ? " · 👤 مشرف: " + t.supervisorName + (t.supervisorPhone ? " (" + t.supervisorPhone + ")" : "") : ""}</div>
+          <div class="fold-hint"><span class="fh-chev" style="display:inline-block;transition:.2s">▼</span> اضغط لإظهار الإجراءات</div>
         </div>
         <div class="badges">
           ${isClosed
@@ -3021,12 +3080,12 @@ function renderAdminTrips() {
             : `<span class="badge-pill badge-open">🔓 الحجز مفتوح</span><span class="badge-pill badge-active">نشط</span>`}
         </div>
       </div>
-      <div class="actions-mid">
+      <div class="actions-mid" onclick="event.stopPropagation()">
         <span style="font-size:.82rem;color:#64748b;margin-left:auto">حجز خارج التطبيق:</span>
         <button type="button" class="btn-seat-add" onclick="adjustSeats(${i},1)">+ حجز مقعد</button>
         <button type="button" class="btn-seat-rem" onclick="adjustSeats(${i},-1)">− إلغاء مقعد</button>
       </div>
-      <div class="actions-bot">
+      <div class="actions-bot" onclick="event.stopPropagation()">
         <button type="button" class="icon-btn danger" title="حذف" onclick="delTrip(${i})">🗑️</button>
         <button type="button" class="icon-btn edit" title="تعديل" onclick="editTrip(${i})">✏️</button>
         ${isClosed
@@ -3036,6 +3095,12 @@ function renderAdminTrips() {
     </div>`;
     }).join("") || '<div style="color:#94a3b8;padding:20px;text-align:center">لا توجد رحلات</div>';
 }
+window.toggleAdminTripFold = function (i, el) {
+    const card = (el && el.closest) ? (el.closest(".admin-trip") || el) : el;
+    const node = card || document.getElementById("atrip-" + i) || document.getElementById("dtrip-" + i);
+    if (!node) return;
+    node.classList.toggle("expanded");
+};
 window.adjustSeats = async function (i, bookedDelta) {
     var _a, _b;
     // bookedDelta = +1 يعني حجز مقعد إضافي (ينقص المتاح)
@@ -3171,13 +3236,17 @@ window.openTripForm = function (editTrip = null, editIdx = -1) {
         const price = +document.getElementById("f-price").value || 0;
         const deposit = +document.getElementById("f-deposit").value || 0;
         const closed = document.getElementById("f-closed").checked;
+        // time = ساعة التحرك فقط — الأيام تُحفظ في days وتُعرض منفصلة للعميل
         let timeLabel = document.getElementById("f-time-label").value.trim();
         if (!timeLabel) {
-            if (days.length)
-                timeLabel = (repeat ? 'كل ' : '') + days.join(' و ') + ' ' + timeStr;
-            else
-                timeLabel = timeStr;
+            timeLabel = timeStr;
+        } else {
+            // إن وُجد نص يدوي نحاول الإبقاء عليه لكن العميل يعرض الوقت من timeRaw
+            timeLabel = timeLabel;
         }
+        // دائماً نفضّل تخزين الوقت المنفصل في time أيضاً عند عدم الرغبة بنص مركّب
+        if (!document.getElementById("f-time-label").value.trim())
+            timeLabel = timeStr;
         const nameVal = document.getElementById("f-name").value.trim() || (from + " ↔ " + to);
         const svSel = document.getElementById("f-supervisor");
         const svOpt = svSel && svSel.selectedOptions && svSel.selectedOptions[0] ? svSel.selectedOptions[0] : null;
