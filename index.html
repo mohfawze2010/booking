@@ -31,8 +31,10 @@ body{overflow-x:hidden;font-family:'Cairo',sans-serif;background:#f1f5f9;color:#
 .badge{background:#eef2dc;color:#46561a;padding:3px 11px;border-radius:999px;font-size:.78rem;font-weight:600}
 .search{width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-family:inherit;font-size:.92rem;margin-bottom:14px;outline:none;background:#fff}
 /* Trip cards - expandable */
-.trip-card{background:#fff;border-radius:16px;margin-bottom:14px;border:1px solid #e2e8f0;overflow:hidden;transition:.2s}
-.trip-card.closed{opacity:.7}
+.trip-card{background:#fff;border-radius:16px;margin-bottom:14px;border:1.5px solid #cbd5e1;overflow:hidden;transition:.2s;box-shadow:0 2px 10px rgba(15,23,42,.06)}
+.trip-card:not(.closed){border-color:#cdd9a3;box-shadow:0 3px 12px rgba(91,110,34,.1)}
+.trip-card:not(.closed).open{border-color:#5b6e22;box-shadow:0 6px 18px rgba(91,110,34,.15)}
+.trip-card.closed{opacity:.72;border-color:#e2e8f0;background:#f8fafc;box-shadow:none}
 .trip-head{padding:16px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer;flex-wrap:wrap}
 .trip-head:hover{background:#f8fafc}
 .trip-title{font-weight:700;font-size:1rem;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -557,14 +559,14 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
   <div class="stat s-wait" onclick="showDashFilter('payment')"><div class="icon">⏳</div><div class="n" id="s-pending">0</div><div class="t">بانتظار العربون</div><div class="d">في انتظار تأكيد الراكب</div></div>
   <div class="stat s-new" onclick="showDashFilter('pending')"><div class="icon">✦</div><div class="n" id="s-new">0</div><div class="t">طلبات جديدة</div><div class="d">قيد المراجعة والتسعير</div></div>
 </div>
-<div class="dash-shortcuts" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-  <button type="button" class="dash-sc" id="dash-btn-bookings" onclick="toggleDashPanel('bookings')" style="display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:14px 16px;cursor:pointer;font-family:inherit;text-align:right;transition:.15s;box-shadow:0 2px 8px rgba(15,23,42,.04)">
-    <span style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#5b6e22,#6b7f2c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">📋</span>
-    <span style="flex:1;min-width:0"><b style="display:block;font-size:.95rem;color:#0f172a">الحجوزات والطلبات</b><small style="color:#64748b;font-size:.75rem">عرض وإدارة كل الطلبات</small></span>
+<div class="dash-shortcuts" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+  <button type="button" class="dash-sc" id="dash-btn-bookings" onclick="toggleDashPanel('bookings')" style="display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #e2e8f0;border-radius:12px;padding:8px 10px;cursor:pointer;font-family:inherit;text-align:right;transition:.15s;box-shadow:0 1px 4px rgba(15,23,42,.04)">
+    <span style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#5b6e22,#6b7f2c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">📋</span>
+    <span style="flex:1;min-width:0"><b style="display:block;font-size:.78rem;color:#0f172a;line-height:1.3">الحجوزات والطلبات</b><small style="color:#64748b;font-size:.65rem">عرض وإدارة الطلبات</small></span>
   </button>
-  <button type="button" class="dash-sc" id="dash-btn-trips" onclick="toggleDashPanel('trips')" style="display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:14px 16px;cursor:pointer;font-family:inherit;text-align:right;transition:.15s;box-shadow:0 2px 8px rgba(15,23,42,.04)">
-    <span style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">🚌</span>
-    <span style="flex:1;min-width:0"><b style="display:block;font-size:.95rem;color:#0f172a">الرحلات والخطوط</b><small style="color:#64748b;font-size:.75rem">المقاعد والإغلاق والتعديل</small></span>
+  <button type="button" class="dash-sc" id="dash-btn-trips" onclick="toggleDashPanel('trips')" style="display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #e2e8f0;border-radius:12px;padding:8px 10px;cursor:pointer;font-family:inherit;text-align:right;transition:.15s;box-shadow:0 1px 4px rgba(15,23,42,.04)">
+    <span style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🚌</span>
+    <span style="flex:1;min-width:0"><b style="display:block;font-size:.78rem;color:#0f172a;line-height:1.3">الرحلات والخطوط</b><small style="color:#64748b;font-size:.65rem">المقاعد والإغلاق</small></span>
   </button>
 </div>
 <div class="panel" id="dash-panel-bookings" style="display:none">
@@ -2513,14 +2515,15 @@ async function refreshAdminStats() {
     try {
         const snap = await getDocs(collection(db, "bookings"));
         const list = snap.docs.map(d => (Object.assign({ id: d.id }, d.data())));
-        const confirmed = list.filter(b => b.status === "confirmed").length;
-        const pending = list.filter(b => b.status === "pending").length;
-        const newer = list.filter(b => b.status === "pending" && b.type === "private").length;
+        // الأرقام يجب أن تطابق نفس فلاتر العرض عند الضغط على الكارت
+        const confirmed = list.filter(b => normalizeBookingStatus(b.status) === "confirmed").length;
+        const waitingPay = list.filter(b => normalizeBookingStatus(b.status) === "payment_pending").length;
+        const newRequests = list.filter(b => normalizeBookingStatus(b.status) === "pending").length;
         const el = (id) => document.getElementById(id);
         if (el("s-bookings")) el("s-bookings").textContent = list.length;
         if (el("s-confirmed")) el("s-confirmed").textContent = confirmed;
-        if (el("s-pending")) el("s-pending").textContent = pending;
-        if (el("s-new")) el("s-new").textContent = newer || pending;
+        if (el("s-pending")) el("s-pending").textContent = waitingPay; // بانتظار العربون
+        if (el("s-new")) el("s-new").textContent = newRequests; // طلبات جديدة
         allAdminBookings = list;
         // لا نعرض القوائم تلقائياً — تظهر فقط عند الضغط على الاختصار أو كارت الإحصاء
     }
@@ -2580,16 +2583,28 @@ window.showDashFilter = function (filter) {
         if (box) box.innerHTML = '<div style="color:#dc2626;padding:10px;text-align:center">تعذر التحميل</div>';
     });
 };
+function normalizeBookingStatus(st) {
+    const s = String(st || "pending").toLowerCase().trim().replace(/[\s\-]+/g, "_");
+    if (s === "payment" || s === "payment_pending" || s === "awaiting_payment" || s === "deposit")
+        return "payment_pending";
+    if (s === "confirmed" || s === "ok" || s === "done")
+        return "confirmed";
+    if (s === "cancelled" || s === "canceled" || s === "cancel")
+        return "cancelled";
+    if (s === "pending" || s === "new" || s === "")
+        return "pending";
+    return s;
+}
 function filterBookingsList(list, filter) {
     let out = list || [];
     if (filter === "pending")
-        out = out.filter(b => b.status === "pending");
+        out = out.filter(b => normalizeBookingStatus(b.status) === "pending");
     else if (filter === "payment")
-        out = out.filter(b => b.status === "payment" || b.status === "payment_pending");
+        out = out.filter(b => normalizeBookingStatus(b.status) === "payment_pending");
     else if (filter === "confirmed")
-        out = out.filter(b => b.status === "confirmed");
+        out = out.filter(b => normalizeBookingStatus(b.status) === "confirmed");
     else if (filter === "cancelled")
-        out = out.filter(b => b.status === "cancelled");
+        out = out.filter(b => normalizeBookingStatus(b.status) === "cancelled");
     return out;
 }
 function renderDashBookings(list, filter) {
@@ -2703,13 +2718,13 @@ function renderFilteredBookings() {
     const q = (((_a = document.getElementById("bk-search")) === null || _a === void 0 ? void 0 : _a.value) || "").trim();
     let list = allAdminBookings;
     if (bkFilter === "pending")
-        list = list.filter(b => b.status === "pending");
+        list = list.filter(b => normalizeBookingStatus(b.status) === "pending");
     else if (bkFilter === "payment")
-        list = list.filter(b => b.status === "payment" || b.status === "payment_pending");
+        list = list.filter(b => normalizeBookingStatus(b.status) === "payment_pending");
     else if (bkFilter === "confirmed")
-        list = list.filter(b => b.status === "confirmed");
+        list = list.filter(b => normalizeBookingStatus(b.status) === "confirmed");
     else if (bkFilter === "cancelled")
-        list = list.filter(b => b.status === "cancelled");
+        list = list.filter(b => normalizeBookingStatus(b.status) === "cancelled");
     if (q)
         list = list.filter(b => (b.code || "").includes(q) || (b.name || "").includes(q) || (b.phone || "").includes(q));
     if (!list.length) {
