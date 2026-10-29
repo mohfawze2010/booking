@@ -35,7 +35,11 @@ body{overflow-x:hidden;font-family:'Cairo',sans-serif;background:#f1f5f9;color:#
 .trip-card:not(.closed){border-color:#2563eb;box-shadow:0 4px 14px rgba(37,99,235,.14)}
 .trip-card:not(.closed).open{border-color:#1d4ed8;box-shadow:0 8px 22px rgba(37,99,235,.2)}
 .trip-card.closed{opacity:.72;border-color:#cbd5e1;background:#f8fafc;box-shadow:none}
-.trip-head{padding:16px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer;flex-wrap:wrap}
+.trip-card{position:relative}
+.trip-status-badge{position:absolute;top:10px;left:10px;z-index:3;pointer-events:none}
+.trip-status-badge .tag{box-shadow:0 2px 8px rgba(15,23,42,.12)}
+.trip-title .tag{display:none}
+.trip-head{padding:16px 18px;padding-left:100px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer;flex-wrap:wrap}
 .trip-head:hover{background:#f8fafc}
 .trip-title{font-weight:700;font-size:1rem;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .tag{background:#ecfdf5;color:#059669;font-size:.72rem;padding:2px 8px;border-radius:999px;font-weight:600}
@@ -161,7 +165,8 @@ body{overflow-x:hidden;font-family:'Cairo',sans-serif;background:#f1f5f9;color:#
   .c-header .nav-btns{display:none}
 }
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e2e8f0;z-index:90;padding:6px 8px calc(6px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(0,0,0,.06)}
-@media(max-width:768px){.bottom-nav.is-visible{display:flex;justify-content:space-around;align-items:center} body.has-bottom-nav{padding-bottom:72px}}
+.bottom-nav.is-visible{display:flex;justify-content:space-around;align-items:center}
+body.has-bottom-nav{padding-bottom:72px}
 .bottom-nav button{flex:1;background:transparent;border:none;font-family:inherit;font-size:.72rem;font-weight:700;color:#64748b;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
 .bottom-nav button.active{color:#2563eb}
 .top-nav-btn{transition:.15s}
@@ -995,6 +1000,22 @@ function isValidEgPhone(p) {
     const s = normalizePhone(p);
     return /^01[0125][0-9]{8}$/.test(s);
 }
+function toWaNumber(phone) {
+    let s = normalizePhone(phone);
+    if (!s) return "";
+    // local 01xxxxxxxxx -> 201xxxxxxxxx
+    if (s.startsWith("0")) s = s.slice(1);
+    if (s.startsWith("20")) return s;
+    return "20" + s;
+}
+function waHref(phone, text) {
+    const n = toWaNumber(phone);
+    if (!n) return "#";
+    return text
+        ? ("https://wa.me/" + n + "?text=" + encodeURIComponent(text))
+        : ("https://wa.me/" + n);
+}
+
 function getReceiptUrl(b) {
     if (!b)
         return "";
@@ -1726,9 +1747,10 @@ function renderTrips(filter = "") {
         else
             tag = `<span class="tag">متاح ${t.available || 0} مقاعد</span>`;
         return `<div class="trip-card ${closed ? 'closed' : ''}" id="tc-${idx}">
+      <div class="trip-status-badge">${tag}</div>
       <div class="trip-head" onclick="toggleTrip(${idx})">
         <div class="th-main">
-          <div class="trip-title"><span class="chev">▼</span><span>${t.name || ((t.from || '') + ' ↔ ' + (t.to || ''))}</span> ${tag}</div>
+          <div class="trip-title"><span class="chev">▼</span><span>${t.name || ((t.from || '') + ' ↔ ' + (t.to || ''))}</span></div>
           <div class="trip-meta">📍 ${(t.from || '') + ' – ' + (t.to || '')}<br>🕐 ${formatTripClock(t)}${(formatTripSchedule(t) ? `<br>📅 ${formatTripSchedule(t)}` : '')}</div>
         </div>
         <div class="th-side">
@@ -1744,10 +1766,10 @@ function renderTrips(filter = "") {
           <div class="d-item"><div class="lbl">🪑 المقاعد المتبقية</div><div class="val">${t.available || 0} من أصل ${t.seats || '-'}</div></div>
           <div class="d-item"><div class="lbl">🚗 نوع السيارة</div><div class="val">${t.car || '-'}</div></div>
           ${t.supervisorName ? `<div class="d-item"><div class="lbl">👤 مشرف المتابعة</div><div class="val">${t.supervisorName}</div></div>` : ''}
-          ${t.supervisorPhone ? `<div class="d-item"><div class="lbl">💬 واتساب المشرف</div><div class="val"><a href="https://wa.me/2${String(t.supervisorPhone).replace(/^0/, '')}" target="_blank" style="color:#16a34a;font-weight:700">${t.supervisorPhone}</a></div></div>` : ''}
+          ${t.supervisorPhone ? `<div class="d-item"><div class="lbl">💬 واتساب المشرف</div><div class="val"><a href="${waHref(t.supervisorPhone)}" target="_blank" style="color:#16a34a;font-weight:700">${t.supervisorPhone}</a></div></div>` : ''}
         </div>
         ${t.notes ? `<div class="note-box">ℹ️ ${t.notes}</div>` : ''}
-        ${t.supervisorPhone ? `<div class="note-box" style="background:#ecfdf5;border-color:#a7f3d0;color:#047857">👤 للمتابعة تواصل مع المشرف <b>${t.supervisorName || ''}</b> عبر واتساب: <a href="https://wa.me/2${String(t.supervisorPhone).replace(/^0/, '')}" target="_blank" style="color:#047857;font-weight:800">${t.supervisorPhone}</a></div>` : ''}
+        ${t.supervisorPhone ? `<div class="note-box" style="background:#ecfdf5;border-color:#a7f3d0;color:#047857">👤 للمتابعة تواصل مع المشرف <b>${t.supervisorName || ''}</b> عبر واتساب: <a href="${waHref(t.supervisorPhone)}" target="_blank" style="color:#047857;font-weight:800">${t.supervisorPhone}</a></div>` : ''}
         <button class="confirm-bar" type="button" ${closed ? 'disabled' : ''} onclick="openBookingAt(${idx})">
           ${closed ? 'الرحلة مكتملة / مغلقة' : 'تأكيد حجز مقعد في رحلة ' + (t.name || '') + ' ←'}
         </button>
@@ -2187,14 +2209,14 @@ function renderTrackCard(b, docId) {
     ${payBlock}
     ${isOk ? `<div style="background:#ecfdf5;border-radius:12px;padding:12px;margin-bottom:12px;color:#047857">
       <div style="font-weight:800;margin-bottom:8px">✓ حجزك مؤكد</div>
-      ${b.driver ? `<div style="margin-bottom:6px">السائق: <b>${b.driver}</b>${b.driverPhone ? ` — <a href="tel:${b.driverPhone}">${b.driverPhone}</a> · <a href="https://wa.me/2${String(b.driverPhone).replace(/^0/, "")}" target="_blank">واتساب</a>` : ""}</div>` : `<div style="color:#64748b;margin-bottom:6px">السائق سيُحدد قريباً</div>`}
+      ${b.driver ? `<div style="margin-bottom:6px">السائق: <b>${b.driver}</b>${b.driverPhone ? ` — <a href="tel:${b.driverPhone}">${b.driverPhone}</a> · <a href="${waHref(b.driverPhone)}" target="_blank">واتساب</a>` : ""}</div>` : `<div style="color:#64748b;margin-bottom:6px">السائق سيُحدد قريباً</div>`}
       ${(b.carModel || b.car) ? `<div>السيارة: <b>${b.carCategory || ""} ${b.carModel || b.car || ""}</b></div>` : ""}
       ${b.carImage ? `<img src="${b.carImage}" alt="سيارة" style="margin-top:8px;max-width:100%;max-height:140px;border-radius:12px;object-fit:cover">` : ""}
     </div>` : ""}
     ${b.supervisorPhone ? `<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px;margin-bottom:12px;color:#166534">
       <div style="font-weight:800;margin-bottom:6px">👤 مشرف المتابعة</div>
       <div>${b.supervisorName ? `<b>${b.supervisorName}</b> — ` : ""}<a href="tel:${b.supervisorPhone}">${b.supervisorPhone}</a>
-      · <a href="https://wa.me/2${String(b.supervisorPhone).replace(/^0/, "")}" target="_blank" style="color:#16a34a;font-weight:700">💬 واتساب المشرف</a></div>
+      · <a href="${waHref(b.supervisorPhone)}" target="_blank" style="color:#16a34a;font-weight:700">💬 واتساب المشرف</a></div>
     </div>` : ""}
     ${(b.passengerNotes || b.paymentNotes) ? `<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px;margin-bottom:12px;font-size:.88rem;color:#1e40af">
       <b>تعليمات الإدارة:</b><br>${b.passengerNotes || ""}${b.passengerNotes && b.paymentNotes ? "<br>" : ""}${b.paymentNotes || ""}
@@ -2214,7 +2236,7 @@ function renderTrackCard(b, docId) {
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       ${!isCancel && !isOk ? `<button type="button" class="btn btn-ghost" style="flex:1;justify-content:center;color:#dc2626;border:1px solid #fecaca" onclick="cancelMyBooking('${docId}')">✕ إلغاء هذا الطلب</button>` : ""}
-      <a class="btn btn-ghost" style="flex:1;justify-content:center" href="https://wa.me/2${(pay.phone || "").replace(/^0/, "")}?text=${encodeURIComponent("استفسار عن الحجز " + b.code)}" target="_blank">💬 دعم الإدارة</a>
+      <a class="btn btn-ghost" style="flex:1;justify-content:center" href="${waHref((pay.phone || ""), "استفسار عن الحجز " + b.code)}" target="_blank">💬 دعم الإدارة</a>
       <button type="button" class="btn btn-ghost" style="flex:1;justify-content:center" onclick="shareBookingWA('${b.code}','${b.name || ""}')">↗ مشاركة الكود عبر واتساب</button>
     </div>
   </div>`;
@@ -2364,7 +2386,7 @@ function updateWaFloat() {
     a.classList.add("is-visible");
     a.style.display = "";
     const contact = (window.APP_SETTINGS || {}).contact_name || "أ/ محمد فوزى";
-    a.href = "https://wa.me/2" + phone.replace(/^0/, "") + "?text=" + encodeURIComponent("مرحباً أ/ محمد فوزى، أحتاج مساعدة بخصوص الحجز");
+    a.href = waHref(phone, "مرحباً أ/ محمد فوزى، أحتاج مساعدة بخصوص الحجز");
     a.title = "واتساب " + contact;
 }
 function normalizeBookingCode(raw) {
@@ -2458,6 +2480,7 @@ window.clearAllDemoData = async function () {
         cars = [];
         supervisors = [];
         allAdminBookings = [];
+        try { localStorage.setItem("aman_skip_demo_seed", "1"); } catch (e) {}
         toast("تم الحذف: حجوزات " + n1 + " · رحلات " + n2 + " · سائقين " + n3 + " · سيارات " + n4 + " · مشرفين " + n5, "ok");
         setTimeout(() => location.reload(), 800);
     }
@@ -2477,6 +2500,7 @@ window.restoreDemoData = async function () {
         await Promise.all(DEFAULT_TRIPS.map(t => addDoc(collection(db, "trips"), Object.assign({}, t)).catch(() => { })));
         await Promise.all(DEFAULT_DRIVERS.map(d => addDoc(collection(db, "drivers"), Object.assign({}, d)).catch(() => { })));
         await Promise.all(DEFAULT_CARS.map(c => addDoc(collection(db, "cars"), Object.assign({}, c)).catch(() => { })));
+        try { localStorage.removeItem("aman_skip_demo_seed"); } catch (e) {}
         toast("تمت استعادة البيانات التجريبية", "ok");
         setTimeout(() => location.reload(), 800);
     }
@@ -2690,7 +2714,7 @@ function renderDashBookings(list, filter) {
         <button type="button" class="btn btn-indigo btn-sm" onclick="manageBooking('${id}')">إدارة / تعيين</button>
         ${st !== "confirmed" && st !== "cancelled" ? `<button type="button" class="btn btn-green btn-sm" onclick="updStatus('${id}','confirmed')">✓ تأكيد</button>` : ""}
         ${st !== "cancelled" ? `<button type="button" class="btn btn-ghost btn-sm" style="color:#dc2626" onclick="updStatus('${id}','cancelled')">إلغاء</button>` : ""}
-        ${b.phone ? `<a class="btn btn-ghost btn-sm" href="https://wa.me/2${String(b.phone).replace(/^0/, "")}" target="_blank">💬 واتساب</a>` : ""}
+        ${b.phone ? `<a class="btn btn-ghost btn-sm" href="${waHref(b.phone)}" target="_blank">💬 واتساب</a>` : ""}
       </div>
     </div>`;
     }).join("");
@@ -2814,7 +2838,7 @@ function renderFilteredBookings() {
         ${getReceiptUrl(b) ? `<div style="margin-top:8px"><a href="${getReceiptUrl(b)}" target="_blank"><img src="${getReceiptUrl(b)}" alt="إيصال" style="max-height:80px;border-radius:8px;border:1px solid #e2e8f0"></a> <span style="color:#059669;font-size:.78rem">إيصال مرفوع</span></div>` : ""}
       </div>
       <div class="actions-bot" style="justify-content:stretch;gap:8px">
-        <a class="icon-btn" href="https://wa.me/2${(b.phone || "").replace(/^0/, "")}" target="_blank" title="واتساب">💬</a>
+        <a class="icon-btn" href="${waHref(b.phone)}" target="_blank" title="واتساب">💬</a>
         ${b.status !== "cancelled" ? `<button type="button" class="btn-seat-rem" style="color:#dc2626;border-color:#fecaca" onclick="updStatus('${b.id}','cancelled')">✕ إلغاء</button>` : ""}
         <button type="button" class="btn btn-indigo" style="flex:1;justify-content:center;padding:10px" onclick="manageBooking('${b.id}')">🔄 تحديث الحالة وتعيين السائق</button>
       </div>
@@ -2909,8 +2933,8 @@ window.openStatusDriver = function (id) {
       <div style="font-size:.8rem;color:#64748b;margin-top:4px">اضغط الصورة لفتحها بحجم أكبر</div>
     </div>` : `<div class="fg" style="background:#f8fafc;padding:10px;border-radius:10px;font-size:.85rem;color:#64748b">لم يُرفع إيصال بعد</div>`}
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-      <a class="btn btn-green btn-sm" target="_blank" href="https://wa.me/2${(b.phone || "").replace(/^0/, "")}?text=${encodeURIComponent("مرحباً " + (b.name || "") + "، بخصوص حجزك " + b.code + (b.price ? ("\nالسعر الإجمالي: " + b.price + " ج.م") : "") + (b.deposit ? ("\nالعربون: " + b.deposit + " ج.م") : "") + "\nيرجى تأكيد الموافقة ورفع إيصال التحويل من شاشة متابعة الحجز.")}">💬 إرسال السعر/العربون واتساب</a>
-      <a class="btn btn-ghost btn-sm" target="_blank" href="https://wa.me/2${(b.phone || "").replace(/^0/, "")}?text=${encodeURIComponent("تم تأكيد حجزك " + b.code + " بنجاح ✅" + (b.driver ? ("\nالسائق: " + b.driver) : "") + (b.carModel || b.car ? ("\nالسيارة: " + (b.carModel || b.car)) : ""))}">✅ رسالة تأكيد</a>
+      <a class="btn btn-green btn-sm" target="_blank" href="${waHref((b.phone || ""), "مرحباً " + (b.name || "") + "، بخصوص حجزك " + b.code + (b.price ? ("\nالسعر الإجمالي: " + b.price + " ج.م") : "") + (b.deposit ? ("\nالعربون: " + b.deposit + " ج.م") : "") + "\nيرجى تأكيد الموافقة ورفع إيصال التحويل من شاشة متابعة الحجز.")}">💬 إرسال السعر/العربون واتساب</a>
+      <a class="btn btn-ghost btn-sm" target="_blank" href="${waHref((b.phone || ""), "تم تأكيد حجزك " + b.code + " بنجاح ✅" + (b.driver ? ("\nالسائق: " + b.driver) : "") + (b.carModel || b.car ? ("\nالسيارة: " + (b.carModel || b.car)) : ""))}">✅ رسالة تأكيد</a>
     </div>`;
     document.getElementById("form-save-btn").onclick = async () => {
         var _a, _b, _c;
@@ -3295,17 +3319,21 @@ window.openTripForm = function (editTrip = null, editIdx = -1) {
 window.delTrip = async function (i) {
     if (!confirm("حذف الرحلة؟"))
         return;
-    const t = trips[i];
-    if (t === null || t === void 0 ? void 0 : t.firestoreId) {
-        try {
-            await deleteDoc(doc(db, "trips", t.firestoreId));
+    const tr = trips[i];
+    if (!tr) return toast("الرحلة غير موجودة", "err");
+    try {
+        if (tr.firestoreId) {
+            await deleteDoc(doc(db, "trips", tr.firestoreId));
         }
-        catch (e) { }
+        trips.splice(i, 1);
+        renderAdminTrips();
+        if (typeof renderDashTrips === "function") renderDashTrips();
+        renderTrips();
+        toast("تم حذف الرحلة", "ok");
+    } catch (e) {
+        console.error(e);
+        toast("تعذر الحذف — تحقق من صلاحيات Firestore", "err");
     }
-    trips.splice(i, 1);
-    renderAdminTrips();
-    renderTrips();
-    toast("تم الحذف", "ok");
 };
 // ========== DRIVERS & CARS ==========
 function renderAdminDrivers() {
@@ -3318,7 +3346,7 @@ function renderAdminDrivers() {
         </div>
         <div class="actions-bot" style="margin:0">
           ${d.phone ? `<a class="icon-btn" href="tel:${d.phone}" title="اتصال">📞</a>
-          <a class="icon-btn" href="https://wa.me/2${normalizePhone(d.phone).replace(/^0/, "")}" target="_blank" title="واتساب">💬</a>` : ""}
+          <a class="icon-btn" href="${waHref(d.phone)}" target="_blank" title="واتساب">💬</a>` : ""}
           <button type="button" class="icon-btn danger" title="حذف" onclick="delDriver(${i})">🗑️</button>
           <button type="button" class="icon-btn edit" title="تعديل" onclick="editDriver(${i})">✏️</button>
         </div>
@@ -3329,15 +3357,16 @@ window.delDriver = async function (i) {
     if (!confirm("حذف السائق؟"))
         return;
     const d = drivers[i];
-    if (d === null || d === void 0 ? void 0 : d.firestoreId) {
-        try {
-            await deleteDoc(doc(db, "drivers", d.firestoreId));
-        }
-        catch (e) { }
+    if (!d) return toast("السائق غير موجود", "err");
+    try {
+        if (d.firestoreId) await deleteDoc(doc(db, "drivers", d.firestoreId));
+        drivers.splice(i, 1);
+        renderAdminDrivers();
+        toast("تم حذف السائق", "ok");
+    } catch (e) {
+        console.error(e);
+        toast("تعذر الحذف — تحقق من صلاحيات Firestore", "err");
     }
-    drivers.splice(i, 1);
-    renderAdminDrivers();
-    toast("تم الحذف", "ok");
 };
 window.editDriver = function (i) { openDriverForm(drivers[i], i); };
 window.openDriverForm = function (editD = null, editIdx = -1) {
@@ -3405,7 +3434,7 @@ function renderAdminSupervisors() {
         </div>
         <div class="actions-bot" style="margin:0">
           ${s.phone ? `<a class="icon-btn" href="tel:${s.phone}" title="اتصال">📞</a>
-          <a class="icon-btn" href="https://wa.me/2${normalizePhone(s.phone).replace(/^0/, "")}" target="_blank" title="واتساب">💬</a>` : ""}
+          <a class="icon-btn" href="${waHref(s.phone)}" target="_blank" title="واتساب">💬</a>` : ""}
           <button type="button" class="icon-btn danger" title="حذف" onclick="delSupervisor(${i})">🗑️</button>
           <button type="button" class="icon-btn edit" title="تعديل" onclick="editSupervisor(${i})">✏️</button>
         </div>
@@ -3415,12 +3444,16 @@ function renderAdminSupervisors() {
 window.delSupervisor = async function (i) {
     if (!confirm("حذف المشرف؟")) return;
     const s = supervisors[i];
-    if (s && s.firestoreId) {
-        try { await deleteDoc(doc(db, "supervisors", s.firestoreId)); } catch (e) { }
+    if (!s) return toast("المشرف غير موجود", "err");
+    try {
+        if (s.firestoreId) await deleteDoc(doc(db, "supervisors", s.firestoreId));
+        supervisors.splice(i, 1);
+        renderAdminSupervisors();
+        toast("تم حذف المشرف", "ok");
+    } catch (e) {
+        console.error(e);
+        toast("تعذر الحذف — تحقق من صلاحيات Firestore", "err");
     }
-    supervisors.splice(i, 1);
-    renderAdminSupervisors();
-    toast("تم الحذف", "ok");
 };
 window.editSupervisor = function (i) { openSupervisorForm(supervisors[i], i); };
 window.openSupervisorForm = function (editS = null, editIdx = -1) {
@@ -3482,15 +3515,16 @@ window.delCar = async function (i) {
     if (!confirm("حذف السيارة؟"))
         return;
     const c = cars[i];
-    if (c === null || c === void 0 ? void 0 : c.firestoreId) {
-        try {
-            await deleteDoc(doc(db, "cars", c.firestoreId));
-        }
-        catch (e) { }
+    if (!c) return toast("السيارة غير موجودة", "err");
+    try {
+        if (c.firestoreId) await deleteDoc(doc(db, "cars", c.firestoreId));
+        cars.splice(i, 1);
+        renderAdminCars();
+        toast("تم حذف السيارة", "ok");
+    } catch (e) {
+        console.error(e);
+        toast("تعذر الحذف — تحقق من صلاحيات Firestore", "err");
     }
-    cars.splice(i, 1);
-    renderAdminCars();
-    toast("تم الحذف", "ok");
 };
 window.editCar = function (i) { openCarForm(cars[i], i); };
 window._carImageData = "";
@@ -3655,7 +3689,7 @@ async function loadDriverTrips() {
         html += confirmed.map(p => `<div class="card" style="margin-bottom:8px"><div class="card-info"><div class="card-title">${p.name} <span class="status st-confirmed">مؤكد</span></div>
     <div class="card-meta">${p.phone} · مقاعد: ${p.seats || 1}${p.tripName ? " · " + p.tripName : ""}${p.notes ? " · 📝 " + p.notes : ""}</div></div>
     <div style="display:flex;gap:6px"><a class="btn btn-ghost btn-sm" href="tel:${p.phone}">📞</a>
-    <a class="btn btn-ghost btn-sm" href="https://wa.me/2${normalizePhone(p.phone).replace(/^0/, "")}" target="_blank">واتساب</a></div></div>`).join("");
+    <a class="btn btn-ghost btn-sm" href="${waHref(p.phone)}" target="_blank">واتساب</a></div></div>`).join("");
     html += "</div>";
     if (myTrips.length) {
         html += `<div class="panel" style="margin-top:14px"><h3>رحلات مرتبطة</h3>` + myTrips.map(t => `<div class="card-meta" style="margin-bottom:8px"><b>${t.name}</b><br>🕐 ${t.time || "-"} · 📍 ${t.from || ""} ← ${t.to || ""} · مقاعد متاحة: ${t.available || 0}</div>`).join("") + "</div>";
@@ -3702,9 +3736,10 @@ async function loadDriverTrips() {
 })();
 // ========== INIT ==========
 function init() {
-    trips = [...DEFAULT_TRIPS];
-    drivers = [...DEFAULT_DRIVERS];
-    cars = [...DEFAULT_CARS];
+    const _skipSeed0 = (function () { try { return localStorage.getItem("aman_skip_demo_seed") === "1"; } catch (e) { return false; } })();
+    trips = _skipSeed0 ? [] : [...DEFAULT_TRIPS];
+    drivers = _skipSeed0 ? [] : [...DEFAULT_DRIVERS];
+    cars = _skipSeed0 ? [] : [...DEFAULT_CARS];
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
         if (user) {
@@ -3743,6 +3778,7 @@ function init() {
         }
     });
     renderTrips();
+    const skipSeed = (function () { try { return localStorage.getItem("aman_skip_demo_seed") === "1"; } catch (e) { return false; } })();
     getDocs(collection(db, "trips")).then(snap => {
         if (!snap.empty) {
             trips = snap.docs.map(d => {
@@ -3751,21 +3787,28 @@ function init() {
             });
             renderTrips();
         }
-        else {
+        else if (!skipSeed) {
             Promise.all(DEFAULT_TRIPS.map(t => addDoc(collection(db, "trips"), t).catch(() => { })));
+        } else {
+            trips = [];
+            renderTrips();
         }
     }).catch(() => { });
     getDocs(collection(db, "drivers")).then(snap => {
         if (!snap.empty)
             drivers = snap.docs.map(d => (Object.assign({ firestoreId: d.id }, d.data())));
-        else
+        else if (!skipSeed)
             Promise.all(DEFAULT_DRIVERS.map(d => addDoc(collection(db, "drivers"), d).catch(() => { })));
+        else
+            drivers = [];
     }).catch(() => { });
     getDocs(collection(db, "cars")).then(snap => {
         if (!snap.empty)
             cars = snap.docs.map(d => (Object.assign({ firestoreId: d.id }, d.data())));
-        else
+        else if (!skipSeed)
             Promise.all(DEFAULT_CARS.map(c => addDoc(collection(db, "cars"), c).catch(() => { })));
+        else
+            cars = [];
     }).catch(() => { });
     getDocs(collection(db, "supervisors")).then(snap => {
         if (!snap.empty)
