@@ -982,7 +982,7 @@ const DEFAULT_CARS = [
     { id: "c5", category: "ملاكي", model: "تويوتا كورولا", color: "رمادي", plate: "أ ب ج 5184", notes: "ملاكي مريحة", image: "" },
     { id: "c6", category: "VIP", model: "مرسيدس فيتو VIP", color: "أسود", plate: "د س ج 9921", notes: "صالون VIP فاخر", image: "" }
 ];
-let trips = [...DEFAULT_TRIPS], drivers = [...DEFAULT_DRIVERS], cars = [...DEFAULT_CARS], supervisors = [];
+let trips = [], drivers = [], cars = [], supervisors = [];
 let currentTrip = null, currentDriver = null, lastBooking = null;
 let adminPass = localStorage.getItem("adminPass") || "admin123";
 function toast(msg, type = "") { const t = document.getElementById("toast"); t.textContent = msg; t.className = "toast on " + (type === "ok" ? "ok" : type === "err" ? "err" : ""); setTimeout(() => t.classList.remove("on"), 3500); }
@@ -1846,7 +1846,7 @@ window.chgSeats = function (d) {
     updateTotals();
 };
 function updateTotals() {
-    const seats = +document.getElementById("b-seats").value || 1;
+    const seats = Math.max(1, Math.floor(+document.getElementById("b-seats").value) || 1);
     const price = ((currentTrip === null || currentTrip === void 0 ? void 0 : currentTrip.price) || 0) * seats;
     const dep = ((currentTrip === null || currentTrip === void 0 ? void 0 : currentTrip.deposit) || 0) * seats;
     document.getElementById("tot-seats").textContent = seats;
@@ -1857,7 +1857,7 @@ window.submitBooking = async function () {
     var _a, _b;
     const name = document.getElementById("b-name").value.trim();
     let phone = document.getElementById("b-phone").value.trim();
-    const seats = +document.getElementById("b-seats").value || 1;
+    const seats = Math.max(1, Math.floor(+document.getElementById("b-seats").value) || 1);
     const notes = document.getElementById("b-notes").value.trim();
     if (!name)
         return toast("أدخل اسم الراكب", "err");
@@ -1879,6 +1879,7 @@ window.submitBooking = async function () {
         price: (currentTrip.price || 0) * seats,
         deposit: (currentTrip.deposit || 0) * seats,
         status: "pending", driver: currentTrip.driver || "", car: currentTrip.car || "",
+        driverId: currentTrip.driverId || "", driverPhone: currentTrip.driverPhone || "", carId: currentTrip.carId || "",
         supervisorId: currentTrip.supervisorId || "",
         supervisorName: currentTrip.supervisorName || "",
         supervisorPhone: currentTrip.supervisorPhone || "",
@@ -2898,7 +2899,7 @@ window.openStatusDriver = function (id) {
         toast("الحجز غير محمّل — أعد فتح القائمة", "err");
         return;
     }
-    const drvOpts = drivers.map(d => `<option value="${d.name}" data-phone="${d.phone || ""}" ${b.driver === d.name ? "selected" : ""}>${d.name} — ${d.phone || ""}</option>`).join("");
+    const drvOpts = drivers.map(d => `<option value="${d.name}" data-id="${d.firestoreId || d.id || ""}" data-phone="${d.phone || ""}" ${b.driver === d.name ? "selected" : ""}>${d.name} — ${d.phone || ""}</option>`).join("");
     const carOpts = cars.map(c => `<option value="${c.model}" data-id="${c.firestoreId || c.id || ""}" data-cat="${c.category || ""}" data-img="${(c.image || "").replace(/"/g, "&quot;")}" ${b.carModel === c.model || b.car === c.model ? "selected" : ""}>${c.category ? c.category + " · " : ""}${c.model}</option>`).join("");
     const svOpts = supervisors.map(s => `<option value="${s.id || s.firestoreId || s.name}" data-name="${s.name || ""}" data-phone="${s.phone || ""}" ${(b.supervisorId === (s.id || s.firestoreId) || b.supervisorName === s.name) ? "selected" : ""}>${s.name} — ${s.phone || ""}</option>`).join("");
     const receipt = getReceiptUrl(b);
@@ -2964,8 +2965,11 @@ window.openStatusDriver = function (id) {
             return toast("العربون غير صالح", "err");
         if (price != null && deposit != null && deposit > price)
             return toast("العربون لا يمكن أن يتجاوز السعر", "err");
+        if (b.status === "cancelled" && status !== "cancelled")
+            return toast("الحجز ملغي ولا يمكن إعادة تفعيله (المقاعد أُعيدت) — أنشئ حجزًا جديدًا", "err");
+        const driverId = (document.getElementById("sd-driver").selectedOptions[0] || { dataset: {} }).dataset.id || "";
         const payload = {
-            status, driver, driverPhone, adminNotes, passengerNotes, paymentNotes,
+            status, driver, driverId, driverPhone, adminNotes, passengerNotes, paymentNotes,
             car: carModel || b.car || "", carModel: carModel || b.carModel || "", carCategory, carImage, carId,
             supervisorId, supervisorName, supervisorPhone,
             updatedAt: new Date().toISOString()
@@ -3037,17 +3041,21 @@ window.openManualBooking = function () {
     </div>`;
     document.getElementById("form-save-btn").onclick = async () => {
         const name = document.getElementById("mb-name").value.trim();
-        const phone = document.getElementById("mb-phone").value.trim();
+        const phone = normalizePhone(document.getElementById("mb-phone").value);
         if (!name || !phone)
             return toast("أدخل الاسم والموبايل", "err");
+        if (!isValidEgPhone(phone))
+            return toast("رقم هاتف غير صالح (مثال: 01012345678)", "err");
         const tripId = document.getElementById("mb-trip").value;
-        const seats = +document.getElementById("mb-seats").value || 1;
+        const seats = Math.max(1, Math.floor(+document.getElementById("mb-seats").value) || 1);
         const t = tripId ? trips.find(x => x.id === tripId) : null;
         const c = code();
         const booking = {
             code: c,
             type: t ? "scheduled" : "private",
-            tripId: t ? t.id : "",
+            tripId: t ? (t.firestoreId || t.id) : "",
+            driver: t ? (t.driver || "") : "", driverId: t ? (t.driverId || "") : "", driverPhone: t ? (t.driverPhone || "") : "", car: t ? (t.car || "") : "",
+            supervisorId: t ? (t.supervisorId || "") : "", supervisorName: t ? (t.supervisorName || "") : "", supervisorPhone: t ? (t.supervisorPhone || "") : "",
             tripName: t ? t.name : "",
             name, phone, seats,
             from: document.getElementById("mb-from").value.trim() || (t ? t.from : ""),
@@ -3060,18 +3068,24 @@ window.openManualBooking = function () {
             manual: true
         };
         try {
-            await addDoc(collection(db, "bookings"), booking);
-            if (t) {
-                t.available = Math.max(0, (t.available || 0) - seats);
-                t.type = "متاح " + t.available + " مقاعد";
-                if (t.available <= 0)
-                    t.closed = true;
-                if (t.firestoreId) {
-                    try {
-                        await updateDoc(doc(db, "trips", t.firestoreId), { available: t.available, closed: !!t.closed, type: t.type });
-                    }
-                    catch (e) { }
-                }
+            if (t && t.firestoreId) {
+                await runTransaction(db, async (tx) => {
+                    const tRef = doc(db, "trips", t.firestoreId);
+                    const sn = await tx.get(tRef);
+                    if (!sn.exists()) throw new Error("trip missing");
+                    const td = sn.data();
+                    if (td.is_booking_closed || td.closed) throw new Error("closed");
+                    const av = Number(td.available) || 0;
+                    if (seats > av) throw new Error("no seats");
+                    const nx = av - seats;
+                    const ty = nx <= 0 ? "اكتمل العدد" : ("متاح " + nx + " مقاعد");
+                    tx.update(tRef, { available: nx, type: ty });
+                    tx.set(doc(collection(db, "bookings")), booking);
+                    t.available = nx; t.type = ty;
+                });
+            } else {
+                await addDoc(collection(db, "bookings"), booking);
+                if (t) { t.available = Math.max(0, (t.available || 0) - seats); t.type = t.available <= 0 ? "اكتمل العدد" : ("متاح " + t.available + " مقاعد"); }
             }
             closeModals();
             loadAdminBookings();
@@ -3080,7 +3094,7 @@ window.openManualBooking = function () {
             toast("تم إضافة الحجز " + c, "ok");
         }
         catch (e) {
-            toast("خطأ", "err");
+            toast(e.message === "closed" ? "الحجز مغلق لهذه الرحلة" : e.message === "no seats" ? "المقاعد المطلوبة أكثر من المتاح" : "خطأ في الحفظ — تحقق من الاتصال", "err");
         }
     };
     document.getElementById("m-form").classList.add("on");
@@ -3126,34 +3140,36 @@ window.toggleAdminTripFold = function (i, el) {
     node.classList.toggle("expanded");
 };
 window.adjustSeats = async function (i, bookedDelta) {
-    var _a, _b;
-    // bookedDelta = +1 يعني حجز مقعد إضافي (ينقص المتاح)
-    // bookedDelta = -1 يعني إلغاء مقعد (يزيد المتاح)
     const t = trips[i];
-    if (!t)
-        return;
+    if (!t) return;
     const total = Number(t.seats) || 4;
-    let avail = Number(t.available);
-    if (isNaN(avail))
-        avail = total;
-    // المتاح الجديد = المتاح الحالي - عدد المقاعد المحجوزة الآن
-    let next = avail - bookedDelta;
-    if (next < 0)
-        next = 0;
-    if (next > total)
-        next = total;
-    t.available = next;
-    t.closed = next <= 0;
-    t.type = t.closed ? "مغلق / مكتمل" : ("متاح " + next + " مقاعد");
+    let next;
     if (t.firestoreId) {
         try {
-            await updateDoc(doc(db, "trips", t.firestoreId), { available: next, closed: !!t.closed, type: t.type, seats: total });
-        }
-        catch (e) { }
+            next = await runTransaction(db, async (tx) => {
+                const ref = doc(db, "trips", t.firestoreId);
+                const sn = await tx.get(ref);
+                if (!sn.exists()) throw new Error("missing");
+                const d = sn.data();
+                const tot = Number(d.seats) || total;
+                let av = Number(d.available);
+                if (isNaN(av)) av = tot;
+                const n = Math.min(tot, Math.max(0, av - bookedDelta));
+                const closed = !!(d.closed || d.is_booking_closed);
+                tx.update(ref, { available: n, type: closed ? "مغلق / مكتمل" : (n <= 0 ? "اكتمل العدد" : ("متاح " + n + " مقاعد")) });
+                return n;
+            });
+        } catch (e) { console.error(e); return toast("تعذر تعديل المقاعد — تحقق من الاتصال", "err"); }
+    } else {
+        let avail = Number(t.available);
+        if (isNaN(avail)) avail = total;
+        next = Math.min(total, Math.max(0, avail - bookedDelta));
     }
+    t.available = next;
+    t.type = (t.closed || t.is_booking_closed) ? "مغلق / مكتمل" : (next <= 0 ? "اكتمل العدد" : ("متاح " + next + " مقاعد"));
     renderAdminTrips();
     if (typeof renderDashTrips === "function") renderDashTrips();
-    renderTrips(((_b = (_a = document.getElementById("search")) === null || _a === void 0 ? void 0 : _a.value) === null || _b === void 0 ? void 0 : _b.trim()) || "");
+    renderTrips(((document.getElementById("search") || {}).value || "").trim());
     toast(bookedDelta > 0 ? ("تم حجز مقعد — المتاح الآن: " + next) : ("تم إلغاء مقعد — المتاح الآن: " + next), "ok");
 };
 window.toggleCloseTrip = async function (i, close) {
@@ -3187,6 +3203,34 @@ window.editTrip = function (i) {
         return;
     openTripForm(t, i);
 };
+function driverOptions(cur) {
+    const o = drivers.map(d => `<option value="${d.name}" data-id="${d.firestoreId || d.id || ""}" data-phone="${d.phone || ""}" ${cur === d.name ? "selected" : ""}>${d.name} — ${d.phone || ""}</option>`).join("");
+    const stale = cur && !drivers.some(d => d.name === cur) ? `<option value="${cur}" selected>⚠ ${cur} (غير مسجّل)</option>` : "";
+    return `<option value="">— بدون سائق —</option>${o}${stale}`;
+}
+function carOptions(cur) {
+    const o = cars.map(c => `<option value="${c.model}" data-id="${c.firestoreId || c.id || ""}" data-cap="${Number(c.seats || c.capacity) || 0}" ${cur === c.model ? "selected" : ""}>${c.category ? c.category + " · " : ""}${c.model}${c.plate ? " — " + c.plate : ""}</option>`).join("");
+    const stale = cur && !cars.some(c => c.model === cur) ? `<option value="${cur}" selected>⚠ ${cur} (غير مسجّلة)</option>` : "";
+    return `<option value="">— بدون سيارة —</option>${o}${stale}`;
+}
+function tripConflict(field, value, timeRaw, days, self) {
+    if (!value) return null;
+    return trips.find(o => o !== self && !isTripClosed(o) && o[field] === value && (o.timeRaw || "") === timeRaw &&
+        (!(o.days || []).length || !days.length || o.days.some(x => days.includes(x))));
+}
+async function syncTripBookings(t) {
+    const ids = [t.firestoreId, t.id].filter(Boolean);
+    if (!ids.length) return;
+    try {
+        const snap = await getDocs(query(collection(db, "bookings"), where("tripId", "in", ids)));
+        await Promise.all(snap.docs.filter(d => d.data().status !== "cancelled").map(d => updateDoc(d.ref, {
+            driver: t.driver || "", driverId: t.driverId || "", driverPhone: t.driverPhone || "",
+            car: t.car || "", carId: t.carId || "",
+            supervisorId: t.supervisorId || "", supervisorName: t.supervisorName || "", supervisorPhone: t.supervisorPhone || "",
+            updatedAt: new Date().toISOString()
+        })));
+    } catch (e) { console.error("sync bookings", e); }
+}
 window.openTripForm = function (editTrip = null, editIdx = -1) {
     var _a, _b, _c, _d;
     const isEdit = !!editTrip;
@@ -3226,14 +3270,14 @@ window.openTripForm = function (editTrip = null, editIdx = -1) {
     </div>
     <div class="fg"><label>موعد وساعة التحرك</label><input id="f-time" type="time" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.timeRaw) || "07:30"}"></div>
     <div class="fg"><label>نص الموعد المعروض (يمكن تعديله يدوياً)</label><input id="f-time-label" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.time) || ""}" placeholder=""></div>
-    <div class="fg"><label>السائق</label><input id="f-driver" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.driver) || ""}" placeholder=""></div>
+    <div class="fg"><label>السائق (من المسجّلين فقط)</label><select id="f-driver">${driverOptions(editTrip && editTrip.driver)}</select></div>
     <div class="fg"><label>المشرف (للمتابعة عبر واتساب)</label>
       <select id="f-supervisor">
         <option value="">— بدون مشرف —</option>
         ${supervisors.map(s => `<option value="${s.id || s.firestoreId || s.name}" data-name="${s.name || ""}" data-phone="${s.phone || ""}" ${((editTrip && (editTrip.supervisorId === (s.id || s.firestoreId) || editTrip.supervisorName === s.name)) ? "selected" : "")}>${s.name} — ${s.phone || ""}</option>`).join("")}
       </select>
     </div>
-    <div class="fg"><label>السيارة</label><input id="f-car" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.car) || ""}" placeholder=""></div>
+    <div class="fg"><label>السيارة (من المسجّلة فقط)</label><select id="f-car">${carOptions(editTrip && editTrip.car)}</select></div>
     <div class="fg"><label>ملاحظات</label><input id="f-notes" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.notes) || ""}" placeholder=""></div>
     <div class="fg"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="f-closed" style="width:auto" ${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.closed) ? "checked" : ""}> إغلاق الحجز (مكتمل العدد)</label></div>
   `;
@@ -3255,8 +3299,11 @@ window.openTripForm = function (editTrip = null, editIdx = -1) {
             h12 = 12;
         const timeStr = h12 + ':' + String(mm).padStart(2, '0') + ' ' + period;
         const repeat = document.getElementById("f-repeat").checked;
-        const seats = +document.getElementById("f-seats").value || 4;
-        const available = +document.getElementById("f-available").value || seats;
+        const seats = Math.max(1, Math.floor(+document.getElementById("f-seats").value) || 4);
+        const avRaw = document.getElementById("f-available").value;
+        let available = avRaw === "" ? seats : Math.floor(+avRaw);
+        if (isNaN(available)) available = seats;
+        available = Math.min(Math.max(available, 0), seats);
         const price = +document.getElementById("f-price").value || 0;
         const deposit = +document.getElementById("f-deposit").value || 0;
         const closed = document.getElementById("f-closed").checked;
@@ -3277,26 +3324,39 @@ window.openTripForm = function (editTrip = null, editIdx = -1) {
         const supervisorId = (svSel && svSel.value) || "";
         const supervisorName = svOpt ? (svOpt.dataset.name || "") : "";
         const supervisorPhone = svOpt ? (svOpt.dataset.phone || "") : "";
+        const drvSel = document.getElementById("f-driver"), carSel = document.getElementById("f-car");
+        const drvOpt = drvSel.selectedOptions[0], carOpt = carSel.selectedOptions[0];
+        const selfRef = isEdit && editIdx >= 0 ? trips[editIdx] : null;
+        if (!closed) {
+            const cd = tripConflict("driver", drvSel.value, timeVal, days, selfRef);
+            if (cd) return toast("السائق مسكّن بالفعل على «" + (cd.name || "") + "» في نفس الموعد", "err");
+            const cc = tripConflict("car", carSel.value, timeVal, days, selfRef);
+            if (cc) return toast("السيارة مسكّنة بالفعل على «" + (cc.name || "") + "» في نفس الموعد", "err");
+        }
+        const capCar = Number(carOpt && carOpt.dataset.cap) || 0;
+        if (capCar && seats > capCar) return toast("عدد المقاعد (" + seats + ") أكبر من سعة السيارة (" + capCar + ")", "err");
         const tData = {
             name: nameVal, from, to,
             stops: document.getElementById("f-stops").value.trim(),
             time: timeLabel, timeRaw: timeVal, days, repeat,
-            price, deposit, seats, available: closed ? 0 : available,
-            type: closed ? "مغلق / مكتمل" : ("متاح " + (closed ? 0 : available) + " مقاعد"),
-            driver: document.getElementById("f-driver").value.trim(),
-            car: document.getElementById("f-car").value.trim(),
+            price, deposit, seats, available,
+            type: closed ? "مغلق / مكتمل" : (available <= 0 ? "اكتمل العدد" : ("متاح " + available + " مقاعد")),
+            driver: drvSel.value, driverId: (drvOpt && drvOpt.dataset.id) || "", driverPhone: (drvOpt && drvOpt.dataset.phone) || "",
+            car: carSel.value, carId: (carOpt && carOpt.dataset.id) || "",
             notes: document.getElementById("f-notes").value.trim(),
             closed,
             supervisorId, supervisorName, supervisorPhone
         };
         if (isEdit && editIdx >= 0) {
             const old = trips[editIdx];
+            const prev = [old.driver, old.car, old.supervisorId].join("|");
             Object.assign(old, tData);
             if (old.firestoreId) {
                 try {
                     await updateDoc(doc(db, "trips", old.firestoreId), tData);
                 }
-                catch (e) { }
+                catch (e) { return toast("تعذر حفظ التعديل — تحقق من الاتصال", "err"); }
+                if (prev !== [old.driver, old.car, old.supervisorId].join("|")) await syncTripBookings(old);
             }
             toast("تم تعديل الرحلة", "ok");
         }
@@ -3307,7 +3367,7 @@ window.openTripForm = function (editTrip = null, editIdx = -1) {
                 const ref = await addDoc(collection(db, "trips"), tData);
                 tData.firestoreId = ref.id;
             }
-            catch (e) { }
+            catch (e) { trips.pop(); return toast("تعذر حفظ الرحلة — تحقق من الاتصال", "err"); }
             toast("تم إضافة الخط", "ok");
         }
         closeModals();
@@ -3358,6 +3418,8 @@ window.delDriver = async function (i) {
         return;
     const d = drivers[i];
     if (!d) return toast("السائق غير موجود", "err");
+    const usedD = trips.filter(t => !isTripClosed(t) && (t.driver === d.name || (t.driverId && t.driverId === (d.firestoreId || d.id)))).length;
+    if (usedD) return toast("لا يمكن حذف السائق — مسكّن على " + usedD + " رحلة. غيّر التسكين أولًا", "err");
     try {
         if (d.firestoreId) await deleteDoc(doc(db, "drivers", d.firestoreId));
         drivers.splice(i, 1);
@@ -3445,6 +3507,8 @@ window.delSupervisor = async function (i) {
     if (!confirm("حذف المشرف؟")) return;
     const s = supervisors[i];
     if (!s) return toast("المشرف غير موجود", "err");
+    const usedS = trips.filter(t => !isTripClosed(t) && (t.supervisorId === (s.id || s.firestoreId) || t.supervisorName === s.name)).length;
+    if (usedS) return toast("لا يمكن حذف المشرف — مسكّن على " + usedS + " رحلة. غيّر التسكين أولًا", "err");
     try {
         if (s.firestoreId) await deleteDoc(doc(db, "supervisors", s.firestoreId));
         supervisors.splice(i, 1);
@@ -3668,7 +3732,7 @@ async function loadDriverTrips() {
     const confirmed = mine.filter(b => b.status === "confirmed");
     const waitingPay = mine.filter(b => b.status === "payment" || b.status === "payment_pending");
     const pending = mine.filter(b => b.status === "pending");
-    const myTrips = trips.filter(t => t.driver === dName || mine.some(b => b.tripId === t.id || b.tripName === t.name));
+    const myTrips = trips.filter(t => t.driver === dName || (t.driverId && (t.driverId === currentDriver.firestoreId || t.driverId === currentDriver.id)) || mine.some(b => b.tripId === t.id || b.tripName === t.name));
     const car = cars.find(c => c.model === (currentDriver.car || "") || mine.find(b => b.carModel && b.carModel === c.model));
     let html = `<div class="stats" style="margin-bottom:16px">
     <div class="stat s-ok"><div class="icon">✓</div><div class="n">${confirmed.length}</div><div class="t">مؤكدة</div></div>
@@ -3736,10 +3800,7 @@ async function loadDriverTrips() {
 })();
 // ========== INIT ==========
 function init() {
-    const _skipSeed0 = (function () { try { return localStorage.getItem("aman_skip_demo_seed") === "1"; } catch (e) { return false; } })();
-    trips = _skipSeed0 ? [] : [...DEFAULT_TRIPS];
-    drivers = _skipSeed0 ? [] : [...DEFAULT_DRIVERS];
-    cars = _skipSeed0 ? [] : [...DEFAULT_CARS];
+    trips = []; drivers = []; cars = [];
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
         if (user) {
@@ -3787,9 +3848,7 @@ function init() {
             });
             renderTrips();
         }
-        else if (!skipSeed) {
-            Promise.all(DEFAULT_TRIPS.map(t => addDoc(collection(db, "trips"), t).catch(() => { })));
-        } else {
+        else {
             trips = [];
             renderTrips();
         }
@@ -3797,22 +3856,20 @@ function init() {
     getDocs(collection(db, "drivers")).then(snap => {
         if (!snap.empty)
             drivers = snap.docs.map(d => (Object.assign({ firestoreId: d.id }, d.data())));
-        else if (!skipSeed)
-            Promise.all(DEFAULT_DRIVERS.map(d => addDoc(collection(db, "drivers"), d).catch(() => { })));
         else
             drivers = [];
     }).catch(() => { });
     getDocs(collection(db, "cars")).then(snap => {
         if (!snap.empty)
             cars = snap.docs.map(d => (Object.assign({ firestoreId: d.id }, d.data())));
-        else if (!skipSeed)
-            Promise.all(DEFAULT_CARS.map(c => addDoc(collection(db, "cars"), c).catch(() => { })));
         else
             cars = [];
     }).catch(() => { });
     getDocs(collection(db, "supervisors")).then(snap => {
         if (!snap.empty)
             supervisors = snap.docs.map(d => (Object.assign({ firestoreId: d.id }, d.data())));
+        else
+            supervisors = [];
     }).catch(() => { });
     loadAppSettings().then(() => updateWaFloat()).catch(() => updateWaFloat());
     // URL params
