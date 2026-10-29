@@ -530,7 +530,6 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
   </div>
   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;order:2;margin-right:auto">
     <button type="button" class="btn btn-sm" style="background:#1e293b;color:#e2e8f0;border-radius:10px" onclick="logoutAdmin()">↗ موقع الركاب</button>
-    <button type="button" class="btn btn-sm" style="background:#1e293b;color:#e2e8f0;border-radius:10px" onclick="exportBackup()">↓ نسخ احتياطي</button>
     <button type="button" class="btn btn-sm" style="background:#dc2626;color:#fff;border-radius:10px;width:38px;height:38px;padding:0;justify-content:center" onclick="logoutAdmin()" title="خروج">→</button>
   </div>
 </div>
@@ -553,28 +552,30 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 <main class="main">
 <div id="at-dash">
 <div class="stats">
-  <div class="stat s-all" onclick="setBkFilter('all');adminTab('bookings')"><div class="icon">📦</div><div class="n" id="s-bookings">0</div><div class="t">إجمالي الحجوزات</div><div class="d">كافة الطلبات المسجلة</div></div>
-  <div class="stat s-ok" onclick="setBkFilter('confirmed');adminTab('bookings')"><div class="icon">✓</div><div class="n" id="s-confirmed">0</div><div class="t">حجوزات مؤكدة</div><div class="d">تم توفير السيارة وتأكيدها</div></div>
-  <div class="stat s-wait" onclick="setBkFilter('payment');adminTab('bookings')"><div class="icon">⏳</div><div class="n" id="s-pending">0</div><div class="t">بانتظار العربون</div><div class="d">في انتظار تأكيد الراكب</div></div>
-  <div class="stat s-new" onclick="setBkFilter('pending');adminTab('bookings')"><div class="icon">✦</div><div class="n" id="s-new">0</div><div class="t">طلبات جديدة</div><div class="d">قيد المراجعة والتسعير</div></div>
+  <div class="stat s-all" onclick="showDashFilter('all')"><div class="icon">📦</div><div class="n" id="s-bookings">0</div><div class="t">إجمالي الحجوزات</div><div class="d">كافة الطلبات المسجلة</div></div>
+  <div class="stat s-ok" onclick="showDashFilter('confirmed')"><div class="icon">✓</div><div class="n" id="s-confirmed">0</div><div class="t">حجوزات مؤكدة</div><div class="d">تم توفير السيارة وتأكيدها</div></div>
+  <div class="stat s-wait" onclick="showDashFilter('payment')"><div class="icon">⏳</div><div class="n" id="s-pending">0</div><div class="t">بانتظار العربون</div><div class="d">في انتظار تأكيد الراكب</div></div>
+  <div class="stat s-new" onclick="showDashFilter('pending')"><div class="icon">✦</div><div class="n" id="s-new">0</div><div class="t">طلبات جديدة</div><div class="d">قيد المراجعة والتسعير</div></div>
 </div>
-<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
-  <button type="button" class="btn btn-indigo" id="dash-btn-bookings" onclick="toggleDashPanel('bookings')">الحجوزات والطلبات</button>
-  <button type="button" class="btn btn-ghost" id="dash-btn-trips" onclick="toggleDashPanel('trips')">الرحلات والخطوط</button>
-  <button type="button" class="btn btn-ghost btn-sm" onclick="adminTab('bookings')">فتح صفحة الحجوزات ↗</button>
-  <button type="button" class="btn btn-ghost btn-sm" onclick="adminTab('trips')">فتح صفحة الرحلات ↗</button>
+<div class="dash-shortcuts" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+  <button type="button" class="dash-sc" id="dash-btn-bookings" onclick="toggleDashPanel('bookings')" style="display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:14px 16px;cursor:pointer;font-family:inherit;text-align:right;transition:.15s;box-shadow:0 2px 8px rgba(15,23,42,.04)">
+    <span style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#5b6e22,#6b7f2c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">📋</span>
+    <span style="flex:1;min-width:0"><b style="display:block;font-size:.95rem;color:#0f172a">الحجوزات والطلبات</b><small style="color:#64748b;font-size:.75rem">عرض وإدارة كل الطلبات</small></span>
+  </button>
+  <button type="button" class="dash-sc" id="dash-btn-trips" onclick="toggleDashPanel('trips')" style="display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:14px 16px;cursor:pointer;font-family:inherit;text-align:right;transition:.15s;box-shadow:0 2px 8px rgba(15,23,42,.04)">
+    <span style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">🚌</span>
+    <span style="flex:1;min-width:0"><b style="display:block;font-size:.95rem;color:#0f172a">الرحلات والخطوط</b><small style="color:#64748b;font-size:.75rem">المقاعد والإغلاق والتعديل</small></span>
+  </button>
 </div>
-<div class="panel" id="dash-panel-bookings">
+<div class="panel" id="dash-panel-bookings" style="display:none">
   <h3 style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-    <span>الحجوزات (تفاعلية)</span>
-    <button type="button" class="btn btn-ghost btn-sm" onclick="adminTab('bookings')">عرض الكل</button>
+    <span id="dash-bookings-title">الحجوزات والطلبات</span>
   </h3>
-  <div id="dash-bookings-list"><div style="color:#94a3b8;padding:10px;text-align:center">جاري التحميل...</div></div>
+  <div id="dash-bookings-list"><div style="color:#94a3b8;padding:10px;text-align:center">اختر اختصاراً أو كارت إحصاء للعرض</div></div>
 </div>
-<div class="panel" id="dash-panel-trips" style="margin-top:14px">
+<div class="panel" id="dash-panel-trips" style="display:none">
   <h3 style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-    <span>الرحلات والخطوط (تفاعلية)</span>
-    <button type="button" class="btn btn-ghost btn-sm" onclick="adminTab('trips')">عرض الكل</button>
+    <span>الرحلات والخطوط</span>
   </h3>
   <div id="dash-trips-list"><div style="color:#94a3b8;padding:10px;text-align:center">جاري التحميل...</div></div>
 </div>
@@ -644,9 +645,15 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
   <label class="btn btn-ghost" style="cursor:pointer">↑ استعادة نسخة
     <input type="file" accept="application/json,.json" style="display:none" onchange="importBackup(this)">
   </label>
-  <button class="btn btn-ghost" type="button" style="color:#dc2626;border-color:#fecaca" onclick="resetDemoData()">⚠ إعادة ضبط البيانات التجريبية</button>
 </div>
-<p style="font-size:.78rem;color:#64748b;margin-top:10px">الاستعادة تدمج البيانات ولا تحذف إلا عند اختيار إعادة الضبط صراحة.</p>
+<p style="font-size:.78rem;color:#64748b;margin-top:10px">الاستعادة من ملف تدمج البيانات. النسخ الاحتياطي متاح من هنا فقط.</p>
+<hr style="margin:18px 0;border:none;border-top:1px solid #e2e8f0">
+<h3 style="margin-bottom:10px">البيانات التجريبية / العمل الفعلي</h3>
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+  <button class="btn btn-ghost" type="button" style="color:#dc2626;border-color:#fecaca" onclick="clearAllDemoData()">🗑 حذف كل البيانات التجريبية</button>
+  <button class="btn btn-indigo" type="button" onclick="restoreDemoData()">↻ استعادة البيانات التجريبية</button>
+</div>
+<p style="font-size:.78rem;color:#64748b;margin-top:10px">الحذف يزيل الرحلات والسائقين والسيارات والحجوزات والمشرفين من قاعدة البيانات (بعد تأكيد). الاستعادة تعيد زرع البيانات الافتراضية للتجربة.</p>
 </div></div>
 </main></div></div>
 
@@ -2363,23 +2370,59 @@ window.importBackup = async function (input) {
     }
 };
 window.resetDemoData = async function () {
-    if (!confirm("سيتم فقط إعادة زرع البيانات التجريبية الافتراضية للرحلات/السائقين/السيارات إن كانت فارغة. المتابعة؟"))
+    return restoreDemoData();
+};
+async function deleteCollectionDocs(colName) {
+    const snap = await getDocs(collection(db, colName));
+    const batchSize = 40;
+    const docs = snap.docs;
+    for (let i = 0; i < docs.length; i += batchSize) {
+        await Promise.all(docs.slice(i, i + batchSize).map(d => deleteDoc(d.ref).catch(() => { })));
+    }
+    return docs.length;
+}
+window.clearAllDemoData = async function () {
+    if (!confirm("⚠ تحذير: سيتم حذف كل الحجوزات والرحلات والسائقين والسيارات والمشرفين من قاعدة البيانات.\nهذا الإجراء للتحضير للعمل الفعلي.\nهل أنت متأكد؟"))
+        return;
+    if (!confirm("تأكيد نهائي: حذف كافة البيانات التجريبية؟ لا يمكن التراجع إلا من نسخة احتياطية."))
         return;
     try {
-        const ts = await getDocs(collection(db, "trips"));
-        if (ts.empty)
-            await Promise.all(DEFAULT_TRIPS.map(t => addDoc(collection(db, "trips"), t)));
-        const ds = await getDocs(collection(db, "drivers"));
-        if (ds.empty)
-            await Promise.all(DEFAULT_DRIVERS.map(d => addDoc(collection(db, "drivers"), d)));
-        const cs = await getDocs(collection(db, "cars"));
-        if (cs.empty)
-            await Promise.all(DEFAULT_CARS.map(c => addDoc(collection(db, "cars"), c)));
-        toast("تم التحقق/الزرع", "ok");
-        location.reload();
+        toast("جاري الحذف...", "ok");
+        const n1 = await deleteCollectionDocs("bookings");
+        const n2 = await deleteCollectionDocs("trips");
+        const n3 = await deleteCollectionDocs("drivers");
+        const n4 = await deleteCollectionDocs("cars");
+        const n5 = await deleteCollectionDocs("supervisors");
+        trips = [];
+        drivers = [];
+        cars = [];
+        supervisors = [];
+        allAdminBookings = [];
+        toast("تم الحذف: حجوزات " + n1 + " · رحلات " + n2 + " · سائقين " + n3 + " · سيارات " + n4 + " · مشرفين " + n5, "ok");
+        setTimeout(() => location.reload(), 800);
     }
     catch (e) {
-        toast("تعذر إعادة الضبط", "err");
+        console.error(e);
+        toast("تعذر حذف بعض البيانات — تحقق من صلاحيات Firestore", "err");
+    }
+};
+window.restoreDemoData = async function () {
+    if (!confirm("استعادة البيانات التجريبية الافتراضية (رحلات + سائقين + سيارات)؟\nلن تُحذف الحجوزات الحالية تلقائياً."))
+        return;
+    if (!confirm("تأكيد: زرع البيانات التجريبية الآن؟"))
+        return;
+    try {
+        toast("جاري الاستعادة...", "ok");
+        // أعد زرع الرحلات/السائقين/السيارات دائماً كنسخ تجريبية جديدة
+        await Promise.all(DEFAULT_TRIPS.map(t => addDoc(collection(db, "trips"), Object.assign({}, t)).catch(() => { })));
+        await Promise.all(DEFAULT_DRIVERS.map(d => addDoc(collection(db, "drivers"), Object.assign({}, d)).catch(() => { })));
+        await Promise.all(DEFAULT_CARS.map(c => addDoc(collection(db, "cars"), Object.assign({}, c)).catch(() => { })));
+        toast("تمت استعادة البيانات التجريبية", "ok");
+        setTimeout(() => location.reload(), 800);
+    }
+    catch (e) {
+        console.error(e);
+        toast("تعذر الاستعادة — تحقق من صلاحيات Firestore", "err");
     }
 };
 // ========== STAFF LOGIN ==========
@@ -2478,39 +2521,84 @@ async function refreshAdminStats() {
         if (el("s-confirmed")) el("s-confirmed").textContent = confirmed;
         if (el("s-pending")) el("s-pending").textContent = pending;
         if (el("s-new")) el("s-new").textContent = newer || pending;
-        // Interactive dash lists (same actions as full pages)
-        renderDashBookings(list);
-        renderDashTrips();
+        allAdminBookings = list;
+        // لا نعرض القوائم تلقائياً — تظهر فقط عند الضغط على الاختصار أو كارت الإحصاء
     }
-    catch (e) {
-        renderDashTrips();
-    }
+    catch (e) { }
 }
-window.toggleDashPanel = function (which) {
+function setDashPanelVisible(mode) {
+    // mode: 'bookings' | 'trips' | 'none'
     const bPanel = document.getElementById("dash-panel-bookings");
     const tPanel = document.getElementById("dash-panel-trips");
     const bBtn = document.getElementById("dash-btn-bookings");
     const tBtn = document.getElementById("dash-btn-trips");
+    if (bPanel) bPanel.style.display = mode === "bookings" ? "block" : "none";
+    if (tPanel) tPanel.style.display = mode === "trips" ? "block" : "none";
+    if (bBtn) bBtn.style.borderColor = mode === "bookings" ? "#5b6e22" : "#e2e8f0";
+    if (bBtn) bBtn.style.boxShadow = mode === "bookings" ? "0 4px 14px rgba(91,110,34,.2)" : "0 2px 8px rgba(15,23,42,.04)";
+    if (tBtn) tBtn.style.borderColor = mode === "trips" ? "#0284c7" : "#e2e8f0";
+    if (tBtn) tBtn.style.boxShadow = mode === "trips" ? "0 4px 14px rgba(2,132,199,.2)" : "0 2px 8px rgba(15,23,42,.04)";
+}
+window.toggleDashPanel = function (which) {
     if (which === "bookings") {
-        if (bPanel) bPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-        if (bBtn) { bBtn.className = "btn btn-indigo"; }
-        if (tBtn) { tBtn.className = "btn btn-ghost"; }
+        setDashPanelVisible("bookings");
+        const title = document.getElementById("dash-bookings-title");
+        if (title) title.textContent = "الحجوزات والطلبات";
+        const box = document.getElementById("dash-bookings-list");
+        if (box) box.innerHTML = '<div style="color:#94a3b8;padding:10px;text-align:center">جاري التحميل...</div>';
         loadAdminBookings().then(() => {
-            if (typeof allAdminBookings !== "undefined") renderDashBookings(allAdminBookings);
-        }).catch(() => {});
+            renderDashBookings(allAdminBookings, "all");
+            const p = document.getElementById("dash-panel-bookings");
+            if (p) p.scrollIntoView({ behavior: "smooth", block: "start" });
+        }).catch(() => {
+            if (box) box.innerHTML = '<div style="color:#dc2626;padding:10px;text-align:center">تعذر التحميل</div>';
+        });
     } else if (which === "trips") {
-        if (tPanel) tPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-        if (tBtn) { tBtn.className = "btn btn-indigo"; }
-        if (bBtn) { bBtn.className = "btn btn-ghost"; }
+        setDashPanelVisible("trips");
         renderDashTrips();
+        const p = document.getElementById("dash-panel-trips");
+        if (p) p.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 };
-function renderDashBookings(list) {
+window.showDashFilter = function (filter) {
+    setDashPanelVisible("bookings");
+    const labels = {
+        all: "إجمالي الحجوزات",
+        confirmed: "حجوزات مؤكدة",
+        payment: "بانتظار العربون",
+        pending: "طلبات جديدة"
+    };
+    const title = document.getElementById("dash-bookings-title");
+    if (title) title.textContent = labels[filter] || "الحجوزات";
+    const box = document.getElementById("dash-bookings-list");
+    if (box) box.innerHTML = '<div style="color:#94a3b8;padding:10px;text-align:center">جاري التحميل...</div>';
+    loadAdminBookings().then(() => {
+        renderDashBookings(allAdminBookings, filter);
+        const p = document.getElementById("dash-panel-bookings");
+        if (p) p.scrollIntoView({ behavior: "smooth", block: "start" });
+    }).catch(() => {
+        if (box) box.innerHTML = '<div style="color:#dc2626;padding:10px;text-align:center">تعذر التحميل</div>';
+    });
+};
+function filterBookingsList(list, filter) {
+    let out = list || [];
+    if (filter === "pending")
+        out = out.filter(b => b.status === "pending");
+    else if (filter === "payment")
+        out = out.filter(b => b.status === "payment" || b.status === "payment_pending");
+    else if (filter === "confirmed")
+        out = out.filter(b => b.status === "confirmed");
+    else if (filter === "cancelled")
+        out = out.filter(b => b.status === "cancelled");
+    return out;
+}
+function renderDashBookings(list, filter) {
     const box = document.getElementById("dash-bookings-list");
     if (!box) return;
-    const sorted = (list || []).slice().sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || "")).slice(0, 8);
+    const filtered = filterBookingsList(list, filter || "all");
+    const sorted = filtered.slice().sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
     if (!sorted.length) {
-        box.innerHTML = '<div style="color:#94a3b8;padding:10px;text-align:center">لا توجد حجوزات</div>';
+        box.innerHTML = '<div style="color:#94a3b8;padding:10px;text-align:center">لا توجد حجوزات في هذا التصنيف</div>';
         return;
     }
     box.innerHTML = sorted.map(b => {
@@ -2526,7 +2614,7 @@ function renderDashBookings(list) {
         <span class="status st-${st}">${stLabel}</span>
       </div>
       <div class="actions-bot" style="margin-top:10px">
-        <button type="button" class="btn btn-indigo btn-sm" onclick="(async()=>{allAdminBookings=allAdminBookings&&allAdminBookings.length?allAdminBookings:[];if(!allAdminBookings.find(x=>x.id==='${id}')){try{const snap=await getDocs(collection(db,'bookings'));allAdminBookings=snap.docs.map(d=>({id:d.id,...d.data()}));}catch(e){}} openStatusDriver('${id}');})()">إدارة / تعيين</button>
+        <button type="button" class="btn btn-indigo btn-sm" onclick="manageBooking('${id}')">إدارة / تعيين</button>
         ${st !== "confirmed" && st !== "cancelled" ? `<button type="button" class="btn btn-green btn-sm" onclick="updStatus('${id}','confirmed')">✓ تأكيد</button>` : ""}
         ${st !== "cancelled" ? `<button type="button" class="btn btn-ghost btn-sm" style="color:#dc2626" onclick="updStatus('${id}','cancelled')">إلغاء</button>` : ""}
         ${b.phone ? `<a class="btn btn-ghost btn-sm" href="https://wa.me/2${String(b.phone).replace(/^0/, "")}" target="_blank">💬 واتساب</a>` : ""}
@@ -2565,6 +2653,32 @@ function renderDashTrips() {
     </div>`;
     }).join("");
 }
+window.manageBooking = async function (id) {
+    if (!id) return toast("معرف الحجز غير صالح", "err");
+    try {
+        let b = (allAdminBookings || []).find(x => x.id === id);
+        if (!b) {
+            const snap = await getDoc(doc(db, "bookings", id));
+            if (!snap.exists()) {
+                // حاول تحميل الكل
+                const all = await getDocs(collection(db, "bookings"));
+                allAdminBookings = all.docs.map(d => Object.assign({ id: d.id }, d.data()));
+                b = allAdminBookings.find(x => x.id === id);
+            } else {
+                b = Object.assign({ id: snap.id }, snap.data());
+                if (!allAdminBookings) allAdminBookings = [];
+                const idx = allAdminBookings.findIndex(x => x.id === id);
+                if (idx >= 0) allAdminBookings[idx] = b;
+                else allAdminBookings.push(b);
+            }
+        }
+        if (!b) return toast("الحجز غير موجود", "err");
+        openStatusDriver(id);
+    } catch (e) {
+        console.error(e);
+        toast("تعذر فتح إدارة الحجز", "err");
+    }
+};
 let allAdminBookings = [], bkFilter = "all";
 window.setBkFilter = function (f) {
     bkFilter = f;
@@ -2628,7 +2742,7 @@ function renderFilteredBookings() {
       <div class="actions-bot" style="justify-content:stretch;gap:8px">
         <a class="icon-btn" href="https://wa.me/2${(b.phone || "").replace(/^0/, "")}" target="_blank" title="واتساب">💬</a>
         ${b.status !== "cancelled" ? `<button type="button" class="btn-seat-rem" style="color:#dc2626;border-color:#fecaca" onclick="updStatus('${b.id}','cancelled')">✕ إلغاء</button>` : ""}
-        <button type="button" class="btn btn-indigo" style="flex:1;justify-content:center;padding:10px" onclick="openStatusDriver('${b.id}')">🔄 تحديث الحالة وتعيين السائق</button>
+        <button type="button" class="btn btn-indigo" style="flex:1;justify-content:center;padding:10px" onclick="manageBooking('${b.id}')">🔄 تحديث الحالة وتعيين السائق</button>
       </div>
     </div>`;
     }).join("");
@@ -2681,9 +2795,11 @@ window.updStatus = async function (id, status) {
 };
 window.openStatusDriver = function (id) {
     var _a, _b;
-    const b = allAdminBookings.find(x => x.id === id);
-    if (!b)
+    let b = (allAdminBookings || []).find(x => x.id === id);
+    if (!b) {
+        toast("الحجز غير محمّل — أعد فتح القائمة", "err");
         return;
+    }
     const drvOpts = drivers.map(d => `<option value="${d.name}" data-phone="${d.phone || ""}" ${b.driver === d.name ? "selected" : ""}>${d.name} — ${d.phone || ""}</option>`).join("");
     const carOpts = cars.map(c => `<option value="${c.model}" data-id="${c.firestoreId || c.id || ""}" data-cat="${c.category || ""}" data-img="${(c.image || "").replace(/"/g, "&quot;")}" ${b.carModel === c.model || b.car === c.model ? "selected" : ""}>${c.category ? c.category + " · " : ""}${c.model}</option>`).join("");
     const svOpts = supervisors.map(s => `<option value="${s.id || s.firestoreId || s.name}" data-name="${s.name || ""}" data-phone="${s.phone || ""}" ${(b.supervisorId === (s.id || s.firestoreId) || b.supervisorName === s.name) ? "selected" : ""}>${s.name} — ${s.phone || ""}</option>`).join("");
@@ -2791,6 +2907,8 @@ window.openStatusDriver = function (id) {
             toast("تعذر التحديث — تحقق من صلاحيات Firestore", "err");
         }
     };
+    const saveBtn = document.getElementById("form-save-btn");
+    if (saveBtn) saveBtn.textContent = "حفظ التحديث";
     document.getElementById("m-form").classList.add("on");
 };
 window.exportBackup = function () {

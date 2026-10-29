@@ -1,5 +1,5 @@
 // Service worker: network-first (updates are always instant), with an offline fallback.
-const CACHE = 'aman-v43';
+const CACHE = 'aman-v44';
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(
   caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
