@@ -31,10 +31,10 @@ body{overflow-x:hidden;font-family:'Cairo',sans-serif;background:#f1f5f9;color:#
 .badge{background:#dbeafe;color:#1e40af;padding:3px 11px;border-radius:999px;font-size:.78rem;font-weight:600}
 .search{width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;font-family:inherit;font-size:.92rem;margin-bottom:14px;outline:none;background:#fff}
 /* Trip cards - expandable */
-.trip-card{background:#fff;border-radius:16px;margin-bottom:14px;border:1.5px solid #cbd5e1;overflow:hidden;transition:.2s;box-shadow:0 2px 10px rgba(15,23,42,.06)}
-.trip-card:not(.closed){border-color:#bfdbfe;box-shadow:0 3px 12px rgba(37,99,235,.1)}
-.trip-card:not(.closed).open{border-color:#2563eb;box-shadow:0 6px 18px rgba(37,99,235,.15)}
-.trip-card.closed{opacity:.72;border-color:#e2e8f0;background:#f8fafc;box-shadow:none}
+.trip-card{background:#fff;border-radius:16px;margin-bottom:16px;border:2px solid #94a3b8;overflow:hidden;transition:.2s;box-shadow:0 3px 12px rgba(15,23,42,.08)}
+.trip-card:not(.closed){border-color:#2563eb;box-shadow:0 4px 14px rgba(37,99,235,.14)}
+.trip-card:not(.closed).open{border-color:#1d4ed8;box-shadow:0 8px 22px rgba(37,99,235,.2)}
+.trip-card.closed{opacity:.72;border-color:#cbd5e1;background:#f8fafc;box-shadow:none}
 .trip-head{padding:16px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer;flex-wrap:wrap}
 .trip-head:hover{background:#f8fafc}
 .trip-title{font-weight:700;font-size:1rem;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -71,9 +71,10 @@ body{overflow-x:hidden;font-family:'Cairo',sans-serif;background:#f1f5f9;color:#
 .img-upload-btn input{display:none}
 .car-preview{width:100%;max-height:160px;object-fit:cover;border-radius:12px;margin-top:10px;display:none}
 .car-preview.on{display:block}
-.fg{margin-bottom:14px}.fg label{display:block;font-weight:600;font-size:.88rem;margin-bottom:5px;color:#334155}
-.fg input,.fg select,.fg textarea{width:100%;padding:11px 12px;border:1px solid #e2e8f0;border-radius:10px;font-family:inherit;font-size:.92rem;outline:none}
-.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.fg{margin-bottom:14px}.fg label{display:block;font-weight:600;font-size:.85rem;margin-bottom:6px;color:#334155;line-height:1.35;min-height:1.35em}
+.fg input,.fg select,.fg textarea{width:100%;padding:11px 12px;border:1.5px solid #94a3b8;border-radius:10px;font-family:inherit;font-size:.92rem;outline:none;background:#fff;color:#0f172a}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+.search{border:1.5px solid #94a3b8!important}
 .info-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;background:#f8fafc;padding:12px;border-radius:12px;font-size:.85rem;color:#475569}
 .info-row span{display:flex;align-items:center;gap:4px}
 .seats-ctrl{display:flex;align-items:center;gap:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:8px 14px;width:fit-content}
@@ -203,7 +204,7 @@ body{overflow-x:hidden;font-family:'Cairo',sans-serif;background:#f1f5f9;color:#
 .auth-card .fg{text-align:right;margin-bottom:12px}
 .auth-card .fg label{display:none}
 .auth-card .fg input{
-  background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;
+  background:#fff;border:1.5px solid #94a3b8;border-radius:12px;padding:14px 16px;
   font-size:.95rem;width:100%;text-align:right;direction:rtl
 }
 .auth-card .fg input:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.12);background:#fff}
@@ -285,7 +286,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 /* ===== admin cards: stacked list (1 column), stats stay 2x2 ===== */
 #admin-bookings-list,#admin-trips-list,#admin-drivers-list,#admin-cars-list,#admin-supervisors-list,#dash-trips-list,#dash-bookings-list{display:flex;flex-direction:column;gap:14px;align-items:stretch}
 #admin-bookings-list>div:not(.admin-trip),#admin-trips-list>div:not(.admin-trip),#admin-drivers-list>div:not(.admin-trip),#admin-cars-list>div:not(.admin-trip),#admin-supervisors-list>div:not(.admin-trip){width:100%}
-.admin-trip{margin-bottom:0;border:1.5px solid #cbd5e1;border-radius:18px;box-shadow:0 3px 12px rgba(15,23,42,.07);background:#fff;position:relative;overflow:hidden}
+.admin-trip{margin-bottom:0;border:2px solid #94a3b8;border-radius:18px;box-shadow:0 3px 12px rgba(15,23,42,.08);background:#fff;position:relative;overflow:hidden}
 .admin-trip.bk{border-top:5px solid #f59e0b}
 .admin-trip.bk-confirmed{border-top-color:#10b981}
 .admin-trip.bk-cancelled{border-top-color:#ef4444}
@@ -351,8 +352,8 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
     <p style="font-size:.74rem;color:#94a3b8;text-align:center;margin:0 0 6px">كضيف: احجز وتابع حجزك بالكود فقط، بدون حساب.</p>
     <div id="auth-admin-area" class="hidden" style="margin-top:14px;padding-top:12px;border-top:1px dashed #e2e8f0">
     <div id="auth-form-login">
-      <div class="fg"><label>البريد</label><input id="auth-email" type="email" placeholder="البريد الإلكتروني" autocomplete="email"></div>
-      <div class="fg" style="margin-bottom:4px"><label>كلمة المرور</label><input id="auth-pass" type="password" placeholder="كلمة المرور" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="fg"><label>البريد</label><input id="auth-email" type="email" placeholder="" autocomplete="email"></div>
+      <div class="fg" style="margin-bottom:4px"><label>كلمة المرور</label><input id="auth-pass" type="password" placeholder="" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <button type="button" class="btn-login-main" onclick="doLogin()">تسجيل الدخول</button>
       <button type="button" class="link-forgot" onclick="forgotPassword()">نسيت كلمة المرور؟</button>
     </div>
@@ -424,7 +425,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 <div id="cust-trips">
 <div class="sec-head"><h2>الرحلات المجدولة والمنتظمة</h2><span class="badge" id="av-count">متاح للحجز</span></div>
 <p style="color:#64748b;font-size:.88rem;margin-bottom:12px">احجز مقعدك مباشرة في الرحلات المتاحة أو اضغط على الرحلة لمعاينة التفاصيل</p>
-<input class="search" id="search" placeholder="بحث بالمحافظة أو المحطة..." oninput="filterTrips()">
+<input class="search" id="search" placeholder="" oninput="filterTrips()">
 <div id="trips-list"></div>
 </div>
 <div id="cust-track" class="hidden">
@@ -441,7 +442,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
   <div id="track-guest-panel">
     <p style="color:#64748b;font-size:.85rem;margin-bottom:12px;text-align:center">أدخل رقم الحجز لمتابعة الحالة (وضع الضيف)</p>
     <div style="display:flex;gap:8px;margin-bottom:16px">
-      <input class="search" id="tr-code" placeholder="BK-XXXXX" style="margin:0;flex:1" onkeydown="if(event.key==='Enter')trackBooking()">
+      <input class="search" id="tr-code" placeholder="" style="margin:0;flex:1" onkeydown="if(event.key==='Enter')trackBooking()">
       <input type="hidden" id="tr-phone">
       <button class="btn btn-indigo" type="button" onclick="trackBooking()" style="padding:12px 20px;white-space:nowrap">🔍 بحث</button>
     </div>
@@ -474,8 +475,8 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
     </div>
     <div id="pv-car-desc" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px;margin:12px 0;font-size:.85rem;color:#475569;display:none"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">
-      <div class="fg" style="margin:0"><label>📍 مكان الانطلاق (من) *</label><input id="pv-from" placeholder="مثال: القاهرة، التجمع أو المطار"></div>
-      <div class="fg" style="margin:0"><label>🎯 مكان الوصول (إلى) *</label><input id="pv-to" placeholder="مثال: الإسكندرية، الساحل، الجونة"></div>
+      <div class="fg" style="margin:0"><label>من *</label><input id="pv-from" placeholder=""></div>
+      <div class="fg" style="margin:0"><label>إلى *</label><input id="pv-to" placeholder=""></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px">
       <div class="fg" style="margin:0">
@@ -498,10 +499,10 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
       <div class="fg" id="pv-return-wrap" style="margin-top:10px;display:none"><label>📅 تاريخ العودة *</label><input id="pv-date-return" type="date"><small style="color:#94a3b8;font-size:.75rem">يجب أن يكون بعد أو يساوي تاريخ الذهاب</small></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">
-      <div class="fg" style="margin:0"><label>الاسم بالكامل *</label><input id="pv-name" placeholder="محمد فتحي"></div>
-      <div class="fg" style="margin:0"><label>رقم الواتساب للتواصل وتأكيد الحجز *</label><input id="pv-phone" type="tel" placeholder="01xxxxxxxxx"></div>
+      <div class="fg" style="margin:0"><label>الاسم *</label><input id="pv-name" placeholder=""></div>
+      <div class="fg" style="margin:0"><label>واتساب *</label><input id="pv-phone" type="tel" placeholder=""></div>
     </div>
-    <div class="fg"><label>تفاصيل إضافية أو متطلبات خاصة (اختياري)</label><input id="pv-notes" placeholder="حجم الحقائب، نقاط توقف، أية طلبات خاصة..."></div>
+    <div class="fg"><label>ملاحظات (اختياري)</label><input id="pv-notes" placeholder=""></div>
     <button type="button" class="btn btn-green" style="width:100%;justify-content:center;padding:14px;font-size:1rem;margin-top:8px" onclick="submitPrivate()">✓ إرسال طلب السيارة الخاصة الآن</button>
   </div>
 </div>
@@ -592,7 +593,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
   <button class="btn btn-indigo btn-sm" type="button" onclick="openManualBooking()">+ حجز يدوي</button>
 </div>
 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
-  <input class="search" id="bk-search" placeholder="بحث بالاسم أو الهاتف أو الكود..." oninput="filterAdminBookings()" style="margin:0;max-width:320px;flex:1">
+  <input class="search" id="bk-search" placeholder="" oninput="filterAdminBookings()" style="margin:0;max-width:320px;flex:1">
   <div style="display:flex;gap:6px;flex-wrap:wrap" id="bk-filters">
     <button type="button" class="btn btn-indigo btn-sm filt-btn" data-f="all" onclick="setBkFilter('all')">الكل</button>
     <button type="button" class="btn btn-ghost btn-sm filt-btn" data-f="pending" onclick="setBkFilter('pending')">جديدة</button>
@@ -631,7 +632,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 <div class="fg"><label>اسم التطبيق / الشركة</label><input id="set-name" value="سفريات الأمان للركوب والنقل"></div>
 <div class="fg"><label>رسالة الترحيب</label><textarea id="set-welcome" rows="2">احجز مقعدك في أحدث أسطول سيارات برحلات يومية بين المحافظات والمطارات</textarea></div>
 <div class="fg"><label>شعار التطبيق (رابط صورة أو رفع)</label>
-  <input id="set-logo-url" placeholder="https://... أو ارفع صورة بالأسفل" style="margin-bottom:8px">
+  <input id="set-logo-url" placeholder="" style="margin-bottom:8px">
   <input type="file" id="set-logo-file" accept="image/*" onchange="previewLogoFile(this)">
   <img id="set-logo-preview" alt="" style="display:none;max-height:80px;margin-top:8px;border-radius:12px;border:1px solid #e2e8f0">
 </div>
@@ -676,8 +677,8 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 </div>
 <div class="modal-body">
   <div class="info-row" id="m-book-info"></div>
-  <div class="fg"><label>اسم الراكب بالكامل *</label><input id="b-name" placeholder="مثال: أحمد محمد علي"></div>
-  <div class="fg"><label>رقم الهاتف (واتساب لتأكيد الحجز) *</label><input id="b-phone" type="tel" placeholder="01012345678"></div>
+  <div class="fg"><label>اسم الراكب *</label><input id="b-name" placeholder=""></div>
+  <div class="fg"><label>واتساب *</label><input id="b-phone" type="tel" placeholder=""></div>
   <div class="fg">
     <label>عدد المقاعد المطلوبة * <span id="b-seats-hint" style="font-weight:400;color:#64748b"></span></label>
     <div class="seats-ctrl">
@@ -687,7 +688,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
     </div>
     <input type="hidden" id="b-seats" value="1">
   </div>
-  <div class="fg"><label>ملاحظات أو نقطة الالتقاء (اختياري)</label><input id="b-notes" placeholder="مثال: حقائب سفر، الركوب من أمام المحطة..."></div>
+  <div class="fg"><label>ملاحظات (اختياري)</label><input id="b-notes" placeholder=""></div>
   <div class="totals">
     <div class="tot-box"><div class="lbl">الإجمالي (<span id="tot-seats">1</span> مقاعد)</div><div class="val green" id="tot-price">0 ج.م</div></div>
     <div class="tot-box"><div class="lbl">العربون المطلوب</div><div class="val orange" id="tot-deposit">0 ج.م</div></div>
@@ -750,8 +751,8 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 </div>
 <div class="modal-body">
 <p style="font-size:.85rem;color:#64748b;margin-bottom:14px">أدخل بيانات حسابك المعتمد ككابتن للوصول لرحلاتك</p>
-<div class="fg"><label>اسم المستخدم أو رقم الموبايل</label><input id="staff-user" placeholder="01xxxxxxxxx" onkeydown="if(event.key==='Enter')staffLogin()"></div>
-<div class="fg"><label>كلمة المرور</label><input id="staff-pass" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter')staffLogin()"></div>
+<div class="fg"><label>اسم المستخدم أو رقم الموبايل</label><input id="staff-user" placeholder="" onkeydown="if(event.key==='Enter')staffLogin()"></div>
+<div class="fg"><label>كلمة المرور</label><input id="staff-pass" type="password" placeholder="" onkeydown="if(event.key==='Enter')staffLogin()"></div>
 <div class="modal-acts">
   <button type="button" class="btn btn-ghost" data-close onclick="window.closeModals()">إلغاء</button>
   <button type="button" class="btn btn-indigo" onclick="staffLogin()">دخول</button>
@@ -782,8 +783,8 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 <div class="modal-head"><h3>استكمال بيانات الحساب</h3></div>
 <div class="modal-body">
   <p style="font-size:.85rem;color:#64748b;margin-bottom:14px;line-height:1.7">أدخل اسمك ورقم موبايلك (11 رقم) لإتمام إنشاء الحساب. هذه البيانات تُستخدم لتأكيد حجوزاتك.</p>
-  <div class="fg"><label>الاسم بالكامل *</label><input id="pf-name" type="text" placeholder="الاسم الكامل"></div>
-  <div class="fg"><label>رقم الموبايل (11 رقم) *</label><input id="pf-phone" type="tel" inputmode="numeric" maxlength="11" placeholder="01xxxxxxxxx" style="direction:ltr;text-align:right" oninput="this.value=this.value.replace(/[^0-9]/g,'')" onkeydown="if(event.key==='Enter')saveProfile()"></div>
+  <div class="fg"><label>الاسم *</label><input id="pf-name" type="text" placeholder=""></div>
+  <div class="fg"><label>الموبايل *</label><input id="pf-phone" type="tel" inputmode="numeric" maxlength="11" placeholder="" style="direction:ltr;text-align:right" oninput="this.value=this.value.replace(/[^0-9]/g,'')" onkeydown="if(event.key==='Enter')saveProfile()"></div>
   <div class="modal-acts">
     <button type="button" class="btn btn-ghost" onclick="logoutCustomer();document.getElementById('m-profile').classList.remove('on')">إلغاء وخروج</button>
     <button type="button" class="btn btn-green" id="pf-save" onclick="saveProfile()">حفظ ودخول</button>
@@ -793,8 +794,8 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 <div class="modal" style="max-width:420px" onclick="event.stopPropagation()">
 <div class="modal-head"><button type="button" class="xbtn" data-close onclick="window.closeModals()">×</button><h3>تعديل بياناتي</h3></div>
 <div class="modal-body">
-  <div class="fg"><label>الاسم بالكامل *</label><input id="ep-name" type="text" placeholder="الاسم الكامل"></div>
-  <div class="fg"><label>رقم الموبايل (11 رقم) *</label><input id="ep-phone" type="tel" inputmode="numeric" maxlength="11" placeholder="01xxxxxxxxx" style="direction:ltr;text-align:right" oninput="this.value=this.value.replace(/[^0-9]/g,'')" onkeydown="if(event.key==='Enter')saveEditProfile()"></div>
+  <div class="fg"><label>الاسم *</label><input id="ep-name" type="text" placeholder=""></div>
+  <div class="fg"><label>الموبايل *</label><input id="ep-phone" type="tel" inputmode="numeric" maxlength="11" placeholder="" style="direction:ltr;text-align:right" oninput="this.value=this.value.replace(/[^0-9]/g,'')" onkeydown="if(event.key==='Enter')saveEditProfile()"></div>
   <div class="fg"><label>البريد الإلكتروني</label><input id="ep-email" type="email" disabled style="background:#f1f5f9;color:#64748b"></div>
   <div class="modal-acts">
     <button type="button" class="btn btn-ghost" data-close onclick="window.closeModals()">إلغاء</button>
@@ -2830,10 +2831,10 @@ window.openStatusDriver = function (id) {
       </select>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="fg" style="margin:0"><label>السعر الإجمالي (ج)</label><input id="sd-price" type="number" min="0" value="${(_a = b.price) !== null && _a !== void 0 ? _a : ""}" placeholder="0"></div>
-      <div class="fg" style="margin:0"><label>العربون المطلوب (ج)</label><input id="sd-deposit" type="number" min="0" value="${(_b = b.deposit) !== null && _b !== void 0 ? _b : ""}" placeholder="0"></div>
+      <div class="fg" style="margin:0"><label>السعر (ج)</label><input id="sd-price" type="number" min="0" value="${(_a = b.price) !== null && _a !== void 0 ? _a : ""}" placeholder=""></div>
+      <div class="fg" style="margin:0"><label>العربون (ج)</label><input id="sd-deposit" type="number" min="0" value="${(_b = b.deposit) !== null && _b !== void 0 ? _b : ""}" placeholder=""></div>
     </div>
-    <div class="fg"><label>تعليمات الدفع للراكب</label><textarea id="sd-pay-notes" rows="2" placeholder="مثال: حوّل العربون على فودافون كاش ثم ارفع الإيصال">${b.paymentNotes || b.payNotes || ""}</textarea></div>
+    <div class="fg"><label>تعليمات الدفع</label><textarea id="sd-pay-notes" rows="2" placeholder="">${b.paymentNotes || b.payNotes || ""}</textarea></div>
     <div class="fg"><label>تعيين سائق</label>
       <select id="sd-driver"><option value="">— بدون —</option>${drvOpts}</select>
     </div>
@@ -2843,8 +2844,8 @@ window.openStatusDriver = function (id) {
     <div class="fg"><label>تعيين سيارة</label>
       <select id="sd-car"><option value="">— بدون —</option>${carOpts}</select>
     </div>
-    <div class="fg"><label>ملاحظات ظاهرة للراكب</label><input id="sd-notes-public" value="${b.passengerNotes || ""}" placeholder="تظهر للراكب في شاشة المتابعة"></div>
-    <div class="fg"><label>ملاحظات داخلية (للإدارة فقط)</label><input id="sd-notes" value="${b.adminNotes || ""}" placeholder="لا تظهر للراكب"></div>
+    <div class="fg"><label>ملاحظات للراكب</label><input id="sd-notes-public" value="${b.passengerNotes || ""}" placeholder=""></div>
+    <div class="fg"><label>ملاحظات داخلية</label><input id="sd-notes" value="${b.adminNotes || ""}" placeholder=""></div>
     ${receipt ? `<div class="fg"><label>إيصال الدفع المرفوع</label>
       <a href="${receipt}" target="_blank"><img src="${receipt}" alt="إيصال" style="max-width:100%;max-height:160px;border-radius:12px;border:1px solid #e2e8f0"></a>
       <div style="font-size:.8rem;color:#64748b;margin-top:4px">اضغط الصورة لفتحها بحجم أكبر</div>
@@ -3105,11 +3106,11 @@ window.openTripForm = function (editTrip = null, editIdx = -1) {
     const selectedDays = editTrip ? (editTrip.days || []) : [];
     document.getElementById("form-body").innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="fg" style="margin:0"><label>من (محطة التحرك) *</label><input id="f-from" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.from) || ""}" placeholder="مثال: موقف رمسيس"></div>
-      <div class="fg" style="margin:0"><label>إلى (محطة الوصول) *</label><input id="f-to" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.to) || ""}" placeholder="مثال: سيدي جابر"></div>
+      <div class="fg" style="margin:0"><label>من *</label><input id="f-from" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.from) || ""}" placeholder=""></div>
+      <div class="fg" style="margin:0"><label>إلى *</label><input id="f-to" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.to) || ""}" placeholder=""></div>
     </div>
-    <div class="fg" style="margin-top:12px"><label>اسم الرحلة (اختياري)</label><input id="f-name" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.name) || ""}" placeholder="يُملأ تلقائياً إن تُرك فارغاً"></div>
-    <div class="fg"><label>محطات إضافية (اختياري)</label><input id="f-stops" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.stops) || ""}" placeholder="مفصولة بـ - مثال: العباسية - مدينة نصر"></div>
+    <div class="fg" style="margin-top:12px"><label>اسم الرحلة</label><input id="f-name" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.name) || ""}" placeholder=""></div>
+    <div class="fg"><label>محطات إضافية</label><input id="f-stops" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.stops) || ""}" placeholder=""></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
       <div class="fg" style="margin:0"><label>سعر التذكرة للفرد (ج) *</label><input id="f-price" type="number" value="${(_a = editTrip === null || editTrip === void 0 ? void 0 : editTrip.price) !== null && _a !== void 0 ? _a : 150}"></div>
       <div class="fg" style="margin:0"><label>العربون المطلوب للفرد (ج)</label><input id="f-deposit" type="number" value="${(_b = editTrip === null || editTrip === void 0 ? void 0 : editTrip.deposit) !== null && _b !== void 0 ? _b : 50}"></div>
@@ -3135,16 +3136,16 @@ window.openTripForm = function (editTrip = null, editIdx = -1) {
       </label>
     </div>
     <div class="fg"><label>موعد وساعة التحرك</label><input id="f-time" type="time" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.timeRaw) || "07:30"}"></div>
-    <div class="fg"><label>نص الموعد المعروض (يمكن تعديله يدوياً)</label><input id="f-time-label" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.time) || ""}" placeholder="يومياً 7:30 صباحاً"></div>
-    <div class="fg"><label>السائق</label><input id="f-driver" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.driver) || ""}" placeholder="اسم السائق"></div>
+    <div class="fg"><label>نص الموعد المعروض (يمكن تعديله يدوياً)</label><input id="f-time-label" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.time) || ""}" placeholder=""></div>
+    <div class="fg"><label>السائق</label><input id="f-driver" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.driver) || ""}" placeholder=""></div>
     <div class="fg"><label>المشرف (للمتابعة عبر واتساب)</label>
       <select id="f-supervisor">
         <option value="">— بدون مشرف —</option>
         ${supervisors.map(s => `<option value="${s.id || s.firestoreId || s.name}" data-name="${s.name || ""}" data-phone="${s.phone || ""}" ${((editTrip && (editTrip.supervisorId === (s.id || s.firestoreId) || editTrip.supervisorName === s.name)) ? "selected" : "")}>${s.name} — ${s.phone || ""}</option>`).join("")}
       </select>
     </div>
-    <div class="fg"><label>السيارة</label><input id="f-car" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.car) || ""}" placeholder="تويوتا هايس 2023..."></div>
-    <div class="fg"><label>ملاحظات</label><input id="f-notes" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.notes) || ""}" placeholder="تكييف، واي فاي..."></div>
+    <div class="fg"><label>السيارة</label><input id="f-car" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.car) || ""}" placeholder=""></div>
+    <div class="fg"><label>ملاحظات</label><input id="f-notes" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.notes) || ""}" placeholder=""></div>
     <div class="fg"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="f-closed" style="width:auto" ${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.closed) ? "checked" : ""}> إغلاق الحجز (مكتمل العدد)</label></div>
   `;
     window.updateDaysLabel = function () {
@@ -3275,9 +3276,9 @@ window.openDriverForm = function (editD = null, editIdx = -1) {
     document.getElementById("form-title").textContent = isEdit ? "تعديل سائق" : "إضافة سائق";
     document.getElementById("form-body").innerHTML = `
     <div class="fg"><label>الاسم *</label><input id="f-name" value="${(editD === null || editD === void 0 ? void 0 : editD.name) || ""}"></div>
-    <div class="fg"><label>الموبايل *</label><input id="f-phone" type="tel" value="${(editD === null || editD === void 0 ? void 0 : editD.phone) || ""}" placeholder="01xxxxxxxxx"></div>
-    <div class="fg"><label>اسم المستخدم للدخول</label><input id="f-username" value="${(editD === null || editD === void 0 ? void 0 : editD.username) || ""}" placeholder="اختياري — يمكن الدخول بالموبايل"></div>
-    <div class="fg"><label>كلمة مرور الدخول ${isEdit ? "(اتركها فارغة لعدم التغيير)" : "*"}</label><input id="f-pass" type="password" placeholder="${isEdit ? "••••••" : "حدد كلمة مرور"}"></div>
+    <div class="fg"><label>الموبايل *</label><input id="f-phone" type="tel" value="${(editD === null || editD === void 0 ? void 0 : editD.phone) || ""}" placeholder=""></div>
+    <div class="fg"><label>اسم المستخدم للدخول</label><input id="f-username" value="${(editD === null || editD === void 0 ? void 0 : editD.username) || ""}" placeholder=""></div>
+    <div class="fg"><label>كلمة مرور الدخول ${isEdit ? "(اتركها فارغة لعدم التغيير)" : "*"}</label><input id="f-pass" type="password" placeholder=""></div>
     <div class="fg"><label>ملاحظات</label><input id="f-notes" value="${(editD === null || editD === void 0 ? void 0 : editD.notes) || ""}"></div>
     <p style="font-size:.78rem;color:#64748b">كلمة المرور تُخزَّن كنص مشفّر (SHA-256) وليست كنص صريح. للأمان الكامل فعّل Firebase Authentication لاحقاً.</p>`;
     document.getElementById("form-save-btn").onclick = async () => {
@@ -3357,9 +3358,9 @@ window.openSupervisorForm = function (editS = null, editIdx = -1) {
     const isEdit = !!editS;
     document.getElementById("form-title").textContent = isEdit ? "تعديل مشرف" : "إضافة مشرف";
     document.getElementById("form-body").innerHTML = `
-    <div class="fg"><label>اسم المشرف *</label><input id="f-name" value="${(editS && editS.name) || ""}" placeholder="مثال: أحمد المتابعة"></div>
-    <div class="fg"><label>رقم الواتساب *</label><input id="f-phone" type="tel" value="${(editS && editS.phone) || ""}" placeholder="01xxxxxxxxx"></div>
-    <div class="fg"><label>ملاحظات</label><input id="f-notes" value="${(editS && editS.notes) || ""}" placeholder="اختياري"></div>
+    <div class="fg"><label>اسم المشرف *</label><input id="f-name" value="${(editS && editS.name) || ""}" placeholder=""></div>
+    <div class="fg"><label>رقم الواتساب *</label><input id="f-phone" type="tel" value="${(editS && editS.phone) || ""}" placeholder=""></div>
+    <div class="fg"><label>ملاحظات</label><input id="f-notes" value="${(editS && editS.notes) || ""}" placeholder=""></div>
     <p style="font-size:.78rem;color:#64748b">رقم الواتساب يظهر للراكب على الرحلة المسندة لهذا المشرف لمتابعة الحجز مباشرة.</p>`;
     document.getElementById("form-save-btn").textContent = "حفظ المشرف";
     document.getElementById("form-save-btn").onclick = async () => {
@@ -3429,12 +3430,12 @@ window.openCarForm = function (editC = null, editIdx = -1) {
     window._carImageData = (editC === null || editC === void 0 ? void 0 : editC.image) || "";
     document.getElementById("form-title").textContent = isEdit ? "تعديل سيارة في الأسطول" : "إضافة سيارة للأسطول";
     document.getElementById("form-body").innerHTML = `
-    <div class="fg"><label>نوع السيارة (الفئة) *</label><input id="f-category" value="${(editC === null || editC === void 0 ? void 0 : editC.category) || ""}" placeholder="مثال: ميني باص / سيدان / VIP"></div>
-    <div class="fg"><label>موديل وماركة السيارة *</label><input id="f-model" value="${(editC === null || editC === void 0 ? void 0 : editC.model) || ""}" placeholder="مثال: كوستر / تويوتا هايس 2023"></div>
-    <div class="fg"><label>وصف نوع السيارة ومواصفاتها (يظهر للمستفيد)</label><input id="f-notes" value="${(editC === null || editC === void 0 ? void 0 : editC.notes) || ""}" placeholder="مثال: رحلات · مكيفة · واي فاي"></div>
+    <div class="fg"><label>الفئة *</label><input id="f-category" value="${(editC === null || editC === void 0 ? void 0 : editC.category) || ""}" placeholder=""></div>
+    <div class="fg"><label>الموديل *</label><input id="f-model" value="${(editC === null || editC === void 0 ? void 0 : editC.model) || ""}" placeholder=""></div>
+    <div class="fg"><label>الوصف (للمستفيد)</label><input id="f-notes" value="${(editC === null || editC === void 0 ? void 0 : editC.notes) || ""}" placeholder=""></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="fg" style="margin:0"><label>اللون</label><input id="f-color" value="${(editC === null || editC === void 0 ? void 0 : editC.color) || ""}" placeholder="أبيض"></div>
-      <div class="fg" style="margin:0"><label>رقم اللوحة</label><input id="f-plate" value="${(editC === null || editC === void 0 ? void 0 : editC.plate) || ""}" placeholder="6525 م ت ل"></div>
+      <div class="fg" style="margin:0"><label>اللون</label><input id="f-color" value="${(editC === null || editC === void 0 ? void 0 : editC.color) || ""}" placeholder=""></div>
+      <div class="fg" style="margin:0"><label>رقم اللوحة</label><input id="f-plate" value="${(editC === null || editC === void 0 ? void 0 : editC.plate) || ""}" placeholder=""></div>
     </div>
     <div class="fg" style="margin-top:12px">
       <label>صورة السيارة (رفع من الاستوديو أو التقاط بالكاميرا)</label>
