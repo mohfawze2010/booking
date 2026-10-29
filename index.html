@@ -448,15 +448,12 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 </div>
 <!-- شاشة حجز سيارة خاصة -->
 <div id="cust-private" class="hidden">
-  <div style="background:linear-gradient(135deg,#059669,#10b981);border-radius:20px;padding:22px 18px;color:#fff;margin-bottom:16px;position:relative">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-      <button type="button" onclick="showCust('trips')" style="background:rgba(255,255,255,.25);border:none;color:#fff;padding:8px 14px;border-radius:999px;font-family:inherit;font-weight:600;cursor:pointer;font-size:.85rem">→ رجوع للرحلات</button>
-      <span style="background:rgba(255,255,255,.2);padding:6px 12px;border-radius:999px;font-size:.8rem;font-weight:600">🔑 خدمة السيارات الخاصة والتوصيل</span>
-    </div>
-    <h1 style="font-size:1.25rem;font-weight:800;margin-bottom:6px">طلب سيارة خاصة للمشوار بالكامل</h1>
-    <p style="font-size:.88rem;opacity:.9;line-height:1.6">اختر نوع وموديل السيارة وسيتم تحديد التكلفة والعربون من الإدارة وتجهيز السيارة لك.</p>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+    <button type="button" class="btn btn-ghost btn-sm" onclick="showCust('trips')" style="border-radius:999px">← رجوع</button>
+    <h2 style="font-size:1.1rem;font-weight:800;margin:0;flex:1">🚗 حجز سيارة خاصة</h2>
   </div>
   <div class="panel" style="border-radius:18px">
+    <p style="font-size:.88rem;color:#64748b;margin-bottom:14px;line-height:1.6">املأ بيانات الطلب وسيتم تحديد التكلفة والعربون من الإدارة.</p>
     <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:12px 14px;margin-bottom:18px;font-size:.85rem;color:#92400e;display:flex;gap:8px;align-items:flex-start">
       <span>ℹ️</span>
       <div><b>ملاحظة للمستفيد:</b> سيتم مراجعة الطلب من قبل الإدارة وسيتم الرد عليكم بالتكلفة. يرجى الاحتفاظ برقم الطلب والاستعلام بعد قليل.</div>
@@ -1503,21 +1500,51 @@ window.loadMyBookings = async function () {
             box.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:16px">لا توجد حجوزات بعد<br><button class="btn btn-indigo btn-sm" style="margin-top:10px" onclick="showCust(\'trips\')">احجز الآن</button></div>';
             return;
         }
-        box.innerHTML = list.map(b => {
+        window._myBookingsCache = list;
+        box.innerHTML = list.map((b, i) => {
             const st = b.status || "pending";
             const label = st === "confirmed" ? "مؤكد" : st === "cancelled" ? "ملغي" : st === "payment" || st === "payment_pending" ? "بانتظار الدفع" : "قيد المراجعة";
-            return `<div class="card" style="margin-bottom:8px;cursor:pointer" onclick="openMyBooking('${b.id}','${b.code || ""}')">
-        <div class="card-info">
-          <div class="card-title">${b.code || "-"} <span class="status st-${st === "confirmed" ? "confirmed" : st === "cancelled" ? "cancelled" : "pending"}">${label}</span></div>
-          <div class="card-meta">${b.tripName || ((b.from || "") + " ← " + (b.to || "")) || "حجز"} · ${b.createdAt ? new Date(b.createdAt).toLocaleDateString("ar-EG") : ""}</div>
+            const stCls = st === "confirmed" ? "confirmed" : st === "cancelled" ? "cancelled" : "pending";
+            return `<div class="trip-card" id="mbc-${i}">
+        <div class="trip-head" onclick="toggleMyBooking(${i})">
+          <div class="th-main">
+            <div class="trip-title"><span class="chev">▼</span><span>${b.code || "-"}</span> <span class="status st-${stCls}">${label}</span></div>
+            <div class="trip-meta">${b.tripName || ((b.from || "") + " ← " + (b.to || "")) || "حجز"} · ${b.createdAt ? new Date(b.createdAt).toLocaleDateString("ar-EG") : ""}</div>
+          </div>
         </div>
-        <span style="color:#5b6e22;font-weight:700">عرض ←</span>
+        <div class="trip-details" id="mbd-${i}"></div>
       </div>`;
         }).join("");
     }
     catch (e) {
         console.error(e);
         box.innerHTML = '<div style="color:#dc2626;padding:12px">تعذر تحميل الحجوزات — تأكد من فهرس userId في Firestore</div>';
+    }
+};
+
+window.toggleMyBooking = async function (i) {
+    const card = document.getElementById("mbc-" + i);
+    const det = document.getElementById("mbd-" + i);
+    if (!card || !det) return;
+    const opening = !card.classList.contains("open");
+    document.querySelectorAll("#my-bookings-list .trip-card.open").forEach(el => {
+        if (el !== card) el.classList.remove("open");
+    });
+    if (!opening) { card.classList.remove("open"); return; }
+    card.classList.add("open");
+    const b = (window._myBookingsCache || [])[i];
+    if (!b) return;
+    if (!det.dataset.loaded) {
+        det.innerHTML = '<div style="padding:12px;color:#94a3b8">جاري التحميل...</div>';
+        try {
+            const snap = await getDoc(doc(db, "bookings", b.id));
+            const data = snap.exists() ? Object.assign({ id: b.id }, snap.data()) : b;
+            det.innerHTML = renderTrackCard(data, b.id);
+            det.dataset.loaded = "1";
+        } catch (e) {
+            det.innerHTML = renderTrackCard(b, b.id);
+            det.dataset.loaded = "1";
+        }
     }
 };
 window.openMyBooking = async function (id, code) {
@@ -1591,7 +1618,8 @@ window.showCust = function (v) {
 function renderTrips(filter = "") {
     const list = document.getElementById("trips-list");
     const f = trips.filter(t => !filter || (t.name || "").includes(filter) || (t.from || "").includes(filter) || (t.to || "").includes(filter));
-    const avail = f.filter(t => !t.closed && (t.available || 0) > 0).length;
+    window._tripsView = f;
+    const avail = f.filter(t => !isTripClosed(t) && (Number(t.available) || 0) > 0).length;
     document.getElementById("av-count").textContent = avail + " متاح للحجز";
     if (!f.length) {
         list.innerHTML = '<div style="text-align:center;padding:30px;color:#94a3b8">لا توجد رحلات</div>';
@@ -1599,7 +1627,7 @@ function renderTrips(filter = "") {
     }
     list.innerHTML = f.map((t, idx) => {
         const adminClosed = isTripClosed(t);
-        const soldOut = (Number(t.available) || 0) <= 0;
+        const soldOut = !isFinite(Number(t.available)) || Number(t.available) <= 0;
         const closed = adminClosed || soldOut;
         let tag;
         if (adminClosed)
@@ -1618,7 +1646,7 @@ function renderTrips(filter = "") {
         </div>
         <div class="th-side">
           <div class="price-side"><div class="p">${t.price || 0} ج.م</div><div class="l">سعر المقعد</div></div>
-          <button class="book-btn" type="button" ${closed ? 'disabled' : ''} onclick="event.stopPropagation();openBookingById('${t.id}')">حجز مباشر ←</button>
+          <button class="book-btn" type="button" ${closed ? 'disabled' : ''} onclick="event.stopPropagation();openBookingAt(${idx})">حجز مباشر ←</button>
         </div>
       </div>
       <div class="trip-details">
@@ -1629,7 +1657,7 @@ function renderTrips(filter = "") {
           <div class="d-item"><div class="lbl">🚗 نوع السيارة</div><div class="val">${t.car || '-'}</div></div>
         </div>
         ${t.notes ? `<div class="note-box">ℹ️ ${t.notes}</div>` : ''}
-        <button class="confirm-bar" type="button" ${closed ? 'disabled' : ''} onclick="openBookingById('${t.id}')">
+        <button class="confirm-bar" type="button" ${closed ? 'disabled' : ''} onclick="openBookingAt(${idx})">
           ${closed ? 'الرحلة مكتملة / مغلقة' : 'تأكيد حجز مقعد في رحلة ' + (t.name || '') + ' ←'}
         </button>
       </div>
@@ -1642,13 +1670,29 @@ window.toggleTrip = function (idx) {
         el.classList.toggle("open");
 };
 window.filterTrips = () => renderTrips(document.getElementById("search").value.trim());
-window.openBookingById = function (id) {
-    const t = trips.find(x => x.id === id);
+window.openBookingAt = function (idx) {
+    const f = window._tripsView || trips;
+    const t = f[idx];
     if (!t)
         return toast("الرحلة غير موجودة", "err");
     if (isTripClosed(t))
         return toast("الحجز مغلق لهذه الرحلة", "err");
-    if ((Number(t.available) || 0) <= 0)
+    const avail = Number(t.available);
+    if (!isFinite(avail) || avail <= 0)
+        return toast("اكتمل العدد — لا توجد مقاعد", "err");
+    openBooking(t);
+};
+window.openBookingById = function (id) {
+    // تفضيل firestoreId ثم id — لتجنب تطابق رحلتين بنفس id المحلي
+    let t = trips.find(x => x.firestoreId && x.firestoreId === id);
+    if (!t)
+        t = trips.find(x => x.id === id);
+    if (!t)
+        return toast("الرحلة غير موجودة", "err");
+    if (isTripClosed(t))
+        return toast("الحجز مغلق لهذه الرحلة", "err");
+    const avail = Number(t.available);
+    if (!isFinite(avail) || avail <= 0)
         return toast("اكتمل العدد — لا توجد مقاعد", "err");
     openBooking(t);
 };
@@ -1682,7 +1726,7 @@ window.openBooking = function (t) {
 };
 window.chgSeats = function (d) {
     let n = +document.getElementById("b-seats").value || 1;
-    const max = currentTrip ? (currentTrip.available || 1) : 4;
+    const max = currentTrip ? Math.max(1, Number(currentTrip.available) || 1) : 4;
     n = Math.max(1, Math.min(max, n + d));
     document.getElementById("b-seats").value = n;
     document.getElementById("b-seats-num").textContent = n;
@@ -1713,11 +1757,11 @@ window.submitBooking = async function () {
         return toast("الحجز مغلق لهذه الرحلة", "err");
     if (seats < 1)
         return toast("عدد المقاعد غير صالح", "err");
-    if (seats > (currentTrip.available || 0))
+    if (seats > (Number(currentTrip.available) || 0))
         return toast("المقاعد المطلوبة أكثر من المتاح", "err");
     const c = code();
     const booking = {
-        code: c, type: "scheduled", tripId: currentTrip.id, tripName: currentTrip.name,
+        code: c, type: "scheduled", tripId: currentTrip.firestoreId || currentTrip.id, tripName: currentTrip.name,
         name, phone, seats, notes,
         price: (currentTrip.price || 0) * seats,
         deposit: (currentTrip.deposit || 0) * seats,
@@ -2699,7 +2743,7 @@ window.openManualBooking = function () {
 function renderAdminTrips() {
     document.getElementById("admin-trips-list").innerHTML = trips.map((t, i) => {
         const isClosed = isTripClosed(t);
-        const soldOut = (Number(t.available) || 0) <= 0;
+        const soldOut = !isFinite(Number(t.available)) || Number(t.available) <= 0;
         return `<div class="admin-trip">
       <div class="top-row">
         <div>
@@ -3286,7 +3330,10 @@ function init() {
     renderTrips();
     getDocs(collection(db, "trips")).then(snap => {
         if (!snap.empty) {
-            trips = snap.docs.map(d => (Object.assign({ firestoreId: d.id }, d.data())));
+            trips = snap.docs.map(d => {
+                const data = d.data() || {};
+                return Object.assign({}, data, { firestoreId: d.id, id: data.id || d.id });
+            });
             renderTrips();
         }
         else {
