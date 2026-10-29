@@ -3253,7 +3253,9 @@ function init() {
             try {
                 const us = await getDoc(doc(db, "users", user.uid));
                 const ud = us.exists() ? us.data() : null;
-                if (ud && (ud.role === "admin" || ud.role === "superadmin")) {
+                const roleNorm = String((ud && ud.role) || "").toLowerCase().replace(/[\s\-]+/g, "_");
+                const isAdminUser = roleNorm === "admin" || roleNorm === "superadmin" || roleNorm === "super_admin";
+                if (ud && isAdminUser) {
                     document.getElementById("view-auth").classList.add("hidden");
                     document.getElementById("view-customer").classList.add("hidden");
                     document.getElementById("view-driver").classList.add("hidden");
