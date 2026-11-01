@@ -698,6 +698,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 </div>
 <div class="modal-body">
   <div class="info-row" id="m-book-info"></div>
+  <div class="fg"><label>📅 تاريخ الرحلة *</label><div id="b-dates" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div><input type="hidden" id="b-date" value=""><small id="b-date-note" style="display:block;margin-top:6px;color:#64748b;font-size:.75rem;line-height:1.6"></small></div>
   <div class="fg"><label>اسم الراكب *</label><input id="b-name" placeholder=""></div>
   <div class="fg"><label>واتساب *</label><input id="b-phone" type="tel" placeholder=""></div>
   <div class="fg">
@@ -1016,6 +1017,89 @@ function waHref(phone, text) {
         : ("https://wa.me/" + n);
 }
 
+// ===== تواريخ الرحلات: الحجز خلال 7 أيام فقط من اليوم =====
+const AR_WEEKDAYS = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+function normDay(x) { return String(x || "").replace(/[أإآ]/g, "ا").replace(/\s+/g, "").trim(); }
+function isoLocal(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+function tripDateLabel(iso) {
+    if (!iso) return "";
+    const p = String(iso).split("-").map(Number);
+    if (p.length !== 3 || p.some(isNaN)) return String(iso);
+    const d = new Date(p[0], p[1] - 1, p[2]);
+    return AR_WEEKDAYS[d.getDay()] + " " + String(p[2]).padStart(2, "0") + "/" + String(p[1]).padStart(2, "0");
+}
+function getBookableDates(t) {
+    const days = (Array.isArray(t && t.days) ? t.days : []).map(normDay).filter(Boolean);
+    const out = [];
+    let todayPassed = false;
+    const now = new Date();
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+        if (days.length && !days.includes(normDay(AR_WEEKDAYS[d.getDay()])))
+            continue;
+        if (i === 0 && t && t.timeRaw) {
+            const parts = String(t.timeRaw).split(":").map(Number);
+            if (!isNaN(parts[0]) && (now.getHours() * 60 + now.getMinutes()) >= parts[0] * 60 + (parts[1] || 0)) {
+                todayPassed = true;
+                continue;
+            }
+        }
+        const iso = isoLocal(d);
+        out.push({ iso, label: tripDateLabel(iso), tag: i === 0 ? "اليوم" : i === 1 ? "غداً" : "" });
+    }
+    return { dates: out, todayPassed };
+}
+window.renderBookDates = function (t) {
+    const box = document.getElementById("b-dates"), inp = document.getElementById("b-date"), note = document.getElementById("b-date-note");
+    if (!box || !inp) return;
+    const r = getBookableDates(t);
+    inp.value = r.dates.length ? r.dates[0].iso : "";
+    box.innerHTML = r.dates.length
+        ? r.dates.map((x, i) => `<button type="button" class="btn btn-sm bk-date-btn ${i === 0 ? "btn-indigo" : "btn-ghost"}" data-iso="${x.iso}" onclick="selectBookDate('${x.iso}')">${x.label}${x.tag ? " · " + x.tag : ""}</button>`).join("")
+        : '<div style="color:#b45309;background:#fef3c7;border-radius:10px;padding:10px 12px;font-size:.85rem;width:100%">لا توجد مواعيد متاحة خلال هذا الأسبوع — احجز في الأسبوع القادم</div>';
+    if (note) note.textContent = (r.todayPassed ? "رحلة اليوم تحرّكت بالفعل — لهذا اليوم احجز في الأسبوع القادم. " : "") + "الحجز متاح خلال 7 أيام فقط من اليوم، وللمواعيد الأبعد احجز في الأسبوع القادم.";
+};
+window.selectBookDate = function (iso) {
+    const inp = document.getElementById("b-date");
+    if (inp) inp.value = iso;
+    document.querySelectorAll(".bk-date-btn").forEach(b => {
+        b.className = "btn btn-sm bk-date-btn " + (b.dataset.iso === iso ? "btn-indigo" : "btn-ghost");
+    });
+};
+// ===== إحصاء المقاعد للأدمن فقط (من الحجوزات التي دُفع عربونها) =====
+async function refreshTripBookings() {
+    try {
+        const snap = await getDocs(collection(db, "bookings"));
+        allAdminBookings = snap.docs.map(d => (Object.assign({ id: d.id }, d.data())));
+    }
+    catch (e) { }
+}
+function tripSeatStats(t) {
+    const ids = [t.firestoreId, t.id].filter(Boolean);
+    const today = isoLocal(new Date());
+    let paidSeats = 0, paidCount = 0, incoming = 0;
+    const byDate = {};
+    (allAdminBookings || []).forEach(b => {
+        if (b.type === "private" || !ids.includes(b.tripId)) return;
+        const st = normalizeBookingStatus(b.status);
+        if (st === "cancelled") return;
+        if (b.tripDate && b.tripDate < today) return;
+        incoming++;
+        if (st === "confirmed" || String(b.status) === "payment") {
+            const n = Number(b.seats) || 1;
+            paidSeats += n;
+            paidCount++;
+            const k = b.tripDate || "";
+            byDate[k] = (byDate[k] || 0) + n;
+        }
+    });
+    return { paidSeats, paidCount, incoming, byDate };
+}
+function seatsInfoHtml(t) {
+    const st = tripSeatStats(t);
+    const chips = Object.keys(st.byDate).sort().map(k => `<span style="background:#fff;border:1px solid #fed7aa;border-radius:999px;padding:2px 10px;font-size:.74rem">${k ? tripDateLabel(k) : "بدون تاريخ"}: <b>${st.byDate[k]}</b></span>`).join("");
+    return `<div style="margin-top:8px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:8px 10px;font-size:.8rem;color:#9a3412;display:flex;flex-wrap:wrap;gap:6px;align-items:center">🪑 مقاعد بعربون مدفوع: <b>${st.paidSeats}</b>${st.paidSeats ? " (" + st.paidCount + " حجز)" : ""} · طلبات واردة: <b>${st.incoming}</b>${chips ? '<span style="width:100%"></span>' + chips : ""}</div>`;
+}
 function getReceiptUrl(b) {
     if (!b)
         return "";
@@ -1025,122 +1109,18 @@ function isTripClosed(t) {
     return !!(t && (t.is_booking_closed || t.closed));
 }
 function tripCanBook(t) {
-    return t && !isTripClosed(t) && (Number(t.available) || 0) > 0;
+    return t && !isTripClosed(t);
 }
 async function restoreSeatsForBooking(booking, cancelledBy) {
-    // Firestore: كل القراءات قبل أي كتابة داخل الـ transaction
+    // لم يعد هناك عدّاد مقاعد متاحة يُعدَّل — الإلغاء يغيّر حالة الحجز فقط
     if (!booking || !booking.id)
         throw new Error("missing booking id");
-    const bRef = doc(db, "bookings", booking.id);
-    try {
-        await runTransaction(db, async (tx) => {
-            const bSnap = await tx.get(bRef);
-            if (!bSnap.exists())
-                throw new Error("not found");
-            const b = bSnap.data();
-            if (b.status === "cancelled")
-                return;
-            const seats = Number(b.seats) || 1;
-            const tripId = b.tripId;
-            // حدّد مرجع الرحلة واقرأه قبل أي update
-            let tripRef = null;
-            let tripData = null;
-            let local = null;
-            if (b.type !== "private" && tripId) {
-                local = trips.find(t => t.id === tripId || t.firestoreId === tripId);
-                if (local && local.firestoreId) {
-                    tripRef = doc(db, "trips", local.firestoreId);
-                    const tSnap = await tx.get(tripRef);
-                    if (tSnap.exists())
-                        tripData = tSnap.data();
-                }
-                else if (typeof tripId === "string" && tripId.length > 8) {
-                    // قد يكون tripId هو firestoreId مباشرة
-                    try {
-                        tripRef = doc(db, "trips", tripId);
-                        const tSnap = await tx.get(tripRef);
-                        if (tSnap.exists()) {
-                            tripData = tSnap.data();
-                            local = trips.find(t => t.firestoreId === tripId || t.id === tripId) || { seats: tripData.seats };
-                        }
-                        else {
-                            tripRef = null;
-                        }
-                    }
-                    catch (e) {
-                        tripRef = null;
-                    }
-                }
-            }
-            // الكتابات بعد اكتمال القراءات
-            tx.update(bRef, {
-                status: "cancelled",
-                cancelled_by: cancelledBy || "unknown",
-                cancelledBy: cancelledBy || "unknown",
-                updatedAt: new Date().toISOString()
-            });
-            if (tripRef && tripData) {
-                const total = Number(tripData.seats) || Number((local && local.seats) || 4);
-                let avail = Number(tripData.available);
-                if (isNaN(avail))
-                    avail = total;
-                const next = Math.min(total, avail + seats);
-                const closed = !!(tripData.is_booking_closed || tripData.closed);
-                const type = closed ? "الحجز مغلق" : (next <= 0 ? "اكتمل العدد" : ("متاح " + next + " مقاعد"));
-                tx.update(tripRef, { available: next, type });
-                if (local) {
-                    local.available = next;
-                    local.type = type;
-                }
-            }
-        });
-    }
-    catch (e) {
-        // إن فشلت المعاملة (قواعد أمان / شبكة): حاول إلغاء الحجز مباشرة بدون استرجاع المقاعد في نفس العملية
-        console.error("restoreSeats transaction failed", e);
-        const snap = await getDoc(bRef);
-        if (!snap.exists())
-            throw e;
-        const b = snap.data();
-        if (b.status === "cancelled")
-            return;
-        await updateDoc(bRef, {
-            status: "cancelled",
-            cancelled_by: cancelledBy || "unknown",
-            cancelledBy: cancelledBy || "unknown",
-            updatedAt: new Date().toISOString()
-        });
-        // محاولة استرجاع المقاعد خارج المعاملة
-        try {
-            const tripId = b.tripId;
-            if (b.type !== "private" && tripId) {
-                const local = trips.find(t => t.id === tripId || t.firestoreId === tripId);
-                const fid = (local && local.firestoreId) || tripId;
-                if (fid) {
-                    const tRef = doc(db, "trips", fid);
-                    const tSnap = await getDoc(tRef);
-                    if (tSnap.exists()) {
-                        const td = tSnap.data();
-                        const seats = Number(b.seats) || 1;
-                        const total = Number(td.seats) || 4;
-                        let avail = Number(td.available);
-                        if (isNaN(avail))
-                            avail = total;
-                        const next = Math.min(total, avail + seats);
-                        const type = next <= 0 ? "اكتمل العدد" : ("متاح " + next + " مقاعد");
-                        await updateDoc(tRef, { available: next, type });
-                        if (local) {
-                            local.available = next;
-                            local.type = type;
-                        }
-                    }
-                }
-            }
-        }
-        catch (e2) {
-            console.error("seat restore fallback failed", e2);
-        }
-    }
+    await updateDoc(doc(db, "bookings", booking.id), {
+        status: "cancelled",
+        cancelled_by: cancelledBy || "unknown",
+        cancelledBy: cancelledBy || "unknown",
+        updatedAt: new Date().toISOString()
+    });
 }
 window.APP_SETTINGS = {
     company_name: "سفريات الأمان للركوب والنقل",
@@ -1727,7 +1707,7 @@ function renderTrips(filter = "") {
     const list = document.getElementById("trips-list");
     const f = trips.filter(t => !filter || (t.name || "").includes(filter) || (t.from || "").includes(filter) || (t.to || "").includes(filter));
     window._tripsView = f;
-    const avail = f.filter(t => !isTripClosed(t) && (Number(t.available) || 0) > 0).length;
+    const avail = f.filter(t => !isTripClosed(t)).length;
     document.getElementById("av-count").textContent = avail + " متاح للحجز";
     if (!f.length) {
         list.innerHTML = '<div style="text-align:center;padding:30px;color:#94a3b8">لا توجد رحلات</div>';
@@ -1735,17 +1715,8 @@ function renderTrips(filter = "") {
     }
     list.innerHTML = f.map((t, idx) => {
         const adminClosed = isTripClosed(t);
-        const soldOut = !isFinite(Number(t.available)) || Number(t.available) <= 0;
-        const closed = adminClosed || soldOut;
-        let tag;
-        if (adminClosed)
-            tag = '<span class="tag tag-closed">الحجز مغلق</span>';
-        else if (soldOut)
-            tag = '<span class="tag tag-closed">اكتمل العدد</span>';
-        else if ((Number(t.available) || 0) <= 2)
-            tag = `<span class="tag" style="background:#ffedd5;color:#c2410c">متبقي ${t.available} مقاعد فقط!</span>`;
-        else
-            tag = `<span class="tag">متاح ${t.available || 0} مقاعد</span>`;
+        const closed = adminClosed;
+        const tag = adminClosed ? '<span class="tag tag-closed">الحجز مغلق</span>' : '<span class="tag">متاح للحجز</span>';
         return `<div class="trip-card ${closed ? 'closed' : ''}" id="tc-${idx}">
       <div class="trip-status-badge">${tag}</div>
       <div class="trip-head" onclick="toggleTrip(${idx})">
@@ -1763,7 +1734,6 @@ function renderTrips(filter = "") {
           <div class="d-item"><div class="lbl">🕐 وقت التحرك</div><div class="val">${formatTripClock(t)}</div></div>
           <div class="d-item"><div class="lbl">📅 الأيام المجدولة</div><div class="val">${formatTripSchedule(t) || '—'}</div></div>
           <div class="d-item"><div class="lbl">💰 العربون المطلوب</div><div class="val" style="color:#f97316">${t.deposit || 0} ج.م / مقعد</div></div>
-          <div class="d-item"><div class="lbl">🪑 المقاعد المتبقية</div><div class="val">${t.available || 0} من أصل ${t.seats || '-'}</div></div>
           <div class="d-item"><div class="lbl">🚗 نوع السيارة</div><div class="val">${t.car || '-'}</div></div>
           ${t.supervisorName ? `<div class="d-item"><div class="lbl">👤 مشرف المتابعة</div><div class="val">${t.supervisorName}</div></div>` : ''}
           ${t.supervisorPhone ? `<div class="d-item"><div class="lbl">💬 واتساب المشرف</div><div class="val"><a href="${waHref(t.supervisorPhone)}" target="_blank" style="color:#16a34a;font-weight:700">${t.supervisorPhone}</a></div></div>` : ''}
@@ -1771,7 +1741,7 @@ function renderTrips(filter = "") {
         ${t.notes ? `<div class="note-box">ℹ️ ${t.notes}</div>` : ''}
         ${t.supervisorPhone ? `<div class="note-box" style="background:#ecfdf5;border-color:#a7f3d0;color:#047857">👤 للمتابعة تواصل مع المشرف <b>${t.supervisorName || ''}</b> عبر واتساب: <a href="${waHref(t.supervisorPhone)}" target="_blank" style="color:#047857;font-weight:800">${t.supervisorPhone}</a></div>` : ''}
         <button class="confirm-bar" type="button" ${closed ? 'disabled' : ''} onclick="openBookingAt(${idx})">
-          ${closed ? 'الرحلة مكتملة / مغلقة' : 'تأكيد حجز مقعد في رحلة ' + (t.name || '') + ' ←'}
+          ${closed ? 'الحجز مغلق لهذه الرحلة' : 'تأكيد حجز مقعد في رحلة ' + (t.name || '') + ' ←'}
         </button>
       </div>
     </div>`;
@@ -1790,9 +1760,6 @@ window.openBookingAt = function (idx) {
         return toast("الرحلة غير موجودة", "err");
     if (isTripClosed(t))
         return toast("الحجز مغلق لهذه الرحلة", "err");
-    const avail = Number(t.available);
-    if (!isFinite(avail) || avail <= 0)
-        return toast("اكتمل العدد — لا توجد مقاعد", "err");
     openBooking(t);
 };
 window.openBookingById = function (id) {
@@ -1804,9 +1771,6 @@ window.openBookingById = function (id) {
         return toast("الرحلة غير موجودة", "err");
     if (isTripClosed(t))
         return toast("الحجز مغلق لهذه الرحلة", "err");
-    const avail = Number(t.available);
-    if (!isFinite(avail) || avail <= 0)
-        return toast("اكتمل العدد — لا توجد مقاعد", "err");
     openBooking(t);
 };
 // ========== BOOKING MODAL ==========
@@ -1816,7 +1780,7 @@ window.openBooking = function (t) {
     document.getElementById("m-book-info").innerHTML = `
     <span>📍 المسار: ${(t.from || "") + " – " + (t.to || "")}</span>
     <span>🕐 الوقت: ${formatTripClock(t)}</span>${formatTripSchedule(t) ? `<span>📅 ${formatTripSchedule(t)}</span>` : ""}
-    <span style="color:#059669;font-weight:700">المتاح للحجز: ${t.available || 0} مقاعد</span>`;
+    <span style="color:#059669;font-weight:700">💰 ${t.price || 0} ج.م للمقعد</span>`;
     document.getElementById("b-name").value = (currentUser && currentUser.displayName) || "";
     document.getElementById("b-phone").value = "";
     if (currentUser) {
@@ -1833,13 +1797,14 @@ window.openBooking = function (t) {
     document.getElementById("b-notes").value = "";
     document.getElementById("b-seats").value = "1";
     document.getElementById("b-seats-num").textContent = "1";
-    document.getElementById("b-seats-hint").textContent = "(المتاح: " + (t.available || 0) + " مقاعد)";
+    document.getElementById("b-seats-hint").textContent = "(لحساب العربون)";
+    renderBookDates(t);
     updateTotals();
     document.getElementById("m-booking").classList.add("on");
 };
 window.chgSeats = function (d) {
     let n = +document.getElementById("b-seats").value || 1;
-    const max = currentTrip ? Math.max(1, Number(currentTrip.available) || 1) : 4;
+    const max = 20;
     n = Math.max(1, Math.min(max, n + d));
     document.getElementById("b-seats").value = n;
     document.getElementById("b-seats-num").textContent = n;
@@ -1870,11 +1835,14 @@ window.submitBooking = async function () {
         return toast("الحجز مغلق لهذه الرحلة", "err");
     if (seats < 1)
         return toast("عدد المقاعد غير صالح", "err");
-    if (seats > (Number(currentTrip.available) || 0))
-        return toast("المقاعد المطلوبة أكثر من المتاح", "err");
+    const tripDate = (document.getElementById("b-date") || {}).value || "";
+    if (!tripDate)
+        return toast("لا توجد مواعيد متاحة هذا الأسبوع — احجز في الأسبوع القادم", "err");
+    if (!getBookableDates(currentTrip).dates.some(x => x.iso === tripDate))
+        return toast("اختر تاريخاً صالحاً خلال الأسبوع", "err");
     const c = code();
     const booking = {
-        code: c, type: "scheduled", tripId: currentTrip.firestoreId || currentTrip.id, tripName: currentTrip.name,
+        code: c, type: "scheduled", tripDate, tripDateLabel: tripDateLabel(tripDate), tripId: currentTrip.firestoreId || currentTrip.id, tripName: currentTrip.name,
         name, phone, seats, notes,
         price: (currentTrip.price || 0) * seats,
         deposit: (currentTrip.deposit || 0) * seats,
@@ -1889,32 +1857,21 @@ window.submitBooking = async function () {
     };
     try {
         if (currentTrip.firestoreId) {
-            await runTransaction(db, async (tx) => {
-                const tRef = doc(db, "trips", currentTrip.firestoreId);
-                const tSnap = await tx.get(tRef);
-                if (!tSnap.exists())
-                    throw new Error("trip missing");
-                const td = tSnap.data();
-                if (td.is_booking_closed || td.closed)
-                    throw new Error("closed");
-                const avail = Number(td.available) || 0;
-                if (seats > avail)
-                    throw new Error("no seats");
-                const next = avail - seats;
-                const type = next <= 0 ? "اكتمل العدد" : ("متاح " + next + " مقاعد");
-                tx.update(tRef, { available: next, type });
-                const bRef = doc(collection(db, "bookings"));
-                tx.set(bRef, booking);
-                booking.id = bRef.id;
-                currentTrip.available = next;
-                currentTrip.type = type;
-            });
+            try {
+                const tSnap = await getDoc(doc(db, "trips", currentTrip.firestoreId));
+                if (tSnap.exists()) {
+                    const td = tSnap.data();
+                    if (td.is_booking_closed || td.closed)
+                        throw new Error("closed");
+                }
+            }
+            catch (e0) {
+                if (e0 && e0.message === "closed")
+                    throw e0;
+            }
         }
-        else {
-            await addDoc(collection(db, "bookings"), booking);
-            currentTrip.available = Math.max(0, (currentTrip.available || 0) - seats);
-            currentTrip.type = currentTrip.available <= 0 ? "اكتمل العدد" : ("متاح " + currentTrip.available + " مقاعد");
-        }
+        const bRef = await addDoc(collection(db, "bookings"), booking);
+        booking.id = bRef.id;
         lastBooking = booking;
         closeModals();
         showSuccess(booking);
@@ -1948,7 +1905,7 @@ window.shareWhatsApp = function () {
     if (!lastBooking)
         return;
     const b = lastBooking;
-    const txt = `تم تسجيل حجزك بنجاح ✅%0Aكود الحجز: ${b.code}%0Aالاسم: ${b.name}%0Aالمقاعد: ${b.seats || 1}%0Aالإجمالي: ${b.price || 0} ج.م%0Aالعربون: ${b.deposit || 0} ج.م%0A${b.tripName ? "الرحلة: " + b.tripName : ""}`;
+    const txt = `تم تسجيل حجزك بنجاح ✅%0Aكود الحجز: ${b.code}%0Aالاسم: ${b.name}%0Aالمقاعد: ${b.seats || 1}%0Aالإجمالي: ${b.price || 0} ج.م%0Aالعربون: ${b.deposit || 0} ج.م%0A${b.tripName ? "الرحلة: " + b.tripName : ""}${b.tripDate ? "%0Aالتاريخ: " + tripDateLabel(b.tripDate) : ""}`;
     window.open("https://wa.me/?text=" + txt, "_blank");
 };
 // ========== PRIVATE ==========
@@ -2228,6 +2185,7 @@ function renderTrackCard(b, docId) {
         <div><span style="color:#94a3b8">اسم الراكب</span><br><b>${b.name || "-"}</b></div>
         <div><span style="color:#94a3b8">رقم الهاتف</span><br><b>${b.phone || "-"}</b></div>
         <div><span style="color:#94a3b8">خط السير</span><br><b>${b.tripName || ((b.from || "") + " ← " + (b.to || "")) || "-"}</b></div>
+        ${b.tripDate ? `<div><span style="color:#94a3b8">تاريخ الرحلة</span><br><b>📅 ${tripDateLabel(b.tripDate)}</b></div>` : ""}
         <div><span style="color:#94a3b8">عدد المقاعد</span><br><b>${b.seats || 1} فرد</b></div>
         ${b.date ? `<div><span style="color:#94a3b8">الموعد</span><br><b>${b.date}${b.dateReturn ? " → " + b.dateReturn : ""}</b></div>` : ""}
         ${(b.carModel || b.car) ? `<div><span style="color:#94a3b8">السيارة</span><br><b>${b.carCategory || ""} ${b.carModel || b.car}</b></div>` : ""}
@@ -2570,8 +2528,10 @@ window.adminTab = function (tab) {
     toggleSidebar(false);
     if (tab === "bookings")
         loadAdminBookings();
-    if (tab === "trips")
+    if (tab === "trips") {
         renderAdminTrips();
+        refreshTripBookings().then(renderAdminTrips);
+    }
     if (tab === "drivers")
         renderAdminDrivers();
     if (tab === "supervisors")
@@ -2642,6 +2602,7 @@ window.toggleDashPanel = function (which) {
     } else if (which === "trips") {
         setDashPanelVisible("trips");
         renderDashTrips();
+        refreshTripBookings().then(renderDashTrips);
         const p = document.getElementById("dash-panel-trips");
         if (p) p.scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -2707,7 +2668,7 @@ function renderDashBookings(list, filter) {
       <div class="top-row" style="margin-bottom:0">
         <div>
           <div class="card-title">${b.code || "-"} — ${b.name || ""}</div>
-          <div class="card-meta">${b.tripName || ((b.from || "") + " ← " + (b.to || "")) || "-"} · ${b.phone || ""} · مقاعد: ${b.seats || 1}${b.supervisorName ? " · 👤 " + b.supervisorName : ""}</div>
+          <div class="card-meta">${b.tripName || ((b.from || "") + " ← " + (b.to || "")) || "-"}${b.tripDate ? " · 📅 " + tripDateLabel(b.tripDate) : ""} · ${b.phone || ""} · مقاعد: ${b.seats || 1}${b.supervisorName ? " · 👤 " + b.supervisorName : ""}</div>
         </div>
         <span class="status st-${st}">${stLabel}</span>
       </div>
@@ -2733,8 +2694,9 @@ function renderDashTrips() {
       <div class="top-row" onclick="toggleAdminTripFold(${i}, this)">
         <div>
           <div class="card-title" style="font-size:1rem">${t.name || ((t.from || "") + " ↔ " + (t.to || ""))}</div>
-          <div class="card-meta">🕐 ${formatTripClock(t)} · 💰 ${t.price || 0} ج.م · مقاعد: <b>${t.available || 0}</b>/${t.seats || "-"}
+          <div class="card-meta">🕐 ${formatTripClock(t)} · 💰 ${t.price || 0} ج.م · سعة: ${t.seats || "-"}
           ${formatTripSchedule(t) ? " · 📅 " + formatTripSchedule(t) : ""}${t.driver ? " · 👨‍✈️ " + t.driver : ""}${t.supervisorName ? " · 👤 مشرف: " + t.supervisorName : ""}</div>
+          ${seatsInfoHtml(t)}
           <div class="fold-hint"><span class="fh-chev" style="display:inline-block;transition:.2s">▼</span> اضغط لإظهار الإجراءات</div>
         </div>
         <div class="badges">
@@ -2742,8 +2704,6 @@ function renderDashTrips() {
         </div>
       </div>
       <div class="actions-mid" onclick="event.stopPropagation()">
-        <button type="button" class="btn-seat-add" onclick="adjustSeats(${i},1)">+ حجز مقعد</button>
-        <button type="button" class="btn-seat-rem" onclick="adjustSeats(${i},-1)">− إلغاء مقعد</button>
         ${isClosed
             ? `<button type="button" class="btn-open-trip" onclick="toggleCloseTrip(${i},false)">🔓 فتح</button>`
             : `<button type="button" class="btn-close-trip" onclick="toggleCloseTrip(${i},true)">🔒 إغلاق</button>`}
@@ -2833,7 +2793,7 @@ function renderFilteredBookings() {
         </div>
       </div>
       <div class="card-meta" style="margin-bottom:10px;text-align:left">
-        ${b.tripName || ""}${(b.tripName && b.from) ? " · " : ""}${b.from ? (b.from + " ← " + b.to) : ""}
+        ${b.tripName || ""}${b.tripDate ? " · 📅 " + tripDateLabel(b.tripDate) : ""}${(b.tripName && b.from) ? " · " : ""}${b.from ? (b.from + " ← " + b.to) : ""}
         ${b.price ? " · " + b.price + " ج.م" : ""}${b.deposit ? " · عربون " + b.deposit + " ج" : ""}${b.driver ? " · سائق: " + b.driver : ""}
         ${b.notes ? "<br>📝 " + b.notes : ""}
         ${getReceiptUrl(b) ? `<div style="margin-top:8px"><a href="${getReceiptUrl(b)}" target="_blank"><img src="${getReceiptUrl(b)}" alt="إيصال" style="max-height:80px;border-radius:8px;border:1px solid #e2e8f0"></a> <span style="color:#059669;font-size:.78rem">إيصال مرفوع</span></div>` : ""}
@@ -2864,7 +2824,7 @@ window.updStatus = async function (id, status) {
     var _a, _b;
     try {
         if (status === "cancelled") {
-            if (!confirm("تأكيد إلغاء هذا الحجز؟\nسيتم استرجاع المقاعد للرحلة إن وُجدت."))
+            if (!confirm("تأكيد إلغاء هذا الحجز؟"))
                 return;
             if (!id)
                 return toast("معرف الحجز غير صالح", "err");
@@ -2966,7 +2926,7 @@ window.openStatusDriver = function (id) {
         if (price != null && deposit != null && deposit > price)
             return toast("العربون لا يمكن أن يتجاوز السعر", "err");
         if (b.status === "cancelled" && status !== "cancelled")
-            return toast("الحجز ملغي ولا يمكن إعادة تفعيله (المقاعد أُعيدت) — أنشئ حجزًا جديدًا", "err");
+            return toast("الحجز ملغي ولا يمكن إعادة تفعيله — أنشئ حجزًا جديدًا", "err");
         const driverId = (document.getElementById("sd-driver").selectedOptions[0] || { dataset: {} }).dataset.id || "";
         const payload = {
             status, driver, driverId, driverPhone, adminNotes, passengerNotes, paymentNotes,
@@ -2984,7 +2944,7 @@ window.openStatusDriver = function (id) {
         }
         try {
             if (status === "cancelled") {
-                if (!confirm("تأكيد إلغاء هذا الحجز؟\nسيتم استرجاع المقاعد للرحلة إن وُجدت."))
+                if (!confirm("تأكيد إلغاء هذا الحجز؟"))
                     return;
                 const snap = await getDoc(doc(db, "bookings", id));
                 if (snap.exists()) {
@@ -3024,7 +2984,7 @@ window.exportBackup = function () {
 // ========== MANUAL BOOKING (admin) ==========
 window.openManualBooking = function () {
     document.getElementById("form-title").textContent = "إضافة حجز يدوي (خارج التطبيق)";
-    const tripOpts = trips.map(t => `<option value="${t.id}">${t.name || (t.from + " ↔ " + t.to)} — متاح ${t.available || 0}</option>`).join("");
+    const tripOpts = trips.map(t => `<option value="${t.id}">${t.name || (t.from + " ↔ " + t.to)} </option>`).join("");
     document.getElementById("form-body").innerHTML = `
     <div class="fg"><label>الرحلة (اختياري للحجز الخاص)</label>
       <select id="mb-trip"><option value="">— حجز خاص / بدون رحلة —</option>${tripOpts}</select>
@@ -3032,6 +2992,7 @@ window.openManualBooking = function () {
     <div class="fg"><label>الاسم *</label><input id="mb-name"></div>
     <div class="fg"><label>الموبايل *</label><input id="mb-phone" type="tel"></div>
     <div class="fg"><label>عدد المقاعد</label><input id="mb-seats" type="number" value="1" min="1"></div>
+    <div class="fg"><label>تاريخ الرحلة</label><input id="mb-date" type="date"></div>
     <div class="fg"><label>من (للحجز الخاص)</label><input id="mb-from"></div>
     <div class="fg"><label>إلى (للحجز الخاص)</label><input id="mb-to"></div>
     <div class="fg"><label>المبلغ الإجمالي (ج)</label><input id="mb-price" type="number" value="0"></div>
@@ -3057,6 +3018,7 @@ window.openManualBooking = function () {
             driver: t ? (t.driver || "") : "", driverId: t ? (t.driverId || "") : "", driverPhone: t ? (t.driverPhone || "") : "", car: t ? (t.car || "") : "",
             supervisorId: t ? (t.supervisorId || "") : "", supervisorName: t ? (t.supervisorName || "") : "", supervisorPhone: t ? (t.supervisorPhone || "") : "",
             tripName: t ? t.name : "",
+            tripDate: (document.getElementById("mb-date") || {}).value || "",
             name, phone, seats,
             from: document.getElementById("mb-from").value.trim() || (t ? t.from : ""),
             to: document.getElementById("mb-to").value.trim() || (t ? t.to : ""),
@@ -3068,25 +3030,7 @@ window.openManualBooking = function () {
             manual: true
         };
         try {
-            if (t && t.firestoreId) {
-                await runTransaction(db, async (tx) => {
-                    const tRef = doc(db, "trips", t.firestoreId);
-                    const sn = await tx.get(tRef);
-                    if (!sn.exists()) throw new Error("trip missing");
-                    const td = sn.data();
-                    if (td.is_booking_closed || td.closed) throw new Error("closed");
-                    const av = Number(td.available) || 0;
-                    if (seats > av) throw new Error("no seats");
-                    const nx = av - seats;
-                    const ty = nx <= 0 ? "اكتمل العدد" : ("متاح " + nx + " مقاعد");
-                    tx.update(tRef, { available: nx, type: ty });
-                    tx.set(doc(collection(db, "bookings")), booking);
-                    t.available = nx; t.type = ty;
-                });
-            } else {
-                await addDoc(collection(db, "bookings"), booking);
-                if (t) { t.available = Math.max(0, (t.available || 0) - seats); t.type = t.available <= 0 ? "اكتمل العدد" : ("متاح " + t.available + " مقاعد"); }
-            }
+            await addDoc(collection(db, "bookings"), booking);
             closeModals();
             loadAdminBookings();
             refreshAdminStats();
@@ -3103,13 +3047,13 @@ window.openManualBooking = function () {
 function renderAdminTrips() {
     document.getElementById("admin-trips-list").innerHTML = trips.map((t, i) => {
         const isClosed = isTripClosed(t);
-        const soldOut = !isFinite(Number(t.available)) || Number(t.available) <= 0;
         return `<div class="admin-trip" id="atrip-${i}">
       <div class="top-row" onclick="toggleAdminTripFold(${i}, this)">
         <div>
           <div class="card-title" style="font-size:1.05rem;margin-bottom:6px">${t.name || ((t.from || "") + " ↔ " + (t.to || ""))}</div>
-          <div class="card-meta">🕐 ${formatTripClock(t)} ${t.repeat ? "🔁" : ""} · 💰 ${t.price || 0} ج.م · مقاعد: <b>${t.available || 0}</b>/${t.seats || "-"}
+          <div class="card-meta">🕐 ${formatTripClock(t)} ${t.repeat ? "🔁" : ""} · 💰 ${t.price || 0} ج.م · سعة: ${t.seats || "-"}
           ${formatTripSchedule(t) ? " · 📅 " + formatTripSchedule(t) : ""}${t.driver ? " · 👨‍✈️ " + t.driver : ""}${t.supervisorName ? " · 👤 مشرف: " + t.supervisorName + (t.supervisorPhone ? " (" + t.supervisorPhone + ")" : "") : ""}</div>
+          ${seatsInfoHtml(t)}
           <div class="fold-hint"><span class="fh-chev" style="display:inline-block;transition:.2s">▼</span> اضغط لإظهار الإجراءات</div>
         </div>
         <div class="badges">
@@ -3117,11 +3061,6 @@ function renderAdminTrips() {
             ? `<span class="badge-pill badge-closed">🔒 الحجز مغلق</span>`
             : `<span class="badge-pill badge-open">🔓 الحجز مفتوح</span><span class="badge-pill badge-active">نشط</span>`}
         </div>
-      </div>
-      <div class="actions-mid" onclick="event.stopPropagation()">
-        <span style="font-size:.82rem;color:#64748b;margin-left:auto">حجز خارج التطبيق:</span>
-        <button type="button" class="btn-seat-add" onclick="adjustSeats(${i},1)">+ حجز مقعد</button>
-        <button type="button" class="btn-seat-rem" onclick="adjustSeats(${i},-1)">− إلغاء مقعد</button>
       </div>
       <div class="actions-bot" onclick="event.stopPropagation()">
         <button type="button" class="icon-btn danger" title="حذف" onclick="delTrip(${i})">🗑️</button>
@@ -3139,39 +3078,6 @@ window.toggleAdminTripFold = function (i, el) {
     if (!node) return;
     node.classList.toggle("expanded");
 };
-window.adjustSeats = async function (i, bookedDelta) {
-    const t = trips[i];
-    if (!t) return;
-    const total = Number(t.seats) || 4;
-    let next;
-    if (t.firestoreId) {
-        try {
-            next = await runTransaction(db, async (tx) => {
-                const ref = doc(db, "trips", t.firestoreId);
-                const sn = await tx.get(ref);
-                if (!sn.exists()) throw new Error("missing");
-                const d = sn.data();
-                const tot = Number(d.seats) || total;
-                let av = Number(d.available);
-                if (isNaN(av)) av = tot;
-                const n = Math.min(tot, Math.max(0, av - bookedDelta));
-                const closed = !!(d.closed || d.is_booking_closed);
-                tx.update(ref, { available: n, type: closed ? "مغلق / مكتمل" : (n <= 0 ? "اكتمل العدد" : ("متاح " + n + " مقاعد")) });
-                return n;
-            });
-        } catch (e) { console.error(e); return toast("تعذر تعديل المقاعد — تحقق من الاتصال", "err"); }
-    } else {
-        let avail = Number(t.available);
-        if (isNaN(avail)) avail = total;
-        next = Math.min(total, Math.max(0, avail - bookedDelta));
-    }
-    t.available = next;
-    t.type = (t.closed || t.is_booking_closed) ? "مغلق / مكتمل" : (next <= 0 ? "اكتمل العدد" : ("متاح " + next + " مقاعد"));
-    renderAdminTrips();
-    if (typeof renderDashTrips === "function") renderDashTrips();
-    renderTrips(((document.getElementById("search") || {}).value || "").trim());
-    toast(bookedDelta > 0 ? ("تم حجز مقعد — المتاح الآن: " + next) : ("تم إلغاء مقعد — المتاح الآن: " + next), "ok");
-};
 window.toggleCloseTrip = async function (i, close) {
     const t = trips[i];
     if (!t)
@@ -3184,7 +3090,7 @@ window.toggleCloseTrip = async function (i, close) {
         t.type = "الحجز مغلق";
     }
     else {
-        t.type = avail <= 0 ? "اكتمل العدد" : ("متاح " + avail + " مقاعد");
+        t.type = "متاح";
     }
     if (t.firestoreId) {
         try {
@@ -3249,8 +3155,8 @@ window.openTripForm = function (editTrip = null, editIdx = -1) {
       <div class="fg" style="margin:0"><label>العربون المطلوب للفرد (ج)</label><input id="f-deposit" type="number" value="${(_b = editTrip === null || editTrip === void 0 ? void 0 : editTrip.deposit) !== null && _b !== void 0 ? _b : 50}"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="fg" style="margin:0"><label>المقاعد الإجمالية *</label><input id="f-seats" type="number" value="${(_c = editTrip === null || editTrip === void 0 ? void 0 : editTrip.seats) !== null && _c !== void 0 ? _c : 4}"></div>
-      <div class="fg" style="margin:0"><label>المقاعد المتاحة حالياً *</label><input id="f-available" type="number" value="${(_d = editTrip === null || editTrip === void 0 ? void 0 : editTrip.available) !== null && _d !== void 0 ? _d : 4}"></div>
+      <div class="fg" style="margin:0"><label>سعة الرحلة (للأدمن فقط) *</label><input id="f-seats" type="number" value="${(_c = editTrip === null || editTrip === void 0 ? void 0 : editTrip.seats) !== null && _c !== void 0 ? _c : 4}"></div>
+      <div class="fg" style="margin:0;font-size:.78rem;color:#64748b;display:flex;align-items:flex-end">لا يظهر عدد المقاعد للراكب — يُحسب لك من الحجوزات المدفوع عربونها.</div>
     </div>
     <div class="fg"><label>جدول أيام الأسبوع</label>
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px" id="f-days">
@@ -3300,10 +3206,7 @@ window.openTripForm = function (editTrip = null, editIdx = -1) {
         const timeStr = h12 + ':' + String(mm).padStart(2, '0') + ' ' + period;
         const repeat = document.getElementById("f-repeat").checked;
         const seats = Math.max(1, Math.floor(+document.getElementById("f-seats").value) || 4);
-        const avRaw = document.getElementById("f-available").value;
-        let available = avRaw === "" ? seats : Math.floor(+avRaw);
-        if (isNaN(available)) available = seats;
-        available = Math.min(Math.max(available, 0), seats);
+        const available = seats; // لم يعد عدّاد المقاعد المتاحة مستخدماً
         const price = +document.getElementById("f-price").value || 0;
         const deposit = +document.getElementById("f-deposit").value || 0;
         const closed = document.getElementById("f-closed").checked;
@@ -3340,7 +3243,7 @@ window.openTripForm = function (editTrip = null, editIdx = -1) {
             stops: document.getElementById("f-stops").value.trim(),
             time: timeLabel, timeRaw: timeVal, days, repeat,
             price, deposit, seats, available,
-            type: closed ? "مغلق / مكتمل" : (available <= 0 ? "اكتمل العدد" : ("متاح " + available + " مقاعد")),
+            type: closed ? "مغلق / مكتمل" : "متاح",
             driver: drvSel.value, driverId: (drvOpt && drvOpt.dataset.id) || "", driverPhone: (drvOpt && drvOpt.dataset.phone) || "",
             car: carSel.value, carId: (carOpt && carOpt.dataset.id) || "",
             notes: document.getElementById("f-notes").value.trim(),
@@ -3751,12 +3654,12 @@ async function loadDriverTrips() {
         html += '<div style="color:#94a3b8;padding:10px">لا يوجد ركاب مؤكدون حالياً</div>';
     else
         html += confirmed.map(p => `<div class="card" style="margin-bottom:8px"><div class="card-info"><div class="card-title">${p.name} <span class="status st-confirmed">مؤكد</span></div>
-    <div class="card-meta">${p.phone} · مقاعد: ${p.seats || 1}${p.tripName ? " · " + p.tripName : ""}${p.notes ? " · 📝 " + p.notes : ""}</div></div>
+    <div class="card-meta">${p.phone} · مقاعد: ${p.seats || 1}${p.tripName ? " · " + p.tripName : ""}${p.tripDate ? " · 📅 " + tripDateLabel(p.tripDate) : ""}${p.notes ? " · 📝 " + p.notes : ""}</div></div>
     <div style="display:flex;gap:6px"><a class="btn btn-ghost btn-sm" href="tel:${p.phone}">📞</a>
     <a class="btn btn-ghost btn-sm" href="${waHref(p.phone)}" target="_blank">واتساب</a></div></div>`).join("");
     html += "</div>";
     if (myTrips.length) {
-        html += `<div class="panel" style="margin-top:14px"><h3>رحلات مرتبطة</h3>` + myTrips.map(t => `<div class="card-meta" style="margin-bottom:8px"><b>${t.name}</b><br>🕐 ${t.time || "-"} · 📍 ${t.from || ""} ← ${t.to || ""} · مقاعد متاحة: ${t.available || 0}</div>`).join("") + "</div>";
+        html += `<div class="panel" style="margin-top:14px"><h3>رحلات مرتبطة</h3>` + myTrips.map(t => `<div class="card-meta" style="margin-bottom:8px"><b>${t.name}</b><br>🕐 ${t.time || "-"} · 📍 ${t.from || ""} ← ${t.to || ""}</div>`).join("") + "</div>";
     }
     box.innerHTML = html;
 }
