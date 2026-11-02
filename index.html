@@ -112,6 +112,8 @@ body{overflow-x:hidden;font-family:'Cairo',sans-serif;background:#f1f5f9;color:#
 .sidebar .brand small{display:block;font-weight:400;font-size:.72rem;color:#94a3b8;margin-top:2px}
 .side-link{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;color:#cbd5e1;font-weight:600;font-size:.9rem;cursor:pointer;margin-bottom:4px;border:none;background:transparent;width:100%;font-family:inherit;text-align:right}
 .side-link:hover,.side-link.active{background:#1e293b;color:#fff}.side-link.active{background:#2563eb}
+.side-link[data-tab="bookings"]{color:#ddd6fe}.side-link[data-tab="bookings"].active{background:#7c3aed;color:#fff}
+#tab-bookings-btn{background:#7c3aed!important;border-color:#7c3aed!important;color:#fff!important}
 .side-foot{margin-top:auto;padding-top:12px;border-top:1px solid #1e293b}
 .main{flex:1;padding:20px;overflow-y:auto;background:#f1f5f9;width:100%}.main h1{font-size:1.35rem;font-weight:800;margin-bottom:6px}.main .sub{color:#64748b;font-size:.88rem;margin-bottom:20px}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px}
@@ -562,9 +564,9 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 <aside class="sidebar" id="admin-side">
 <div class="brand">لوحة الأدمن<small>إدارة الحجوزات والأسطول</small></div>
 <button class="side-link active" type="button" data-tab="dash" onclick="adminTab('dash')">📊 الرئيسية</button>
-<button class="side-link" type="button" data-tab="bookings" onclick="adminTab('bookings')">📋 الحجوزات والطلبات</button>
+<button class="side-link" type="button" data-tab="bookings" onclick="adminTab('bookings')">📋 الطلبات</button>
 <button class="side-link" type="button" data-tab="trips" onclick="adminTab('trips')">🚌 الرحلات والخطوط</button>
-<button class="side-link" type="button" data-tab="drivers" onclick="adminTab('drivers')">🧑‍✈️ السائقين</button>
+<button class="side-link" type="button" data-tab="drivers" onclick="adminTab('drivers')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><circle cx="12" cy="4.6" r="2.3"/><path d="M8.2 11.2c.7-1.8 2-2.7 3.8-2.7s3.1.9 3.8 2.7"/><circle cx="12" cy="16" r="5.6"/><circle cx="12" cy="16" r="1.4" fill="currentColor"/><path d="M6.4 16h4.2M13.4 16h4.2M12 17.4v4.2"/><circle cx="6.1" cy="13.6" r="1.1" fill="currentColor" stroke="none"/><circle cx="17.9" cy="13.6" r="1.1" fill="currentColor" stroke="none"/></svg> السائقين</button>
 <button class="side-link" type="button" data-tab="supervisors" onclick="adminTab('supervisors')">👤 المشرفين</button>
 <button class="side-link" type="button" data-tab="cars" onclick="adminTab('cars')">🚗 السيارات</button>
 <button class="side-link" type="button" data-tab="settings" onclick="adminTab('settings')">⚙️ الإعدادات</button>
@@ -583,8 +585,8 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 </div>
 <div class="dash-shortcuts" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
   <button type="button" class="dash-sc" id="dash-btn-bookings" onclick="toggleDashPanel('bookings')" style="display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #e2e8f0;border-radius:12px;padding:8px 10px;cursor:pointer;font-family:inherit;text-align:right;transition:.15s;box-shadow:0 1px 4px rgba(15,23,42,.04)">
-    <span style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">📋</span>
-    <span style="flex:1;min-width:0"><b style="display:block;font-size:.78rem;color:#0f172a;line-height:1.3">الحجوزات والطلبات</b><small style="color:#64748b;font-size:.65rem">عرض وإدارة الطلبات</small></span>
+    <span style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">📋</span>
+    <span style="flex:1;min-width:0"><b style="display:block;font-size:.78rem;color:#0f172a;line-height:1.3">الطلبات</b><small style="color:#64748b;font-size:.65rem">عرض وإدارة الطلبات</small></span>
   </button>
   <button type="button" class="dash-sc" id="dash-btn-trips" onclick="toggleDashPanel('trips')" style="display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #e2e8f0;border-radius:12px;padding:8px 10px;cursor:pointer;font-family:inherit;text-align:right;transition:.15s;box-shadow:0 1px 4px rgba(15,23,42,.04)">
     <span style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🚌</span>
@@ -593,8 +595,13 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 </div>
 <div class="panel" id="dash-panel-bookings" style="display:none">
   <h3 style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-    <span id="dash-bookings-title">الحجوزات والطلبات</span>
+    <span id="dash-bookings-title">الطلبات</span>
   </h3>
+  <div id="dash-bk-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 12px">
+    <button type="button" class="btn btn-sm dash-chip btn-indigo" data-f="rest" onclick="dashBkChip('rest')">الباقي <span class="chip-n"></span></button>
+    <button type="button" class="btn btn-sm dash-chip btn-ghost" data-f="confirmed" onclick="dashBkChip('confirmed')">✓ المؤكدة <span class="chip-n"></span></button>
+    <button type="button" class="btn btn-sm dash-chip btn-ghost" data-f="cancelled" onclick="dashBkChip('cancelled')">✕ الملغية <span class="chip-n"></span></button>
+  </div>
   <div id="dash-bookings-list"><div style="color:#94a3b8;padding:10px;text-align:center">اختر اختصاراً أو كارت إحصاء للعرض</div></div>
 </div>
 <div class="panel" id="dash-panel-trips" style="display:none">
@@ -608,7 +615,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 <button type="button" class="btn btn-ghost btn-sm back-btn" onclick="adminTab('dash')">→ رجوع للرئيسية</button>
 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
   <div style="display:flex;gap:8px;flex-wrap:wrap">
-    <button type="button" class="btn btn-indigo btn-sm" id="tab-bookings-btn" onclick="adminTab('bookings')">الحجوزات والطلبات</button>
+    <button type="button" class="btn btn-indigo btn-sm" id="tab-bookings-btn" onclick="adminTab('bookings')">الطلبات</button>
     <button type="button" class="btn btn-ghost btn-sm" onclick="adminTab('trips')">الرحلات والخطوط</button>
   </div>
   <button class="btn btn-indigo btn-sm" type="button" onclick="openManualBooking()">+ حجز يدوي</button>
@@ -629,7 +636,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 <button type="button" class="btn btn-ghost btn-sm back-btn" onclick="adminTab('dash')">→ رجوع للرئيسية</button>
 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
   <div style="display:flex;gap:8px;flex-wrap:wrap">
-    <button type="button" class="btn btn-ghost btn-sm" onclick="adminTab('bookings')">الحجوزات والطلبات</button>
+    <button type="button" class="btn btn-ghost btn-sm" onclick="adminTab('bookings')">الطلبات</button>
     <button type="button" class="btn btn-indigo btn-sm" onclick="adminTab('trips')">الرحلات والخطوط</button>
   </div>
   <button class="btn btn-indigo btn-sm" type="button" onclick="openTripForm()">+ إضافة رحلة</button>
@@ -1095,7 +1102,7 @@ window.selectBookDate = function (iso) {
 async function refreshTripBookings() {
     try {
         const snap = await getDocs(collection(db, "bookings"));
-        allAdminBookings = snap.docs.map(d => (Object.assign({ id: d.id }, d.data())));
+        allAdminBookings = sortNewest(snap.docs.map(d => (Object.assign({ id: d.id }, d.data()))));
     }
     catch (e) { }
 }
@@ -2569,7 +2576,7 @@ async function refreshAdminStats() {
         if (el("s-confirmed")) el("s-confirmed").textContent = confirmed;
         if (el("s-pending")) el("s-pending").textContent = waitingPay; // بانتظار العربون
         if (el("s-new")) el("s-new").textContent = newRequests; // طلبات جديدة
-        allAdminBookings = list;
+        allAdminBookings = sortNewest(list);
         // لا نعرض القوائم تلقائياً — تظهر فقط عند الضغط على الاختصار أو كارت الإحصاء
     }
     catch (e) { }
@@ -2582,8 +2589,8 @@ function setDashPanelVisible(mode) {
     const tBtn = document.getElementById("dash-btn-trips");
     if (bPanel) bPanel.style.display = mode === "bookings" ? "block" : "none";
     if (tPanel) tPanel.style.display = mode === "trips" ? "block" : "none";
-    if (bBtn) bBtn.style.borderColor = mode === "bookings" ? "#2563eb" : "#e2e8f0";
-    if (bBtn) bBtn.style.boxShadow = mode === "bookings" ? "0 4px 14px rgba(37,99,235,.2)" : "0 2px 8px rgba(15,23,42,.04)";
+    if (bBtn) bBtn.style.borderColor = mode === "bookings" ? "#7c3aed" : "#e2e8f0";
+    if (bBtn) bBtn.style.boxShadow = mode === "bookings" ? "0 4px 14px rgba(124,58,237,.25)" : "0 2px 8px rgba(15,23,42,.04)";
     if (tBtn) tBtn.style.borderColor = mode === "trips" ? "#0284c7" : "#e2e8f0";
     if (tBtn) tBtn.style.boxShadow = mode === "trips" ? "0 4px 14px rgba(2,132,199,.2)" : "0 2px 8px rgba(15,23,42,.04)";
 }
@@ -2591,11 +2598,11 @@ window.toggleDashPanel = function (which) {
     if (which === "bookings") {
         setDashPanelVisible("bookings");
         const title = document.getElementById("dash-bookings-title");
-        if (title) title.textContent = "الحجوزات والطلبات";
+        if (title) title.textContent = "الطلبات";
         const box = document.getElementById("dash-bookings-list");
         if (box) box.innerHTML = '<div style="color:#94a3b8;padding:10px;text-align:center">جاري التحميل...</div>';
         loadAdminBookings().then(() => {
-            renderDashBookings(allAdminBookings, "all");
+            renderDashBookings(allAdminBookings, "rest");
             const p = document.getElementById("dash-panel-bookings");
             if (p) p.scrollIntoView({ behavior: "smooth", block: "start" });
         }).catch(() => {
@@ -2609,10 +2616,16 @@ window.toggleDashPanel = function (which) {
         if (p) p.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 };
+window.dashBkChip = function (f) {
+    const title = document.getElementById("dash-bookings-title");
+    const names = { rest: "الطلبات — الباقي (جديدة وبانتظار العربون)", confirmed: "الطلبات المؤكدة", cancelled: "الطلبات الملغية" };
+    if (title) title.textContent = names[f] || "الطلبات";
+    renderDashBookings(allAdminBookings, f);
+};
 window.showDashFilter = function (filter) {
     setDashPanelVisible("bookings");
     const labels = {
-        all: "إجمالي الحجوزات",
+        all: "إجمالي الطلبات",
         confirmed: "حجوزات مؤكدة",
         payment: "بانتظار العربون",
         pending: "طلبات جديدة"
@@ -2641,9 +2654,13 @@ function normalizeBookingStatus(st) {
         return "pending";
     return s;
 }
+function bkTime(b) { return String((b && (b.createdAt || b.updatedAt)) || ""); }
+function sortNewest(list) { return (list || []).slice().sort((a, b) => bkTime(b).localeCompare(bkTime(a))); }
 function filterBookingsList(list, filter) {
     let out = list || [];
-    if (filter === "pending")
+    if (filter === "rest")
+        out = out.filter(b => { const n = normalizeBookingStatus(b.status); return n !== "confirmed" && n !== "cancelled"; });
+    else if (filter === "pending")
         out = out.filter(b => normalizeBookingStatus(b.status) === "pending");
     else if (filter === "payment")
         out = out.filter(b => normalizeBookingStatus(b.status) === "payment_pending");
@@ -2657,7 +2674,13 @@ function renderDashBookings(list, filter) {
     const box = document.getElementById("dash-bookings-list");
     if (!box) return;
     const filtered = filterBookingsList(list, filter || "all");
-    const sorted = filtered.slice().sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+    const sorted = sortNewest(filtered);
+    document.querySelectorAll("#dash-bk-chips .dash-chip").forEach(c => {
+        c.className = "btn btn-sm dash-chip " + (c.dataset.f === filter ? "btn-indigo" : "btn-ghost");
+        const n = filterBookingsList(list, c.dataset.f).length;
+        const sp = c.querySelector(".chip-n");
+        if (sp) sp.textContent = "(" + n + ")";
+    });
     if (!sorted.length) {
         box.innerHTML = '<div style="color:#94a3b8;padding:10px;text-align:center">لا توجد حجوزات في هذا التصنيف</div>';
         return;
@@ -2680,6 +2703,7 @@ function renderDashBookings(list, filter) {
         ${st !== "cancelled" ? `<button type="button" class="btn btn-ghost btn-sm" style="color:#dc2626" onclick="updStatus(${jsq(id)},'cancelled')">إلغاء</button>` : ""}
         ${needsDepositReminder(b) && b.phone ? `<button type="button" class="btn btn-ghost btn-sm" style="color:#c2410c;border-color:#fed7aa;background:#fff7ed" onclick="remindDeposit(${jsq(id)})">🔔 تذكير بالعربون${b.reminderCount ? " (" + b.reminderCount + ")" : ""}</button>` : ""}
         ${b.phone ? `<a class="btn btn-ghost btn-sm" href="${esc(waHref(b.phone))}" target="_blank">💬 واتساب</a>` : ""}
+        <button type="button" class="btn btn-ghost btn-sm" style="color:#fff;background:#dc2626;border-color:#dc2626" onclick="deleteBooking(${jsq(id)})">🗑 حذف نهائي</button>
       </div>
     </div>`;
     }).join("");
@@ -2711,10 +2735,33 @@ function renderDashTrips() {
             ? `<button type="button" class="btn-open-trip" onclick="toggleCloseTrip(${i},false)">🔓 فتح</button>`
             : `<button type="button" class="btn-close-trip" onclick="toggleCloseTrip(${i},true)">🔒 إغلاق</button>`}
         <button type="button" class="icon-btn edit" title="تعديل" onclick="editTrip(${i})">✏️</button>
+        <button type="button" class="icon-btn danger" title="حذف" onclick="delTrip(${i})">🗑️</button>
       </div>
     </div>`;
     }).join("");
 }
+window.deleteBooking = async function (id) {
+    const b = (allAdminBookings || []).find(x => x.id === id);
+    const label = b ? ((b.code || "") + (b.name ? " — " + b.name : "")) : "";
+    if (!confirm("⚠ حذف نهائي للحجز " + label + "؟\nسيتم مسحه من قاعدة البيانات ولا يمكن استرجاعه.\n(لو تريد الاحتفاظ به في السجل استخدم «إلغاء» بدلاً من الحذف)"))
+        return;
+    try {
+        await deleteDoc(doc(db, "bookings", id));
+        allAdminBookings = (allAdminBookings || []).filter(x => x.id !== id);
+        renderFilteredBookings();
+        const dp = document.getElementById("dash-panel-bookings");
+        if (dp && dp.style.display !== "none") {
+            const act = document.querySelector("#dash-bk-chips .dash-chip.btn-indigo");
+            renderDashBookings(allAdminBookings, act ? act.dataset.f : "rest");
+        }
+        refreshAdminStats();
+        toast("تم حذف الحجز نهائياً", "ok");
+    }
+    catch (e) {
+        console.error(e);
+        toast("تعذر الحذف — تحقق من صلاحيات Firestore", "err");
+    }
+};
 window.remindDeposit = async function (id) {
     const b = (allAdminBookings || []).find(x => x.id === id);
     if (!b)
@@ -2787,7 +2834,7 @@ function renderFilteredBookings() {
     if (!box)
         return;
     const q = (((_a = document.getElementById("bk-search")) === null || _a === void 0 ? void 0 : _a.value) || "").trim();
-    let list = allAdminBookings;
+    let list = sortNewest(allAdminBookings);
     if (bkFilter === "pending")
         list = list.filter(b => normalizeBookingStatus(b.status) === "pending");
     else if (bkFilter === "payment")
@@ -2830,6 +2877,7 @@ function renderFilteredBookings() {
         ${needsDepositReminder(b) ? `<button type="button" class="btn-seat-rem" style="color:#c2410c;border-color:#fed7aa;background:#fff7ed" onclick="remindDeposit(${jsq(b.id)})">🔔 تذكير بالعربون${b.reminderCount ? " (" + b.reminderCount + ")" : ""}</button>` : ""}
         ${b.status !== "cancelled" ? `<button type="button" class="btn-seat-rem" style="color:#dc2626;border-color:#fecaca" onclick="updStatus(${jsq(b.id)},'cancelled')">✕ إلغاء</button>` : ""}
         <button type="button" class="btn btn-indigo" style="flex:1;justify-content:center;padding:10px" onclick="manageBooking(${jsq(b.id)})">🔄 تحديث الحالة وتعيين السائق</button>
+        <button type="button" class="btn-seat-rem" style="color:#fff;background:#dc2626;border-color:#dc2626" onclick="deleteBooking(${jsq(b.id)})">🗑 حذف نهائي</button>
       </div>
     </div>`;
     }).join("");
@@ -3308,10 +3356,11 @@ window.openTripForm = function (editTrip = null, editIdx = -1) {
     document.getElementById("m-form").classList.add("on");
 };
 window.delTrip = async function (i) {
-    if (!confirm("حذف الرحلة؟"))
-        return;
     const tr = trips[i];
     if (!tr) return toast("الرحلة غير موجودة", "err");
+    const st = typeof tripSeatStats === "function" ? tripSeatStats(tr) : { incoming: 0 };
+    if (!confirm("⚠ حذف الرحلة «" + (tr.name || "") + "» نهائياً؟\nلا يمكن التراجع." + (st.incoming ? "\nيوجد " + st.incoming + " طلب/حجز مرتبط بها (لن تُحذف الحجوزات من سجل الطلبات)." : "")))
+        return;
     try {
         if (tr.firestoreId) {
             await deleteDoc(doc(db, "trips", tr.firestoreId));
