@@ -325,7 +325,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 </head>
 <body>
 
-<div id="compat-warn" role="alert"><b id="compat-title">⚠ تعذّر تشغيل التطبيق بالكامل في هذا المتصفح</b><span id="compat-msg">افتح الرابط في Google Chrome ليعمل بشكل صحيح.</span><br><button type="button" id="compat-chrome">فتح في Chrome</button><button type="button" class="alt" id="compat-copy">نسخ الرابط</button><button type="button" class="alt" id="compat-close">إخفاء</button></div>
+<div id="compat-warn" role="alert"><b id="compat-title">⏳ التحميل أبطأ من المعتاد</b><span id="compat-msg">تأكد من اتصال الإنترنت ثم أعد المحاولة.</span><br><button type="button" id="compat-retry">إعادة المحاولة</button><button type="button" id="compat-chrome" style="display:none">فتح في Chrome</button><button type="button" class="alt" id="compat-copy">نسخ الرابط</button><button type="button" class="alt" id="compat-close">إخفاء</button></div>
 <noscript><div style="background:#fef3c7;padding:14px;text-align:center;font-family:sans-serif">يجب تفعيل JavaScript لتشغيل التطبيق.</div></noscript>
 <div id="view-auth">
   <div class="auth-card">
@@ -367,21 +367,29 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 </svg></div>
     </div>
     <h1 id="auth-app-name">الاسطول للرحلات</h1>
-    <p class="sub" id="auth-welcome">أهلاً بك، يرجى تسجيل الدخول بحسابك المعتمد.</p>
-    <button type="button" class="btn-google" onclick="googleLogin()" style="padding:15px;font-size:1.02rem;margin-top:6px;margin-bottom:10px"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>المتابعة بحساب Google</button>
-    <p style="font-size:.78rem;color:#94a3b8;text-align:center;margin:0 0 14px;line-height:1.6">اختر حسابك من القائمة — بدون كلمة مرور، وإنشاء الحساب يتم تلقائيًا في أول مرة.</p>
-    <button type="button" class="btn-guest" onclick="enterAsGuest()">👤 المتابعة كضيف</button>
-    <p style="font-size:.74rem;color:#94a3b8;text-align:center;margin:0 0 6px">كضيف: احجز وتابع حجزك بالكود فقط، بدون حساب.</p>
-    <div id="auth-admin-area" class="hidden" style="margin-top:14px;padding-top:12px;border-top:1px dashed #e2e8f0">
+    <p class="sub" id="auth-welcome">أهلاً بك — سجّل الدخول بالبريد وكلمة المرور، أو أنشئ حساباً جديداً.</p>
     <div id="auth-form-login">
-      <p style="font-size:.8rem;color:#64748b;text-align:right;margin:0 0 12px;line-height:1.65;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 12px">ℹ️ أدخل <b>البريد الإلكتروني</b> و<b>كلمة المرور</b> الخاصين بحسابك المعتمد للدخول إلى التطبيق.</p>
       <div class="fg"><label style="display:block!important;text-align:right;margin-bottom:6px;font-weight:700;color:#334155;font-size:.85rem">البريد الإلكتروني</label><input id="auth-email" type="email" placeholder="" autocomplete="email"></div>
       <div class="fg" style="margin-bottom:4px"><label style="display:block!important;text-align:right;margin-bottom:6px;font-weight:700;color:#334155;font-size:.85rem">كلمة المرور</label><input id="auth-pass" type="password" placeholder="" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <button type="button" class="btn-login-main" onclick="doLogin()">تسجيل الدخول</button>
-      <button type="button" class="link-forgot" onclick="forgotPassword()">نسيت كلمة المرور؟</button>
+      <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap">
+        <button type="button" class="link-forgot" onclick="forgotPassword()">نسيت كلمة المرور؟</button>
+        <button type="button" class="link-forgot" onclick="showAuthMode('register')" style="font-weight:800">إنشاء حساب جديد</button>
+      </div>
     </div>
-    <button type="button" class="link-forgot" onclick="document.getElementById('m-staff-login').classList.add('on')" style="margin-top:8px; display:block; width:100%; text-align:center; color:#475569;">👨‍✈️ تسجيل دخول السائقين (بوابة الكباتن)</button>
+    <div id="auth-form-register" class="hidden">
+      <div class="fg"><label style="display:block!important;text-align:right;margin-bottom:6px;font-weight:700;color:#334155;font-size:.85rem">الاسم بالكامل</label><input id="reg-name" type="text" autocomplete="name"></div>
+      <div class="fg"><label style="display:block!important;text-align:right;margin-bottom:6px;font-weight:700;color:#334155;font-size:.85rem">رقم الموبايل</label><input id="reg-phone" type="tel" inputmode="numeric" placeholder="01XXXXXXXXX" autocomplete="tel"></div>
+      <div class="fg"><label style="display:block!important;text-align:right;margin-bottom:6px;font-weight:700;color:#334155;font-size:.85rem">البريد الإلكتروني</label><input id="reg-email" type="email" autocomplete="email"></div>
+      <div class="fg"><label style="display:block!important;text-align:right;margin-bottom:6px;font-weight:700;color:#334155;font-size:.85rem">كلمة المرور (6 أحرف على الأقل)</label><input id="reg-pass" type="password" autocomplete="new-password"></div>
+      <div class="fg" style="margin-bottom:4px"><label style="display:block!important;text-align:right;margin-bottom:6px;font-weight:700;color:#334155;font-size:.85rem">تأكيد كلمة المرور</label><input id="reg-pass2" type="password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()"></div>
+      <button type="button" class="btn-login-main" onclick="doRegister()">إنشاء الحساب</button>
+      <button type="button" class="link-forgot" onclick="showAuthMode('login')">لديك حساب؟ تسجيل الدخول</button>
     </div>
+    <div style="display:flex;align-items:center;gap:10px;margin:10px 0 8px;color:#94a3b8;font-size:.76rem"><span style="flex:1;height:1px;background:#e2e8f0"></span>أو<span style="flex:1;height:1px;background:#e2e8f0"></span></div>
+    <button type="button" class="btn-google" id="btn-google" onclick="googleLogin()" style="width:auto;display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 12px;padding:8px 16px;font-size:.84rem;font-weight:700;border-radius:999px"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>المتابعة بحساب Google</button>
+    <button type="button" class="btn-guest" onclick="enterAsGuest()">👤 المتابعة كضيف</button>
+    <p style="font-size:.74rem;color:#94a3b8;text-align:center;margin:0 0 6px">كضيف: احجز وتابع حجزك بالكود فقط، بدون حساب.</p>
     <div class="auth-footer">
       <div>اعداد وتنفيذ: <b>factcode</b></div>
       <div style="margin-top:6px">
@@ -691,7 +699,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 <div class="mobile-bar"><strong>بوابة السائق</strong><button type="button" onclick="logoutDriver()">خروج</button></div>
 <div class="wrap" style="padding-top:20px">
 <h1 style="font-size:1.3rem;font-weight:800" id="driver-hello">مرحباً</h1>
-<p style="color:#64748b;font-size:.88rem;margin-bottom:18px">رحلاتك المسندة وكشف الركاب</p>
+<p id="driver-sub" style="color:#64748b;font-size:.88rem;margin-bottom:18px">رحلاتك المسندة وكشف الركاب</p>
 <div id="driver-trips"></div>
 </div></div>
 
@@ -766,25 +774,6 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 <div class="modal-acts">
   <button type="button" class="btn btn-ghost" data-close onclick="window.closeModals()">إلغاء</button>
   <button type="button" class="btn btn-green" onclick="submitPrivate()">إرسال الطلب</button>
-</div>
-</div>
-</div>
-</div>
-
-<!-- Staff login -->
-<div class="overlay" id="m-staff-login" onclick="if(event.target===this)window.closeModals()">
-<div class="modal" onclick="event.stopPropagation()">
-<div class="modal-head">
-  <button type="button" class="xbtn" data-close onclick="window.closeModals()">×</button>
-  <h3>تسجيل دخول السائقين</h3>
-</div>
-<div class="modal-body">
-<p style="font-size:.85rem;color:#64748b;margin-bottom:14px">أدخل بيانات حسابك المعتمد ككابتن للوصول لرحلاتك</p>
-<div class="fg"><label>اسم المستخدم أو رقم الموبايل</label><input id="staff-user" placeholder="" onkeydown="if(event.key==='Enter')staffLogin()"></div>
-<div class="fg"><label>كلمة المرور</label><input id="staff-pass" type="password" placeholder="" onkeydown="if(event.key==='Enter')staffLogin()"></div>
-<div class="modal-acts">
-  <button type="button" class="btn btn-ghost" data-close onclick="window.closeModals()">إلغاء</button>
-  <button type="button" class="btn btn-indigo" onclick="staffLogin()">دخول</button>
 </div>
 </div>
 </div>
@@ -865,6 +854,13 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
     if(isAndroid&&/^https?:/.test(u))return "intent://"+u.replace(/^https?:\/\//,"")+"#Intent;scheme="+location.protocol.replace(":","")+";package=com.android.chrome;end";
     return "";
   }
+  // يحاول فتح نفس الرابط في المتصفح الخارجي (لتفعيل تسجيل Google خارج متصفحات التطبيقات)
+  window.__openExternal=function(){
+    var u=location.href,proto=location.protocol,rest=u.replace(/^https?:\/\//,"");
+    if(isAndroid){location.href="intent://"+rest+"#Intent;scheme="+proto.replace(":","")+";action=android.intent.action.VIEW;end";setTimeout(function(){if(!document.hidden)copyLink()},2000)}
+    else if(isIOS){location.href=(proto==="https:"?"googlechromes://":"googlechrome://")+rest;setTimeout(function(){if(!document.hidden)copyLink()},1800)}
+    else copyLink();
+  };
   function openChrome(){var u=chromeUrl();if(u)location.href=u;else copyLink()}
   function copyLink(){
     var t=location.href;
@@ -873,25 +869,27 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
   }
   window.__showCompat=function(kind){
     var el=$("compat-warn");if(!el)return;
-    var t=$("compat-title"),m=$("compat-msg");
-    if(kind==="inapp"){t.textContent="⚠ تسجيل الدخول بحساب Google لا يعمل داخل هذا المتصفح";m.textContent="أنت تفتح الرابط داخل متصفح تطبيق (فيسبوك / ماسنجر / إنستغرام...). افتحه في Chrome أو Safari."}
-    else if(kind==="old"){t.textContent="⚠ متصفحك قديم ولا يدعم التطبيق";m.textContent="حدّث المتصفح أو افتح الرابط في Google Chrome."}
-    else{t.textContent="⚠ تعذّر تشغيل التطبيق بالكامل في هذا المتصفح";m.textContent="افتح الرابط في Google Chrome ليعمل بشكل صحيح، أو تأكد من اتصال الإنترنت."}
-    $("compat-chrome").style.display=isAndroid?"":"none";
+    var t=$("compat-title"),m=$("compat-msg"),chrome=$("compat-chrome");
+    if(kind==="old"){t.textContent="⚠ إصدار المتصفح قديم";m.textContent="حدّث المتصفح (أو افتح الرابط في متصفح أحدث) لتشغيل التطبيق.";if(chrome)chrome.style.display=isAndroid?"":"none"}
+    else{t.textContent="⏳ التحميل أبطأ من المعتاد";m.textContent="تأكد من اتصال الإنترنت ثم أعد المحاولة — لا حاجة لتغيير المتصفح.";if(chrome)chrome.style.display="none"}
     el.classList.add("on");
   };
   window.__hideCompat=function(){var el=$("compat-warn");if(el)el.classList.remove("on")};
   window.addEventListener("error",function(e){
     var msg=String((e&&e.message)||"");
-    if(!window.__appReady&&(/SyntaxError|Unexpected token|Unexpected identifier|import|module/i.test(msg)||(e.target&&e.target.tagName==="SCRIPT")))window.__showCompat();
+    if(!window.__appReady&&e.target&&e.target.tagName==="SCRIPT"&&e.target!==window)window.__netFail=true;
   },true);
   window.addEventListener("unhandledrejection",function(){});
   window.addEventListener("load",function(){
-    var c=$("compat-chrome"),k=$("compat-copy"),x=$("compat-close");
+    var c=$("compat-chrome"),k=$("compat-copy"),x=$("compat-close"),r=$("compat-retry");
+    if(r)r.addEventListener("click",function(){location.reload()});
     if(c)c.addEventListener("click",openChrome);
     if(k)k.addEventListener("click",copyLink);
     if(x)x.addEventListener("click",window.__hideCompat);
-    setTimeout(function(){if(!window.__appReady)window.__showCompat()},9000);
+    // متصفح لا يدعم وحدات ES أصلاً: الحالة الوحيدة التي نطلب فيها تحديث المتصفح
+    if(!("noModule" in HTMLScriptElement.prototype)){window.__showCompat("old");return}
+    // الشبكة البطيئة ليست خطأ في المتصفح: ننتظر فترة أطول ونعرض رسالة هادئة بدل "غيّر المتصفح"
+    setTimeout(function(){if(!window.__appReady)window.__showCompat("net")},25000);
   });
 
   // ---------- install (PWA) ----------
@@ -964,7 +962,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
         }
     return t;
 };
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getFirestore, collection, getDocs, addDoc, query, where, doc, updateDoc, deleteDoc, getDoc, runTransaction, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile, GoogleAuthProvider, signInWithPopup, signInWithRedirect } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 const firebaseConfig = { apiKey: "AIzaSyAsBftTHVS1DLUypVHD33F_SN-kNeUz_KY", authDomain: "booking-6adaf.firebaseapp.com", projectId: "booking-6adaf", storageBucket: "booking-6adaf.firebasestorage.app", messagingSenderId: "612487831903", appId: "1:612487831903:web:621db120123e12644756ea", measurementId: "G-JDB27JZ0WD" };
@@ -1247,31 +1245,6 @@ function applyBranding() {
     document.title = name;
 }
 // ========== CUSTOMER AUTH ==========
-// إظهار دخول الأدمن/السائقين بالضغط 3 مرات متتالية على الشعار أو اسم التطبيق
-(function () {
-    let taps = 0, timer = null;
-    function onTap() {
-        taps++;
-        clearTimeout(timer);
-        timer = setTimeout(() => { taps = 0; }, 1200);
-        if (taps >= 3) {
-            taps = 0;
-            const area = document.getElementById("auth-admin-area");
-            const open = area.classList.toggle("hidden") === false;
-            if (open)
-                setTimeout(() => { const e = document.getElementById("auth-email"); if (e)
-                    e.focus(); }, 50);
-        }
-    }
-    ["auth-logo-wrap", "auth-app-name"].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.addEventListener("click", onTap);
-            el.style.userSelect = "none";
-            el.style.webkitTapHighlightColor = "transparent";
-        }
-    });
-})();
 window.showAuthScreen = function () {
     document.getElementById("view-auth").classList.remove("hidden");
     document.getElementById("view-customer").classList.add("hidden");
@@ -1317,6 +1290,47 @@ window.enterAsGuest = function () {
     enterAppAsCustomer();
     toast("دخلت كضيف — احفظ كود الحجز للمتابعة", "ok");
 };
+window.showAuthMode = function (m) {
+    document.getElementById("auth-form-login").classList.toggle("hidden", m === "register");
+    document.getElementById("auth-form-register").classList.toggle("hidden", m !== "register");
+};
+window.doRegister = async function () {
+    const name = (document.getElementById("reg-name").value || "").trim();
+    const phone = normalizePhone(document.getElementById("reg-phone").value || "");
+    const email = (document.getElementById("reg-email").value || "").trim();
+    const pass = document.getElementById("reg-pass").value || "";
+    const pass2 = document.getElementById("reg-pass2").value || "";
+    if (name.length < 3)
+        return toast("أدخل الاسم بالكامل", "err");
+    if (!isValidEgPhone(phone))
+        return toast("رقم موبايل غير صالح (مثال: 01012345678)", "err");
+    if (!email || !email.includes("@"))
+        return toast("بريد إلكتروني غير صالح", "err");
+    if (pass.length < 6)
+        return toast("كلمة المرور 6 أحرف على الأقل", "err");
+    if (pass !== pass2)
+        return toast("تأكيد كلمة المرور غير متطابق", "err");
+    registering = true;
+    try {
+        const cred = await createUserWithEmailAndPassword(auth, email, pass);
+        try { await updateProfile(cred.user, { displayName: name }); } catch (e1) { }
+        await setDoc(doc(db, "users", cred.user.uid), {
+            name, phone, email, createdAt: new Date().toISOString(), role: "customer"
+        }, { merge: true });
+        isGuest = false;
+        toast("تم إنشاء الحساب بنجاح", "ok");
+    }
+    catch (e) {
+        console.error(e);
+        const msg = e.code === "auth/email-already-in-use" ? "البريد مستخدم مسبقًا — سجّل الدخول" :
+            e.code === "auth/weak-password" ? "كلمة المرور ضعيفة" :
+                e.code === "auth/invalid-email" ? "بريد غير صالح" : "تعذر إنشاء الحساب";
+        toast(msg, "err");
+    }
+    finally {
+        registering = false;
+    }
+};
 window.doLogin = async function () {
     const email = (document.getElementById("auth-email").value || "").trim();
     const pass = (document.getElementById("auth-pass").value || "");
@@ -1349,8 +1363,9 @@ window.forgotPassword = async function () {
 };
 // ========== GOOGLE + PROFILE COMPLETION ==========
 window.googleLogin = async function () {
-    if (window.__inApp && window.__showCompat) {
-        window.__showCompat("inapp");
+    if (window.__inApp) {
+        toast("جارٍ فتح الرابط في المتصفح لإكمال تسجيل الدخول بجوجل…", "ok");
+        window.__openExternal();
         return;
     }
     const provider = new GoogleAuthProvider();
@@ -1744,12 +1759,8 @@ function renderTrips(filter = "") {
           <div class="d-item"><div class="lbl">🕐 وقت التحرك</div><div class="val">${esc(formatTripClock(t))}</div></div>
           <div class="d-item"><div class="lbl">📅 الأيام المجدولة</div><div class="val">${esc(formatTripSchedule(t) || '—')}</div></div>
           <div class="d-item"><div class="lbl">💰 العربون المطلوب</div><div class="val" style="color:#f97316">${esc(t.deposit || 0)} ج.م / مقعد</div></div>
-          <div class="d-item"><div class="lbl">🚗 نوع السيارة</div><div class="val">${esc(t.car || '-')}</div></div>
-          ${t.supervisorName ? `<div class="d-item"><div class="lbl">👤 مشرف المتابعة</div><div class="val">${esc(t.supervisorName)}</div></div>` : ''}
-          ${t.supervisorPhone ? `<div class="d-item"><div class="lbl">💬 واتساب المشرف</div><div class="val"><a href="${esc(waHref(t.supervisorPhone))}" target="_blank" style="color:#16a34a;font-weight:700">${esc(t.supervisorPhone)}</a></div></div>` : ''}
         </div>
         ${t.notes ? `<div class="note-box">ℹ️ ${esc(t.notes)}</div>` : ''}
-        ${t.supervisorPhone ? `<div class="note-box" style="background:#ecfdf5;border-color:#a7f3d0;color:#047857">👤 للمتابعة تواصل مع المشرف <b>${esc(t.supervisorName || '')}</b> عبر واتساب: <a href="${esc(waHref(t.supervisorPhone))}" target="_blank" style="color:#047857;font-weight:800">${esc(t.supervisorPhone)}</a></div>` : ''}
         <button class="confirm-bar" type="button" ${closed ? 'disabled' : ''} onclick="openBookingAt(${idx})">
           ${esc(closed ? 'الحجز مغلق لهذه الرحلة' : 'تأكيد حجز مقعد في رحلة ' + (t.name || '') + ' ←')}
         </button>
@@ -2196,7 +2207,7 @@ function renderTrackCard(b, docId) {
       ${(b.carModel || b.car) ? `<div>السيارة: <b>${esc(b.carCategory || "")} ${esc(b.carModel || b.car || "")}</b></div>` : ""}
       ${b.carImage ? `<img src="${esc(safeImg(b.carImage))}" alt="سيارة" style="margin-top:8px;max-width:100%;max-height:140px;border-radius:12px;object-fit:cover">` : ""}
     </div>` : ""}
-    ${b.supervisorPhone ? `<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px;margin-bottom:12px;color:#166534">
+    ${isOk && b.supervisorPhone ? `<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px;margin-bottom:12px;color:#166534">
       <div style="font-weight:800;margin-bottom:6px">👤 مشرف المتابعة</div>
       <div>${b.supervisorName ? `<b>${esc(b.supervisorName)}</b> — ` : ""}<a href="tel:${esc(b.supervisorPhone)}">${esc(b.supervisorPhone)}</a>
       · <a href="${esc(waHref(b.supervisorPhone))}" target="_blank" style="color:#16a34a;font-weight:700">💬 واتساب المشرف</a></div>
@@ -2213,7 +2224,7 @@ function renderTrackCard(b, docId) {
         ${b.tripDate ? `<div><span style="color:#94a3b8">تاريخ الرحلة</span><br><b>📅 ${esc(tripDateLabel(b.tripDate))}</b></div>` : ""}
         <div><span style="color:#94a3b8">عدد المقاعد</span><br><b>${esc(b.seats || 1)} فرد</b></div>
         ${b.date ? `<div><span style="color:#94a3b8">الموعد</span><br><b>${esc(b.date)}${esc(b.dateReturn ? " → " + b.dateReturn : "")}</b></div>` : ""}
-        ${(b.carModel || b.car) ? `<div><span style="color:#94a3b8">السيارة</span><br><b>${esc(b.carCategory || "")} ${esc(b.carModel || b.car)}</b></div>` : ""}
+        ${isOk && (b.carModel || b.car) ? `<div><span style="color:#94a3b8">السيارة</span><br><b>${esc(b.carCategory || "")} ${esc(b.carModel || b.car)}</b></div>` : ""}
         ${b.price ? `<div><span style="color:#94a3b8">السعر</span><br><b>${esc(b.price)} ج.م</b></div>` : ""}
         ${b.deposit ? `<div><span style="color:#94a3b8">العربون</span><br><b>${esc(b.deposit)} ج.م</b></div>` : ""}
       </div>
@@ -2379,11 +2390,6 @@ function normalizeBookingCode(raw) {
         return "BK-" + c.slice(2);
     return "BK-" + c;
 }
-async function sha256(text) {
-    const data = new TextEncoder().encode(String(text));
-    const buf = await crypto.subtle.digest("SHA-256", data);
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
-}
 window.importBackup = async function (input) {
     const file = input.files && input.files[0];
     if (!file)
@@ -2464,45 +2470,6 @@ window.clearAllDemoData = async function () {
         console.error(e);
         toast("تعذر حذف بعض البيانات — تحقق من صلاحيات Firestore", "err");
     }
-};
-// ========== STAFF LOGIN ==========
-window.staffLogin = async function () {
-    const user = (document.getElementById("staff-user").value || "").trim();
-    const pass = (document.getElementById("staff-pass").value || "").trim();
-    if (!user || !pass)
-        return toast("أدخل اسم المستخدم وكلمة المرور", "err");
-    const uNorm = normalizePhone(user);
-    const found = drivers.find(d => {
-        const ph = normalizePhone(d.phone || "");
-        const un = (d.username || "").toLowerCase();
-        return ph === uNorm || ph === user.replace(/\s/g, "") || (un && un === user.toLowerCase()) || d.name === user;
-    });
-    if (found) {
-        let ok = false;
-        if (found.passwordHash) {
-            const h = await sha256(pass);
-            ok = h === found.passwordHash;
-        }
-        else {
-            toast("لا توجد كلمة مرور لهذا الحساب — اطلب من الأدمن تعيينها من بيانات السائق", "err");
-            return;
-        }
-        if (!ok) {
-            toast("كلمة المرور غير صحيحة", "err");
-            return;
-        }
-        currentDriver = found;
-        closeModals();
-        document.getElementById("view-customer").classList.add("hidden");
-        document.getElementById("view-admin").classList.add("hidden");
-        document.getElementById("view-driver").classList.remove("hidden");
-        showAppChrome(false);
-        document.getElementById("driver-hello").textContent = "مرحباً كابتن " + found.name;
-        loadDriverTrips();
-        toast("مرحباً كابتن " + found.name, "ok");
-        return;
-    }
-    toast("الحساب غير معروف — تأكد من البيانات", "err");
 };
 window.toggleSidebar = function (force) {
     const side = document.getElementById("admin-side");
@@ -2916,7 +2883,17 @@ window.updStatus = async function (id, status) {
             toast("تم إلغاء الحجز بنجاح", "ok");
         }
         else {
-            await updateDoc(doc(db, "bookings", id), { status, updatedAt: new Date().toISOString() });
+            const payload = { status, updatedAt: new Date().toISOString() };
+            if (status === "confirmed") {
+                let cur = (allAdminBookings || []).find(x => x.id === id);
+                if (!cur) {
+                    const sn = await getDoc(doc(db, "bookings", id));
+                    if (sn.exists()) cur = Object.assign({ id }, sn.data());
+                }
+                const a = cur ? assignmentFromTrip(cur) : null;
+                if (a) Object.assign(payload, a);
+            }
+            await updateDoc(doc(db, "bookings", id), payload);
             toast(status === "confirmed" ? "تم التأكيد" : "تم التحديث", "ok");
         }
         loadAdminBookings();
@@ -2928,7 +2905,80 @@ window.updStatus = async function (id, status) {
         toast("تعذر تنفيذ العملية — تحقق من صلاحيات Firestore", "err");
     }
 };
+function tripOfBooking(b) {
+    if (!b || b.type === "private" || !b.tripId) return null;
+    return trips.find(x => x.firestoreId === b.tripId || x.id === b.tripId) || null;
+}
+function assignmentFromTrip(b) {
+    const t = tripOfBooking(b);
+    if (!t) return null;
+    const car = cars.find(c => (t.carId && (c.firestoreId === t.carId || c.id === t.carId)) || (t.car && c.model === t.car)) || null;
+    return {
+        driver: t.driver || "", driverId: t.driverId || "", driverPhone: t.driverPhone || "",
+        car: t.car || "", carModel: t.car || "", carId: t.carId || (car ? (car.firestoreId || car.id || "") : ""),
+        carCategory: car ? (car.category || "") : "", carImage: car ? (car.image || "") : "",
+        supervisorId: t.supervisorId || "", supervisorName: t.supervisorName || "", supervisorPhone: t.supervisorPhone || ""
+    };
+}
 window.openStatusDriver = function (id) {
+    const b = (allAdminBookings || []).find(x => x.id === id);
+    if (b && tripOfBooking(b) && b.status !== "cancelled")
+        return openScheduledConfirm(b);
+    return openStatusDriverAdvanced(id);
+};
+function openScheduledConfirm(b) {
+    const t = tripOfBooking(b);
+    const a = assignmentFromTrip(b);
+    const receipt = getReceiptUrl(b);
+    const row = (k, v) => `<div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #f1f5f9"><span style="color:#64748b">${k}</span><b style="text-align:left">${v}</b></div>`;
+    const carTxt = [a.carCategory, a.carModel].filter(Boolean).join(" ");
+    const missing = !a.driver || !a.car || !a.supervisorName;
+    const isOkNow = b.status === "confirmed";
+    document.getElementById("form-title").textContent = (isOkNow ? "بيانات الحجز — " : "تأكيد الحجز — ") + b.code;
+    document.getElementById("form-body").innerHTML = `
+    <div style="background:#f8fafc;border-radius:12px;padding:12px;margin-bottom:12px;font-size:.88rem">
+      ${row("الراكب", esc(b.name || "-"))}
+      ${row("الهاتف", esc(b.phone || "-"))}
+      ${row("الرحلة", esc(b.tripName || t.name || "-"))}
+      ${b.tripDate ? row("تاريخ الرحلة", "📅 " + esc(tripDateLabel(b.tripDate))) : ""}
+      ${row("🕐 الموعد", esc(formatTripClock(t)))}
+      ${row("المقاعد", esc(b.seats || 1))}
+      ${row("الإجمالي", esc(b.price || 0) + " ج.م")}
+      ${row("العربون", esc(b.deposit || 0) + " ج.م")}
+      ${row("حالة الدفع", receipt ? "إيصال مرفق ✓" : (b.status === "payment" ? "العميل أبلغ بالدفع (بدون إيصال)" : "لم يُبلَّغ بالدفع بعد"))}
+    </div>
+    ${receipt ? `<div class="fg"><a href="${esc(receipt)}" target="_blank"><img src="${esc(receipt)}" alt="إيصال" style="max-width:100%;max-height:150px;border-radius:12px;border:1px solid #e2e8f0"></a></div>` : ""}
+    <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:12px;margin-bottom:12px;font-size:.88rem;color:#065f46">
+      <div style="font-weight:800;margin-bottom:6px">${isOkNow ? "البيانات الظاهرة للعميل" : "ستظهر هذه البيانات للعميل تلقائياً عند التأكيد"}</div>
+      ${row("👨‍✈️ السائق", esc(a.driver || "— غير محدد —") + (a.driverPhone ? " · " + esc(a.driverPhone) : ""))}
+      ${row("🚗 السيارة", esc(carTxt || "— غير محددة —"))}
+      ${row("👤 المشرف", esc(a.supervisorName || "— غير محدد —") + (a.supervisorPhone ? " · " + esc(a.supervisorPhone) : ""))}
+    </div>
+    ${missing ? `<div style="background:#fef2f2;color:#b91c1c;border-radius:10px;padding:10px;font-size:.82rem;margin-bottom:10px">⚠ الرحلة ناقصها سائق أو سيارة أو مشرف — عدّل الرحلة من تبويب الرحلات أولاً، أو استخدم «تعديل متقدم».</div>` : ""}
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a class="btn btn-green btn-sm" target="_blank" href="${esc(waHref((b.phone || ""), "تم تأكيد حجزك " + b.code + " ✅\nالرحلة: " + (b.tripName || "") + (b.tripDate ? "\nالتاريخ: " + tripDateLabel(b.tripDate) : "") + (a.driver ? "\nالسائق: " + a.driver + (a.driverPhone ? " (" + a.driverPhone + ")" : "") : "") + (carTxt ? "\nالسيارة: " + carTxt : "") + (a.supervisorName ? "\nالمشرف: " + a.supervisorName + (a.supervisorPhone ? " (" + a.supervisorPhone + ")" : "") : "")))}">💬 رسالة تأكيد واتساب</a>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="closeModals();openStatusDriverAdvanced(${jsq(b.id)})">⚙ تعديل متقدم</button>
+      <button type="button" class="btn btn-ghost btn-sm" style="color:#dc2626" onclick="closeModals();updStatus(${jsq(b.id)},'cancelled')">✕ إلغاء الحجز</button>
+    </div>`;
+    const btn = document.getElementById("form-save-btn");
+    btn.textContent = isOkNow ? "تحديث بيانات العميل من الرحلة" : "✓ تأكيد الحجز";
+    btn.onclick = async () => {
+        try {
+            const payload = Object.assign({ status: "confirmed", updatedAt: new Date().toISOString() }, a);
+            await updateDoc(doc(db, "bookings", b.id), payload);
+            toast("تم تأكيد الحجز وظهرت البيانات للعميل", "ok");
+            closeModals();
+            loadAdminBookings();
+            refreshAdminStats();
+        }
+        catch (e) {
+            console.error(e);
+            toast("تعذر التأكيد — تحقق من صلاحيات Firestore", "err");
+        }
+    };
+    document.getElementById("m-form").classList.add("on");
+}
+window.openStatusDriverAdvanced = function (id) {
     var _a, _b;
     let b = (allAdminBookings || []).find(x => x.id === id);
     if (!b) {
@@ -3188,12 +3238,12 @@ window.editTrip = function (i) {
 function driverOptions(cur) {
     const o = drivers.map(d => `<option value="${esc(d.name)}" data-id="${esc(d.firestoreId || d.id || "")}" data-phone="${esc(d.phone || "")}" ${esc(cur === d.name ? "selected" : "")}>${esc(d.name)} — ${esc(d.phone || "")}</option>`).join("");
     const stale = cur && !drivers.some(d => d.name === cur) ? `<option value="${esc(cur)}" selected>⚠ ${esc(cur)} (غير مسجّل)</option>` : "";
-    return `<option value="">— بدون سائق —</option>${o}${stale}`;
+    return `<option value="">— اختر السائق —</option>${o}${stale}`;
 }
 function carOptions(cur) {
     const o = cars.map(c => `<option value="${esc(c.model)}" data-id="${esc(c.firestoreId || c.id || "")}" data-cap="${esc(Number(c.seats || c.capacity) || 0)}" ${esc(cur === c.model ? "selected" : "")}>${esc(c.category ? c.category + " · " : "")}${esc(c.model)}${esc(c.plate ? " — " + c.plate : "")}</option>`).join("");
     const stale = cur && !cars.some(c => c.model === cur) ? `<option value="${esc(cur)}" selected>⚠ ${esc(cur)} (غير مسجّلة)</option>` : "";
-    return `<option value="">— بدون سيارة —</option>${o}${stale}`;
+    return `<option value="">— اختر السيارة —</option>${o}${stale}`;
 }
 function tripConflict(field, value, timeRaw, days, self) {
     if (!value) return null;
@@ -3252,14 +3302,14 @@ window.openTripForm = function (editTrip = null, editIdx = -1) {
     </div>
     <div class="fg"><label>موعد وساعة التحرك</label><input id="f-time" type="time" value="${esc((editTrip === null || editTrip === void 0 ? void 0 : editTrip.timeRaw) || "07:30")}"></div>
     <div class="fg"><label>نص الموعد المعروض (يمكن تعديله يدوياً)</label><input id="f-time-label" value="${esc((editTrip === null || editTrip === void 0 ? void 0 : editTrip.time) || "")}" placeholder=""></div>
-    <div class="fg"><label>السائق (من المسجّلين فقط)</label><select id="f-driver">${driverOptions(editTrip && editTrip.driver)}</select></div>
-    <div class="fg"><label>المشرف (للمتابعة عبر واتساب)</label>
+    <div class="fg"><label>السائق * (يظهر للراكب بعد تأكيد الحجز)</label><select id="f-driver">${driverOptions(editTrip && editTrip.driver)}</select></div>
+    <div class="fg"><label>المشرف * (يظهر للراكب بعد تأكيد الحجز)</label>
       <select id="f-supervisor">
-        <option value="">— بدون مشرف —</option>
+        <option value="">— اختر المشرف —</option>
         ${supervisors.map(s => `<option value="${esc(s.id || s.firestoreId || s.name)}" data-name="${esc(s.name || "")}" data-phone="${esc(s.phone || "")}" ${esc(((editTrip && (editTrip.supervisorId === (s.id || s.firestoreId) || editTrip.supervisorName === s.name)) ? "selected" : ""))}>${esc(s.name)} — ${esc(s.phone || "")}</option>`).join("")}
       </select>
     </div>
-    <div class="fg"><label>السيارة (من المسجّلة فقط)</label><select id="f-car">${carOptions(editTrip && editTrip.car)}</select></div>
+    <div class="fg"><label>السيارة * (تظهر للراكب بعد تأكيد الحجز)</label><select id="f-car">${carOptions(editTrip && editTrip.car)}</select></div>
     <div class="fg"><label>ملاحظات</label><input id="f-notes" value="${esc((editTrip === null || editTrip === void 0 ? void 0 : editTrip.notes) || "")}" placeholder=""></div>
     <div class="fg"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="f-closed" style="width:auto" ${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.closed) ? "checked" : ""}> إغلاق الحجز (مكتمل العدد)</label></div>
   `;
@@ -3305,6 +3355,12 @@ window.openTripForm = function (editTrip = null, editIdx = -1) {
         const supervisorPhone = svOpt ? (svOpt.dataset.phone || "") : "";
         const drvSel = document.getElementById("f-driver"), carSel = document.getElementById("f-car");
         const drvOpt = drvSel.selectedOptions[0], carOpt = carSel.selectedOptions[0];
+        if (!drvSel.value)
+            return toast(drivers.length ? "اختر السائق للرحلة" : "أضف سائقاً أولاً من تبويب السائقين", "err");
+        if (!supervisorId)
+            return toast(supervisors.length ? "اختر المشرف للرحلة" : "أضف مشرفاً أولاً من تبويب المشرفين", "err");
+        if (!carSel.value)
+            return toast(cars.length ? "اختر السيارة للرحلة" : "أضف سيارة أولاً من تبويب السيارات", "err");
         const selfRef = isEdit && editIdx >= 0 ? trips[editIdx] : null;
         if (!closed) {
             const cd = tripConflict("driver", drvSel.value, timeVal, days, selfRef);
@@ -3375,14 +3431,58 @@ window.delTrip = async function (i) {
         toast("تعذر الحذف — تحقق من صلاحيات Firestore", "err");
     }
 };
+// ========== حسابات السائقين والمشرفين (Firebase Auth) ==========
+// ننشئ الحساب عبر نسخة Firebase ثانوية حتى لا تُسجَّل جلسة الأدمن خروجاً
+async function createStaffAccount(role, name, phone, email, pass, linkedId) {
+    let app2 = null;
+    try {
+        app2 = initializeApp(firebaseConfig, "staff-" + Date.now());
+        const auth2 = getAuth(app2);
+        let uid = "";
+        try {
+            const cred = await createUserWithEmailAndPassword(auth2, email, pass);
+            uid = cred.user.uid;
+            try { await signOut(auth2); } catch (e) { }
+            await setDoc(doc(db, "users", uid), { name, phone, email, role, linkedId, createdAt: new Date().toISOString() }, { merge: true });
+        }
+        catch (e) {
+            if (e && e.code === "auth/email-already-in-use") {
+                // البريد مسجّل (غالباً حساب عميل): نحوّل دوره إلى سائق/مشرف
+                const q = await getDocs(query(collection(db, "users"), where("email", "==", email)));
+                if (q.empty)
+                    throw new Error("EMAIL_EXISTS_NO_PROFILE");
+                uid = q.docs[0].id;
+                await updateDoc(doc(db, "users", uid), { role, linkedId, name, phone });
+            }
+            else
+                throw e;
+        }
+        return uid;
+    }
+    finally {
+        if (app2) { try { await deleteApp(app2); } catch (e) { } }
+    }
+}
+function staffAccountError(e) {
+    const c = (e && (e.code || e.message)) || "";
+    if (c === "auth/weak-password") return "كلمة المرور ضعيفة (6 أحرف على الأقل)";
+    if (c === "auth/invalid-email") return "بريد إلكتروني غير صالح";
+    if (c === "EMAIL_EXISTS_NO_PROFILE") return "هذا البريد مسجّل بالفعل بدون ملف — استخدم بريداً آخر أو عدّل الدور يدوياً من users في Firestore";
+    if (c === "permission-denied" || /permission/i.test(String(c))) return "تعذر حفظ الدور — تحقق من صلاحيات Firestore";
+    return "تعذر إنشاء حساب الدخول";
+}
+async function resetUserRole(uid) {
+    if (!uid) return;
+    try { await updateDoc(doc(db, "users", uid), { role: "customer", linkedId: "" }); } catch (e) { }
+}
 // ========== DRIVERS & CARS ==========
 function renderAdminDrivers() {
     document.getElementById("admin-drivers-list").innerHTML = drivers.map((d, i) => `
     <div class="admin-trip" style="padding:14px 16px">
       <div class="top-row" style="margin-bottom:0">
         <div>
-          <div class="card-title">${esc(d.name)}${d.username ? ` <span class="badge">@${esc(d.username)}</span>` : ""}</div>
-          <div class="card-meta">${esc(d.phone)}${esc(d.notes ? " · " + d.notes : "")}${d.passwordHash ? "" : " · ⚠ بلا كلمة مرور مشفّرة"}</div>
+          <div class="card-title">${esc(d.name)}${d.uid ? ` <span class="badge">🔑 حساب دخول</span>` : ""}</div>
+          <div class="card-meta">${esc(d.phone)}${esc(d.email ? " · " + d.email : "")}${esc(d.notes ? " · " + d.notes : "")}${d.uid ? "" : " · ⚠ بلا حساب دخول"}</div>
         </div>
         <div class="actions-bot" style="margin:0">
           ${d.phone ? `<a class="icon-btn" href="tel:${esc(d.phone)}" title="اتصال">📞</a>
@@ -3402,6 +3502,7 @@ window.delDriver = async function (i) {
     if (usedD) return toast("لا يمكن حذف السائق — مسكّن على " + usedD + " رحلة. غيّر التسكين أولًا", "err");
     try {
         if (d.firestoreId) await deleteDoc(doc(db, "drivers", d.firestoreId));
+        await resetUserRole(d.uid);
         drivers.splice(i, 1);
         renderAdminDrivers();
         toast("تم حذف السائق", "ok");
@@ -3417,26 +3518,32 @@ window.openDriverForm = function (editD = null, editIdx = -1) {
     document.getElementById("form-body").innerHTML = `
     <div class="fg"><label>الاسم *</label><input id="f-name" value="${esc((editD === null || editD === void 0 ? void 0 : editD.name) || "")}"></div>
     <div class="fg"><label>الموبايل *</label><input id="f-phone" type="tel" value="${esc((editD === null || editD === void 0 ? void 0 : editD.phone) || "")}" placeholder=""></div>
-    <div class="fg"><label>اسم المستخدم للدخول</label><input id="f-username" value="${esc((editD === null || editD === void 0 ? void 0 : editD.username) || "")}" placeholder=""></div>
-    <div class="fg"><label>كلمة مرور الدخول ${isEdit ? "(اتركها فارغة لعدم التغيير)" : "*"}</label><input id="f-pass" type="password" placeholder=""></div>
+    ${(editD && editD.uid)
+        ? `<div class="fg" style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;padding:10px;font-size:.85rem;color:#047857">✓ حساب الدخول: <b>${esc(editD.email || "")}</b><br><small>لتغيير كلمة المرور يستخدم السائق «نسيت كلمة المرور» من شاشة الدخول.</small></div>`
+        : `<div class="fg"><label>بريد الدخول ${isEdit ? "(لإنشاء حساب دخول)" : "*"}</label><input id="f-email" type="email" value="${esc((editD && editD.email) || "")}" autocomplete="off"></div>
+    <div class="fg"><label>كلمة مرور الدخول ${isEdit ? "(لإنشاء حساب دخول)" : "* (6 أحرف على الأقل)"}</label><input id="f-pass" type="password" autocomplete="new-password"></div>`}
     <div class="fg"><label>ملاحظات</label><input id="f-notes" value="${esc((editD === null || editD === void 0 ? void 0 : editD.notes) || "")}"></div>
-    <p style="font-size:.78rem;color:#64748b">كلمة المرور تُخزَّن كنص مشفّر (SHA-256) وليست كنص صريح. للأمان الكامل فعّل Firebase Authentication لاحقاً.</p>`;
+    <p style="font-size:.78rem;color:#64748b">يدخل السائق من نفس شاشة الدخول ببريده وكلمة مروره، ويفتح له التطبيق بوابة السائق تلقائياً حسب دور حسابه.</p>`;
     document.getElementById("form-save-btn").onclick = async () => {
         const name = document.getElementById("f-name").value.trim();
         let phone = normalizePhone(document.getElementById("f-phone").value.trim());
-        const username = document.getElementById("f-username").value.trim().toLowerCase();
-        const pass = document.getElementById("f-pass").value;
+        const emailEl = document.getElementById("f-email"), passEl = document.getElementById("f-pass");
+        const email = emailEl ? emailEl.value.trim().toLowerCase() : ((editD && editD.email) || "");
+        const pass = passEl ? passEl.value : "";
         const notes = document.getElementById("f-notes").value.trim();
         if (!name || !phone)
             return toast("أكمل الاسم والموبايل", "err");
         if (!isValidEgPhone(phone))
             return toast("رقم موبايل غير صالح", "err");
-        if (!isEdit && !pass)
-            return toast("حدد كلمة مرور للسائق", "err");
-        const payload = { name, phone, username, notes };
-        if (pass) {
-            payload.passwordHash = await sha256(pass);
+        const wantsAccount = !!emailEl && (!isEdit || email || pass);
+        if (wantsAccount) {
+            if (!email || !email.includes("@"))
+                return toast("أدخل بريد الدخول", "err");
+            if (pass.length < 6)
+                return toast("كلمة المرور 6 أحرف على الأقل", "err");
         }
+        const payload = { name, phone, notes };
+        if (email) payload.email = email;
         if (isEdit && editIdx >= 0) {
             const old = drivers[editIdx];
             Object.assign(old, payload);
@@ -3446,7 +3553,17 @@ window.openDriverForm = function (editD = null, editIdx = -1) {
                 }
                 catch (e) { }
             }
-            toast("تم التعديل", "ok");
+            if (wantsAccount) {
+                try {
+                    const uid = await createStaffAccount("driver", name, phone, email, pass, old.firestoreId || old.id);
+                    old.uid = uid;
+                    if (old.firestoreId) await updateDoc(doc(db, "drivers", old.firestoreId), { uid, email });
+                    toast("تم التعديل وإنشاء حساب الدخول", "ok");
+                }
+                catch (e) { console.error(e); toast("تم حفظ البيانات لكن: " + staffAccountError(e), "err"); }
+            }
+            else
+                toast("تم التعديل", "ok");
         }
         else {
             const d = Object.assign({ id: "d" + Date.now() }, payload);
@@ -3456,7 +3573,17 @@ window.openDriverForm = function (editD = null, editIdx = -1) {
                 d.firestoreId = ref.id;
             }
             catch (e) { }
-            toast("تمت الإضافة", "ok");
+            if (wantsAccount) {
+                try {
+                    const uid = await createStaffAccount("driver", name, phone, email, pass, d.firestoreId || d.id);
+                    d.uid = uid;
+                    if (d.firestoreId) await updateDoc(doc(db, "drivers", d.firestoreId), { uid, email });
+                    toast("تمت إضافة السائق وإنشاء حساب الدخول", "ok");
+                }
+                catch (e) { console.error(e); toast("أُضيف السائق لكن: " + staffAccountError(e), "err"); }
+            }
+            else
+                toast("تمت الإضافة", "ok");
         }
         closeModals();
         renderAdminDrivers();
@@ -3471,8 +3598,8 @@ function renderAdminSupervisors() {
     <div class="admin-trip" style="padding:14px 16px">
       <div class="top-row" style="margin-bottom:0">
         <div>
-          <div class="card-title">👤 ${esc(s.name || "-")}</div>
-          <div class="card-meta">${esc(s.phone || "")}${esc(s.notes ? " · " + s.notes : "")}</div>
+          <div class="card-title">👤 ${esc(s.name || "-")}${s.uid ? ` <span class="badge">🔑 حساب دخول</span>` : ""}</div>
+          <div class="card-meta">${esc(s.phone || "")}${esc(s.email ? " · " + s.email : "")}${esc(s.notes ? " · " + s.notes : "")}</div>
         </div>
         <div class="actions-bot" style="margin:0">
           ${s.phone ? `<a class="icon-btn" href="tel:${esc(s.phone)}" title="اتصال">📞</a>
@@ -3491,6 +3618,7 @@ window.delSupervisor = async function (i) {
     if (usedS) return toast("لا يمكن حذف المشرف — مسكّن على " + usedS + " رحلة. غيّر التسكين أولًا", "err");
     try {
         if (s.firestoreId) await deleteDoc(doc(db, "supervisors", s.firestoreId));
+        await resetUserRole(s.uid);
         supervisors.splice(i, 1);
         renderAdminSupervisors();
         toast("تم حذف المشرف", "ok");
@@ -3506,8 +3634,12 @@ window.openSupervisorForm = function (editS = null, editIdx = -1) {
     document.getElementById("form-body").innerHTML = `
     <div class="fg"><label>اسم المشرف *</label><input id="f-name" value="${esc((editS && editS.name) || "")}" placeholder=""></div>
     <div class="fg"><label>رقم الواتساب *</label><input id="f-phone" type="tel" value="${esc((editS && editS.phone) || "")}" placeholder=""></div>
+    ${(editS && editS.uid)
+        ? `<div class="fg" style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;padding:10px;font-size:.85rem;color:#047857">✓ حساب الدخول: <b>${esc(editS.email || "")}</b><br><small>لتغيير كلمة المرور يستخدم المشرف «نسيت كلمة المرور» من شاشة الدخول.</small></div>`
+        : `<div class="fg"><label>بريد الدخول ${isEdit ? "(لإنشاء حساب دخول)" : "(اختياري — لدخول المشرف للتطبيق)"}</label><input id="f-email" type="email" value="${esc((editS && editS.email) || "")}" autocomplete="off"></div>
+    <div class="fg"><label>كلمة مرور الدخول (6 أحرف على الأقل)</label><input id="f-pass" type="password" autocomplete="new-password"></div>`}
     <div class="fg"><label>ملاحظات</label><input id="f-notes" value="${esc((editS && editS.notes) || "")}" placeholder=""></div>
-    <p style="font-size:.78rem;color:#64748b">رقم الواتساب يظهر للراكب على الرحلة المسندة لهذا المشرف لمتابعة الحجز مباشرة.</p>`;
+    <p style="font-size:.78rem;color:#64748b">رقم الواتساب يظهر للراكب على الرحلة المسندة لهذا المشرف بعد تأكيد الحجز. ويدخل المشرف من نفس شاشة الدخول فتفتح له بوابة المشرف تلقائياً.</p>`;
     document.getElementById("form-save-btn").textContent = "حفظ المشرف";
     document.getElementById("form-save-btn").onclick = async () => {
         const name = document.getElementById("f-name").value.trim();
@@ -3515,14 +3647,31 @@ window.openSupervisorForm = function (editS = null, editIdx = -1) {
         const notes = document.getElementById("f-notes").value.trim();
         if (!name || !phone) return toast("أكمل الاسم ورقم الواتساب", "err");
         if (!isValidEgPhone(phone)) return toast("رقم موبايل غير صالح", "err");
+        const emailEl = document.getElementById("f-email"), passEl = document.getElementById("f-pass");
+        const email = emailEl ? emailEl.value.trim().toLowerCase() : ((editS && editS.email) || "");
+        const pass = passEl ? passEl.value : "";
+        const wantsAccount = !!emailEl && !!(email || pass);
+        if (wantsAccount) {
+            if (!email || !email.includes("@")) return toast("أدخل بريد الدخول", "err");
+            if (pass.length < 6) return toast("كلمة المرور 6 أحرف على الأقل", "err");
+        }
         const payload = { name, phone, notes };
+        if (email) payload.email = email;
         if (isEdit && editIdx >= 0) {
             const old = supervisors[editIdx];
             Object.assign(old, payload);
             if (old.firestoreId) {
                 try { await updateDoc(doc(db, "supervisors", old.firestoreId), payload); } catch (e) { }
             }
-            toast("تم التعديل", "ok");
+            if (wantsAccount) {
+                try {
+                    const uid = await createStaffAccount("supervisor", name, phone, email, pass, old.firestoreId || old.id);
+                    old.uid = uid;
+                    if (old.firestoreId) await updateDoc(doc(db, "supervisors", old.firestoreId), { uid, email });
+                    toast("تم التعديل وإنشاء حساب الدخول", "ok");
+                } catch (e) { console.error(e); toast("تم حفظ البيانات لكن: " + staffAccountError(e), "err"); }
+            } else
+                toast("تم التعديل", "ok");
         } else {
             const s = Object.assign({ id: "sv" + Date.now() }, payload);
             supervisors.push(s);
@@ -3530,7 +3679,15 @@ window.openSupervisorForm = function (editS = null, editIdx = -1) {
                 const ref = await addDoc(collection(db, "supervisors"), s);
                 s.firestoreId = ref.id;
             } catch (e) { }
-            toast("تمت الإضافة", "ok");
+            if (wantsAccount) {
+                try {
+                    const uid = await createStaffAccount("supervisor", name, phone, email, pass, s.firestoreId || s.id);
+                    s.uid = uid;
+                    if (s.firestoreId) await updateDoc(doc(db, "supervisors", s.firestoreId), { uid, email });
+                    toast("تمت إضافة المشرف وإنشاء حساب الدخول", "ok");
+                } catch (e) { console.error(e); toast("أُضيف المشرف لكن: " + staffAccountError(e), "err"); }
+            } else
+                toast("تمت الإضافة", "ok");
         }
         closeModals();
         renderAdminSupervisors();
@@ -3687,12 +3844,52 @@ window.saveSettings = async function () {
     }
 };
 // ========== DRIVER PORTAL ==========
-window.logoutDriver = function () {
-    document.getElementById("view-driver").classList.add("hidden");
-    document.getElementById("view-customer").classList.remove("hidden");
+window.logoutDriver = async function () {
+    try {
+        await signOut(auth);
+    }
+    catch (e) { }
     currentDriver = null;
-    showAppChrome(true);
+    currentUser = null;
+    isGuest = false;
+    document.getElementById("view-driver").classList.add("hidden");
+    showAuthScreen();
 };
+window.staffRole = "driver";
+async function findStaffRecord(role, user, ud) {
+    const colName = role === "supervisor" ? "supervisors" : "drivers";
+    let list = role === "supervisor" ? supervisors : drivers;
+    if (!list || !list.length) {
+        try {
+            const snap = await getDocs(collection(db, colName));
+            list = snap.docs.map(d => (Object.assign({ firestoreId: d.id }, d.data())));
+            if (role === "supervisor") supervisors = list; else drivers = list;
+        }
+        catch (e) { list = []; }
+    }
+    const em = String(user.email || "").toLowerCase();
+    const ph = normalizePhone((ud && ud.phone) || "");
+    const link = ud && ud.linkedId;
+    const rec = list.find(x => (link && (x.firestoreId === link || x.id === link)) || x.uid === user.uid ||
+        (em && String(x.email || "").toLowerCase() === em) || (ph && normalizePhone(x.phone || "") === ph));
+    return rec || { name: (ud && ud.name) || user.displayName || "", phone: (ud && ud.phone) || "", id: user.uid, firestoreId: user.uid };
+}
+async function enterStaffPortal(role, user, ud) {
+    window.staffRole = role;
+    currentDriver = await findStaffRecord(role, user, ud);
+    document.getElementById("view-auth").classList.add("hidden");
+    document.getElementById("view-customer").classList.add("hidden");
+    document.getElementById("view-admin").classList.add("hidden");
+    document.getElementById("view-driver").classList.remove("hidden");
+    showAppChrome(false);
+    const nm = currentDriver.name || (ud && ud.name) || "";
+    document.getElementById("driver-hello").textContent = (role === "supervisor" ? "مرحباً مشرف " : "مرحباً كابتن ") + nm;
+    const bar = document.querySelector("#view-driver .mobile-bar strong");
+    if (bar) bar.textContent = role === "supervisor" ? "بوابة المشرف" : "بوابة السائق";
+    const sub = document.getElementById("driver-sub");
+    if (sub) sub.textContent = role === "supervisor" ? "رحلاتك المسندة وكشف الركاب المؤكدين" : "رحلاتك المسندة وكشف الركاب";
+    loadDriverTrips();
+}
 async function loadDriverTrips() {
     const box = document.getElementById("driver-trips");
     if (!box || !currentDriver)
@@ -3704,12 +3901,20 @@ async function loadDriverTrips() {
         bookings = snap.docs.map(d => (Object.assign({ id: d.id }, d.data())));
     }
     catch (e) { }
-    const mine = bookings.filter(b => b.status !== "cancelled" && (b.driver === dName || b.driverId === currentDriver.id || b.driverId === currentDriver.firestoreId));
+    const isSv = window.staffRole === "supervisor";
+    const me = currentDriver;
+    const meId = [me.firestoreId, me.id].filter(Boolean);
+    const mePhone = normalizePhone(me.phone || "");
+    const mine = bookings.filter(b => b.status !== "cancelled" && (isSv
+        ? ((b.supervisorId && meId.includes(b.supervisorId)) || (mePhone && normalizePhone(b.supervisorPhone || "") === mePhone) || (dName && b.supervisorName === dName))
+        : (b.driver === dName || (b.driverId && meId.includes(b.driverId)))));
     const confirmed = mine.filter(b => b.status === "confirmed");
     const waitingPay = mine.filter(b => b.status === "payment" || b.status === "payment_pending");
     const pending = mine.filter(b => b.status === "pending");
-    const myTrips = trips.filter(t => t.driver === dName || (t.driverId && (t.driverId === currentDriver.firestoreId || t.driverId === currentDriver.id)) || mine.some(b => b.tripId === t.id || b.tripName === t.name));
-    const car = cars.find(c => c.model === (currentDriver.car || "") || mine.find(b => b.carModel && b.carModel === c.model));
+    const myTrips = trips.filter(t => isSv
+        ? ((t.supervisorId && meId.includes(t.supervisorId)) || (dName && t.supervisorName === dName))
+        : (t.driver === dName || (t.driverId && meId.includes(t.driverId))));
+    const car = isSv ? null : cars.find(c => (me.car && c.model === me.car) || myTrips.some(t => (t.carId && (t.carId === c.firestoreId || t.carId === c.id)) || (t.car && t.car === c.model)));
     let html = `<div class="stats" style="margin-bottom:16px">
     <div class="stat s-ok"><div class="icon">✓</div><div class="n">${confirmed.length}</div><div class="t">مؤكدة</div></div>
     <div class="stat s-wait"><div class="icon">⏳</div><div class="n">${waitingPay.length}</div><div class="t">بانتظار دفع</div></div>
@@ -3727,7 +3932,7 @@ async function loadDriverTrips() {
         html += '<div style="color:#94a3b8;padding:10px">لا يوجد ركاب مؤكدون حالياً</div>';
     else
         html += confirmed.map(p => `<div class="card" style="margin-bottom:8px"><div class="card-info"><div class="card-title">${esc(p.name)} <span class="status st-confirmed">مؤكد</span></div>
-    <div class="card-meta">${esc(p.phone)} · مقاعد: ${esc(p.seats || 1)}${esc(p.tripName ? " · " + p.tripName : "")}${esc(p.tripDate ? " · 📅 " + tripDateLabel(p.tripDate) : "")}${esc(p.notes ? " · 📝 " + p.notes : "")}</div></div>
+    <div class="card-meta">${esc(p.phone)}${esc(isSv && p.driver ? " · سائق: " + p.driver : "")} · مقاعد: ${esc(p.seats || 1)}${esc(p.tripName ? " · " + p.tripName : "")}${esc(p.tripDate ? " · 📅 " + tripDateLabel(p.tripDate) : "")}${esc(p.notes ? " · 📝 " + p.notes : "")}</div></div>
     <div style="display:flex;gap:6px"><a class="btn btn-ghost btn-sm" href="tel:${esc(p.phone)}">📞</a>
     <a class="btn btn-ghost btn-sm" href="${esc(waHref(p.phone))}" target="_blank">واتساب</a></div></div>`).join("");
     html += "</div>";
@@ -3810,6 +4015,12 @@ function init() {
                     adminTab("dash");
                     toast("مرحباً بك في لوحة الأدمن", "ok");
                 }
+                else if (ud && (roleNorm === "driver" || roleNorm === "captain")) {
+                    await enterStaffPortal("driver", user, ud);
+                }
+                else if (ud && roleNorm === "supervisor") {
+                    await enterStaffPortal("supervisor", user, ud);
+                }
                 else if (registering) {
                     enterAppAsCustomer();
                 }
@@ -3883,6 +4094,18 @@ function init() {
 }
 init();
 window.__appReady = true;
+if (window.__hideCompat) window.__hideCompat();
+(function () {
+    if (window.__inApp) {
+        const g = document.getElementById("btn-google");
+        if (g) {
+            const n = document.createElement("div");
+            n.style.cssText = "font-size:.78rem;color:#64748b;text-align:center;margin:4px 0 10px";
+            n.textContent = "أنت داخل متصفح تطبيق — زر جوجل سيفتح الرابط في متصفحك العادي لإكمال الدخول (أو استخدم البريد/تابع كزائر).";
+            g.parentNode.insertBefore(n, g);
+        }
+    }
+})();
 if (window.__hideCompat)
     window.__hideCompat();
 </script>
