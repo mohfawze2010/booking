@@ -1138,7 +1138,7 @@ function depositNoticeHtml(b) {
         <div style="background:#fff;padding:10px;border-radius:10px;text-align:center"><b>فودافون كاش</b><br><span style="color:#2563eb;font-weight:800;direction:ltr;display:inline-block">${esc(pay.vodafone || "—")}</span></div>
       </div>
       <div>المسؤول: <b>${esc(pay.contact_name || "")}</b> — واتساب: <b>${esc(pay.phone || "")}</b></div>
-      <div style="margin-top:6px">بعد التحويل افتح <b>متابعة الحجز</b> برقم الحجز، ارفع صورة التحويل ثم اضغط <b>تم دفع العربون</b> ليقوم الأدمن بتأكيد حجزك.</div>
+      <div style="margin-top:6px">بعد التحويل افتح <b>متابعة الحجز</b> برقم الحجز واضغط <b>تم دفع العربون</b> (ويمكنك إرفاق صورة التحويل إن توفرت) ليقوم الأدمن بتأكيد حجزك.</div>
     </div>`;
 }
 function needsDepositReminder(b) {
@@ -2122,7 +2122,7 @@ function renderTrackCard(b, docId) {
     if (isSent) {
         statusBanner = `<div style="background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border-radius:14px;padding:14px 16px;margin-bottom:14px">
       <div style="font-size:.8rem;opacity:.9;margin-bottom:4px">حالة الحجز الحالية</div>
-      <div style="font-weight:800;font-size:1.05rem">⏳ تم إرسال إيصال العربون — بانتظار تأكيد الإدارة</div>
+      <div style="font-weight:800;font-size:1.05rem">⏳ تم إبلاغ الإدارة بدفع العربون — بانتظار التأكيد</div>
     </div>`;
     }
     else if (st === "payment_pending") {
@@ -2163,13 +2163,14 @@ function renderTrackCard(b, docId) {
       </div>
       <label style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;border:2px dashed #cbd5e1;border-radius:12px;cursor:pointer;background:#f8fafc">
         <span style="font-size:1.4rem">📷</span>
-        <span style="font-weight:600;font-size:.88rem;color:#475569">اضغط لتصوير أو اختيار صورة إيصال التحويل</span>
+        <span style="font-weight:600;font-size:.88rem;color:#475569">اضغط لتصوير أو اختيار صورة إيصال التحويل (اختياري)</span>
         <input type="file" accept="image/*" style="display:none" onchange="pickReceipt(${jsq(docId)},this)">
       </label>
       <div id="receipt-preview-${esc(docId)}" style="margin-top:10px"></div>
-      <button type="button" id="dep-btn-${esc(docId)}" class="btn btn-green" disabled style="width:100%;justify-content:center;padding:13px;margin-top:10px;opacity:.5" onclick="submitDeposit(${jsq(docId)})">✓ تم دفع العربون — إرسال للإدارة</button>
+      <div style="font-size:.78rem;color:#64748b;margin-top:8px;text-align:center">رفع الصورة اختياري — يمكنك الضغط مباشرة وتأكيد التحويل مع الإدارة عبر واتساب</div>
+      <button type="button" id="dep-btn-${esc(docId)}" class="btn btn-green" style="width:100%;justify-content:center;padding:13px;margin-top:10px" onclick="submitDeposit(${jsq(docId)})">✓ تم دفع العربون — إرسال للإدارة</button>
     </div>` : "";
-    const sentBlock = isSent && getReceiptUrl(b) ? `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px;margin-bottom:12px;font-size:.85rem;color:#9a3412">✓ تم استلام إيصال العربون وسيقوم الأدمن بمراجعته وتأكيد حجزك قريباً.<br><img src="${esc(getReceiptUrl(b))}" alt="إيصال" style="margin-top:8px;max-width:100%;max-height:140px;border-radius:10px;border:1px solid #e2e8f0"></div>` : "";
+    const sentBlock = isSent && !getReceiptUrl(b) ? `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px;margin-bottom:12px;font-size:.85rem;color:#9a3412">✓ سجّلنا أنك حوّلت العربون. سيقوم الأدمن بالتأكيد معك (يمكنك مراسلته عبر واتساب).</div>` : isSent ? `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px;margin-bottom:12px;font-size:.85rem;color:#9a3412">✓ تم استلام إيصال العربون وسيقوم الأدمن بمراجعته وتأكيد حجزك قريباً.<br><img src="${esc(getReceiptUrl(b))}" alt="إيصال" style="margin-top:8px;max-width:100%;max-height:140px;border-radius:10px;border:1px solid #e2e8f0"></div>` : "";
     return `<div class="panel" style="border-radius:18px;padding:18px">
     ${statusBanner}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
@@ -2270,9 +2271,7 @@ window.pickReceipt = function (id, input) {
     }).catch(function () { toast("تعذر قراءة الصورة", "err"); });
 };
 window.submitDeposit = async function (id) {
-    const dataUrl = window._rcptData[id];
-    if (!dataUrl)
-        return toast("ارفع صورة إيصال التحويل أولاً", "err");
+    const dataUrl = window._rcptData[id] || "";
     try {
         const snap = await getDoc(doc(db, "bookings", id));
         if (!snap.exists())
@@ -2284,18 +2283,21 @@ window.submitDeposit = async function (id) {
             return toast("الحجز مؤكد بالفعل", "ok");
         if (!(Number(b.price) > 0))
             return toast("السعر لم يُحدد بعد من الإدارة", "err");
-        if (!confirm("تأكيد أنك قمت بتحويل العربون وإرسال صورة الإيصال للإدارة؟"))
+        if (!confirm(dataUrl ? "تأكيد أنك قمت بتحويل العربون وإرسال صورة الإيصال للإدارة؟" : "تأكيد أنك قمت بتحويل العربون؟ (بدون صورة — يمكنك تأكيد التحويل مع الإدارة عبر واتساب)"))
             return;
-        await updateDoc(doc(db, "bookings", id), {
-            receipt: dataUrl,
-            payment_proof: dataUrl,
+        const upd = {
             customer_confirmed: true,
             customerConfirmed: true,
             customer_confirmed_at: new Date().toISOString(),
             depositSentAt: new Date().toISOString(),
             status: "payment", // بانتظار تأكيد الأدمن
             updatedAt: new Date().toISOString()
-        });
+        };
+        if (dataUrl) {
+            upd.receipt = dataUrl;
+            upd.payment_proof = dataUrl;
+        }
+        await updateDoc(doc(db, "bookings", id), upd);
         delete window._rcptData[id];
         toast("تم إرسال العربون — بانتظار تأكيد الإدارة", "ok");
         if (currentUser && typeof loadMyBookings === "function")
@@ -2726,7 +2728,7 @@ window.remindDeposit = async function (id) {
         + (b.tripName ? " (" + b.tripName + (b.tripDate ? " - " + tripDateLabel(b.tripDate) : "") + ")" : "")
         + ".\nلتأكيد الحجز برجاء تحويل العربون (" + dep + ") على:\n• إنستاباي: " + (pay.instapay || "-")
         + "\n• فودافون كاش: " + (pay.vodafone || "-")
-        + "\nثم افتح الرابط التالي وارفع صورة التحويل واضغط (تم دفع العربون):\n" + link;
+        + "\nثم افتح الرابط التالي واضغط (تم دفع العربون) — مع إمكانية إرفاق صورة التحويل:\n" + link;
     window.open(waHref(b.phone, txt), "_blank");
     try {
         const n = (Number(b.reminderCount) || 0) + 1;
