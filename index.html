@@ -554,7 +554,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
   </div>
   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;order:2;margin-right:auto">
     <button type="button" class="btn btn-sm" style="background:#1e293b;color:#e2e8f0;border-radius:10px" onclick="logoutAdmin()">↗ موقع الركاب</button>
-    <button type="button" class="btn btn-sm" style="background:#dc2626;color:#fff;border-radius:10px;width:38px;height:38px;padding:0;justify-content:center" onclick="logoutAdmin()" title="خروج">→</button>
+    <button type="button" class="btn btn-sm" style="background:#dc2626;color:#fff;border-radius:10px;width:38px;height:38px;padding:0;justify-content:center" onclick="adminSignOut()" title="خروج">→</button>
   </div>
 </div>
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar(false)"></div>
@@ -570,7 +570,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 <button class="side-link" type="button" data-tab="settings" onclick="adminTab('settings')">⚙️ الإعدادات</button>
 <div class="side-foot">
   <button class="side-link" type="button" onclick="logoutAdmin();showCust('trips')">↗ عرض موقع الركاب</button>
-  <button class="side-link" type="button" style="color:#fca5a5" onclick="logoutAdmin()">🚪 تسجيل خروج الأدمن</button>
+  <button class="side-link" type="button" style="color:#fca5a5" onclick="adminSignOut()">🚪 تسجيل خروج الأدمن</button>
 </div>
 </aside>
 <main class="main">
@@ -672,12 +672,11 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
 </div>
 <p style="font-size:.78rem;color:#64748b;margin-top:10px">الاستعادة من ملف تدمج البيانات. النسخ الاحتياطي متاح من هنا فقط.</p>
 <hr style="margin:18px 0;border:none;border-top:1px solid #e2e8f0">
-<h3 style="margin-bottom:10px">البيانات التجريبية / العمل الفعلي</h3>
+<h3 style="margin-bottom:10px">بدء العمل الفعلي من الصفر</h3>
 <div style="display:flex;flex-wrap:wrap;gap:8px">
-  <button class="btn btn-ghost" type="button" style="color:#dc2626;border-color:#fecaca" onclick="clearAllDemoData()">🗑 حذف كل البيانات التجريبية</button>
-  <button class="btn btn-indigo" type="button" onclick="restoreDemoData()">↻ استعادة البيانات التجريبية</button>
+  <button class="btn btn-ghost" type="button" style="color:#dc2626;border-color:#fecaca" onclick="clearAllDemoData()">🗑 حذف كل البيانات (بدء من الصفر)</button>
 </div>
-<p style="font-size:.78rem;color:#64748b;margin-top:10px">الحذف يزيل الرحلات والسائقين والسيارات والحجوزات والمشرفين من قاعدة البيانات (بعد تأكيد). الاستعادة تعيد زرع البيانات الافتراضية للتجربة.</p>
+<p style="font-size:.78rem;color:#64748b;margin-top:10px">الحذف يزيل الرحلات والسائقين والسيارات والحجوزات والمشرفين من قاعدة البيانات (بعد تأكيدين). نزّل نسخة احتياطية قبل الحذف. لا توجد بيانات تجريبية جاهزة بعد الآن.</p>
 </div></div>
 </main></div></div>
 
@@ -735,6 +734,7 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
     <div class="code" id="succ-code">BK-XXXXX</div>
     <button type="button" class="btn btn-indigo btn-sm" onclick="copyCode()" style="margin:0 auto">📋 نسخ رقم الحجز</button>
   </div>
+  <div id="succ-pay"></div>
   <button type="button" class="btn btn-green" style="width:100%;justify-content:center;padding:13px;margin-bottom:10px" onclick="goTrackFromSuccess()">🔍 عرض ومتابعة حالة الحجز الآن</button>
   <button type="button" class="btn btn-ghost" style="width:100%;justify-content:center;padding:12px;margin-bottom:8px" id="succ-wa" onclick="shareWhatsApp()">💬 حفظ نسخة عبر الواتساب</button>
   <button type="button" class="btn btn-ghost" style="width:100%;justify-content:center;color:#94a3b8" data-close onclick="window.closeModals()">إغلاق والعودة للرئيسية</button>
@@ -967,30 +967,55 @@ const auth = getAuth(app);
 let currentUser = null; // Firebase user
 let registering = false;
 let isGuest = false;
-const DEFAULT_TRIPS = [
-    { id: "t1", name: "القاهرة ↔ الإسكندرية (VIP ميكروباص)", type: "متاح 8 مقاعد", from: "موقف رمسيس / التحرير", to: "سيدي جابر / محطة الرمل", time: "يومياً 7:30 صباحاً", price: 150, deposit: 50, seats: 12, available: 8, notes: "سيارة مكيفة مع واي فاي ومساحة واسعة للحقائب", driver: "محمود الشناوي", car: "تويوتا هايس 2023 أبيض - ق هـ ر 8421", closed: false },
-    { id: "t2", name: "القاهرة ↔ الساحل الشمالي (سيدان خاص)", type: "متاح 4 مقاعد", from: "الشيخ زايد / بوابات مصر", to: "مارينا / سيدي عبد الرحمن", time: "الخميس والجمعة 9:00 ص", price: 350, deposit: 100, seats: 4, available: 4, notes: "توصيل لباب الشاليه", driver: "طارق عبد الفتاح", car: "تويوتا كورولا 2022", closed: false },
-    { id: "t3", name: "القاهرة ↔ شرم الشيخ (سوبر جيت سياحي)", type: "متاح 6 مقاعد", from: "ميدان العباسية / ألماظة", to: "خليج نعمة / الهضبة", time: "يومياً 11:30 مساءً", price: 450, deposit: 150, seats: 6, available: 6, notes: "شامل استراحة رأس سدر", driver: "محمود الشناوي", car: "مرسيدس فيتو VIP", closed: false },
-    { id: "t4", name: "القاهرة ↔ الإسكندرية (عادي)", type: "متاح 12 مقعد", from: "موقف المرج", to: "محطة مصر", time: "يومياً 6:00 ص - 8:00 م", price: 100, deposit: 30, seats: 12, available: 12, notes: "", driver: "", car: "", closed: false },
-    { id: "t5", name: "القاهرة ↔ مطار القاهرة", type: "متاح 4 مقاعد", from: "مدينة نصر / العباسية", to: "مطار القاهرة الدولي", time: "حسب الطلب", price: 200, deposit: 50, seats: 4, available: 4, notes: "مباشر للصالة", driver: "", car: "", closed: false }
-];
-const DEFAULT_DRIVERS = [{ id: "d1", name: "محمود الشناوي", phone: "01011112222", notes: "خبرة 10 سنوات" }, { id: "d2", name: "طارق عبد الفتاح", phone: "01033334444", notes: "سائق سيدان فاخرة" }];
-const DEFAULT_CARS = [
-    { id: "c1", category: "ميني باص", model: "تويوتا هايس 2023", color: "أبيض", plate: "ق هـ ر 8421", notes: "سقف عالي · مكيفة · رحلات", image: "" },
-    { id: "c2", category: "ميني باص", model: "كوستر", color: "أبيض", plate: "6525 م ت ل", notes: "رحلات · مساحة واسعة", image: "" },
-    { id: "c3", category: "ميكروباص", model: "تويوتا هايس ميكرو", color: "فضي", plate: "أ ب ج 1001", notes: "ميكروباص مكيف", image: "" },
-    { id: "c4", category: "ملاكي", model: "نيسان صني", color: "أبيض", plate: "س ص ع 2002", notes: "ملاكي اقتصادية", image: "" },
-    { id: "c5", category: "ملاكي", model: "تويوتا كورولا", color: "رمادي", plate: "أ ب ج 5184", notes: "ملاكي مريحة", image: "" },
-    { id: "c6", category: "VIP", model: "مرسيدس فيتو VIP", color: "أسود", plate: "د س ج 9921", notes: "صالون VIP فاخر", image: "" }
-];
 let trips = [], drivers = [], cars = [], supervisors = [];
 let currentTrip = null, currentDriver = null, lastBooking = null;
-let adminPass = localStorage.getItem("adminPass") || "admin123";
 function toast(msg, type = "") { const t = document.getElementById("toast"); t.textContent = msg; t.className = "toast on " + (type === "ok" ? "ok" : type === "err" ? "err" : ""); setTimeout(() => t.classList.remove("on"), 3500); }
 function code() { const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s = ""; for (let i = 0; i < 5; i++)
     s += chars[Math.floor(Math.random() * chars.length)]; return "BK-" + s; }
+function esc(v) {
+    return String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+// نص آمن لاستخدامه داخل onclick="fn(...)" (علامات اقتباس مزدوجة داخل خاصية HTML)
+function jsq(v) {
+    return esc(JSON.stringify(String(v == null ? "" : v)));
+}
+// يسمح فقط بصور data:image (غير SVG) أو روابط http(s)
+function safeImg(u) {
+    u = String(u || "");
+    return /^(data:image\/(?!svg)[a-z0-9.+-]+;base64,|https?:\/\/)/i.test(u) ? u : "";
+}
+// ضغط الصورة قبل التخزين (حد مستند Firestore ≈ 1 ميجابايت)
+function compressImage(file, maxDim, quality, mime) {
+    return new Promise((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onerror = reject;
+        fr.onload = () => {
+            const img = new Image();
+            img.onerror = reject;
+            img.onload = () => {
+                const k = Math.min(1, maxDim / Math.max(img.width, img.height));
+                const w = Math.max(1, Math.round(img.width * k)), h = Math.max(1, Math.round(img.height * k));
+                const cv = document.createElement("canvas");
+                cv.width = w;
+                cv.height = h;
+                const cx = cv.getContext("2d");
+                const type = mime || "image/jpeg";
+                if (type === "image/jpeg") {
+                    cx.fillStyle = "#fff";
+                    cx.fillRect(0, 0, w, h);
+                }
+                cx.drawImage(img, 0, 0, w, h);
+                resolve(cv.toDataURL(type, quality));
+            };
+            img.src = fr.result;
+        };
+        fr.readAsDataURL(file);
+    });
+}
 function normalizePhone(p) {
     let s = String(p || "").replace(/[\s\-()]/g, "");
+    if (s.startsWith("0020"))
+        s = "0" + s.slice(4);
     if (s.startsWith("+20"))
         s = "0" + s.slice(3);
     if (s.startsWith("20") && s.length >= 12)
@@ -1055,7 +1080,7 @@ window.renderBookDates = function (t) {
     const r = getBookableDates(t);
     inp.value = r.dates.length ? r.dates[0].iso : "";
     box.innerHTML = r.dates.length
-        ? r.dates.map((x, i) => `<button type="button" class="btn btn-sm bk-date-btn ${i === 0 ? "btn-indigo" : "btn-ghost"}" data-iso="${x.iso}" onclick="selectBookDate('${x.iso}')">${x.label}${x.tag ? " · " + x.tag : ""}</button>`).join("")
+        ? r.dates.map((x, i) => `<button type="button" class="btn btn-sm bk-date-btn ${i === 0 ? "btn-indigo" : "btn-ghost"}" data-iso="${x.iso}" onclick="selectBookDate(${jsq(x.iso)})">${x.label}${x.tag ? " · " + x.tag : ""}</button>`).join("")
         : '<div style="color:#b45309;background:#fef3c7;border-radius:10px;padding:10px 12px;font-size:.85rem;width:100%">لا توجد مواعيد متاحة خلال هذا الأسبوع — احجز في الأسبوع القادم</div>';
     if (note) note.textContent = (r.todayPassed ? "رحلة اليوم تحرّكت بالفعل — لهذا اليوم احجز في الأسبوع القادم. " : "") + "الحجز متاح خلال 7 أيام فقط من اليوم، وللمواعيد الأبعد احجز في الأسبوع القادم.";
 };
@@ -1097,13 +1122,33 @@ function tripSeatStats(t) {
 }
 function seatsInfoHtml(t) {
     const st = tripSeatStats(t);
-    const chips = Object.keys(st.byDate).sort().map(k => `<span style="background:#fff;border:1px solid #fed7aa;border-radius:999px;padding:2px 10px;font-size:.74rem">${k ? tripDateLabel(k) : "بدون تاريخ"}: <b>${st.byDate[k]}</b></span>`).join("");
+    const chips = Object.keys(st.byDate).sort().map(k => `<span style="background:#fff;border:1px solid #fed7aa;border-radius:999px;padding:2px 10px;font-size:.74rem">${esc(k ? tripDateLabel(k) : "بدون تاريخ")}: <b>${st.byDate[k]}</b></span>`).join("");
     return `<div style="margin-top:8px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:8px 10px;font-size:.8rem;color:#9a3412;display:flex;flex-wrap:wrap;gap:6px;align-items:center">🪑 مقاعد بعربون مدفوع: <b>${st.paidSeats}</b>${st.paidSeats ? " (" + st.paidCount + " حجز)" : ""} · طلبات واردة: <b>${st.incoming}</b>${chips ? '<span style="width:100%"></span>' + chips : ""}</div>`;
+}
+// ===== رسالة العربون (تظهر بعد الحجز وفي متابعة الحجز) =====
+function depositNoticeHtml(b) {
+    const pay = paySettings();
+    const dep = Number(b && b.deposit) > 0 ? Number(b.deposit) : 0;
+    const amount = dep ? `<b style="color:#c2410c">${dep} ج.م</b>` : "المبلغ الذي ستحدده الإدارة";
+    return `<div style="background:#fff7ed;border:1.5px solid #fdba74;border-radius:14px;padding:14px;margin-bottom:14px;text-align:right;font-size:.88rem;line-height:1.8;color:#7c2d12">
+      <div style="font-weight:800;margin-bottom:4px">⚠ لتأكيد حجزك يجب إرسال العربون</div>
+      <div>برجاء تحويل العربون (${amount}) على أحد الأرقام التالية:</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0">
+        <div style="background:#fff;padding:10px;border-radius:10px;text-align:center"><b>إنستاباي</b><br><span style="color:#2563eb;font-weight:800;direction:ltr;display:inline-block">${esc(pay.instapay || "—")}</span></div>
+        <div style="background:#fff;padding:10px;border-radius:10px;text-align:center"><b>فودافون كاش</b><br><span style="color:#2563eb;font-weight:800;direction:ltr;display:inline-block">${esc(pay.vodafone || "—")}</span></div>
+      </div>
+      <div>المسؤول: <b>${esc(pay.contact_name || "")}</b> — واتساب: <b>${esc(pay.phone || "")}</b></div>
+      <div style="margin-top:6px">بعد التحويل افتح <b>متابعة الحجز</b> برقم الحجز، ارفع صورة التحويل ثم اضغط <b>تم دفع العربون</b> ليقوم الأدمن بتأكيد حجزك.</div>
+    </div>`;
+}
+function needsDepositReminder(b) {
+    const raw = String((b && b.status) || "pending");
+    return raw === "pending" || raw === "payment_pending";
 }
 function getReceiptUrl(b) {
     if (!b)
         return "";
-    return b.payment_proof || b.receipt || b.receiptUrl || "";
+    return safeImg(b.payment_proof || b.receipt || b.receiptUrl || "");
 }
 function isTripClosed(t) {
     return !!(t && (t.is_booking_closed || t.closed));
@@ -1173,15 +1218,15 @@ function applyBranding() {
     const welcome = s.welcome || "";
     const logoText = document.querySelector("#logo-area > div:last-child");
     if (logoText) {
-        logoText.innerHTML = name + `<small>رحلات يومية منتظمة وحجوزات خاصة</small>`;
+        logoText.innerHTML = esc(name) + `<small>رحلات يومية منتظمة وحجوزات خاصة</small>`;
     }
     if (s.logo_url) {
         const headerIcon = document.getElementById("header-logo-icon");
         if (headerIcon)
-            headerIcon.innerHTML = `<img src="${s.logo_url}" alt="logo" style="width:100%;height:100%;object-fit:contain;border-radius:12px">`;
+            headerIcon.innerHTML = `<img src="${esc(safeImg(s.logo_url))}" alt="logo" style="width:100%;height:100%;object-fit:contain;border-radius:12px">`;
         const authWrap = document.getElementById("auth-logo-wrap");
         if (authWrap)
-            authWrap.innerHTML = `<img src="${s.logo_url}" alt="logo" style="height:72px;margin:0 auto;display:block;border-radius:12px">`;
+            authWrap.innerHTML = `<img src="${esc(safeImg(s.logo_url))}" alt="logo" style="height:72px;margin:0 auto;display:block;border-radius:12px">`;
     }
     const authName = document.getElementById("auth-app-name");
     if (authName)
@@ -1264,46 +1309,6 @@ window.enterAsGuest = function () {
     catch (e) { }
     enterAppAsCustomer();
     toast("دخلت كضيف — احفظ كود الحجز للمتابعة", "ok");
-};
-window.doRegister = async function () {
-    const name = (document.getElementById("reg-name").value || "").trim();
-    let phone = normalizePhone(document.getElementById("reg-phone").value || "");
-    const email = (document.getElementById("reg-email").value || "").trim();
-    const pass = document.getElementById("reg-pass").value || "";
-    const pass2 = document.getElementById("reg-pass2").value || "";
-    if (!name)
-        return toast("أدخل الاسم", "err");
-    if (!isValidEgPhone(phone))
-        return toast("رقم موبايل غير صالح", "err");
-    if (!email || !email.includes("@"))
-        return toast("بريد إلكتروني غير صالح", "err");
-    if (pass.length < 6)
-        return toast("كلمة المرور 6 أحرف على الأقل", "err");
-    if (pass !== pass2)
-        return toast("تأكيد كلمة المرور غير متطابق", "err");
-    if (name.length < 3)
-        return toast("أدخل الاسم بالكامل", "err");
-    registering = true;
-    try {
-        const cred = await createUserWithEmailAndPassword(auth, email, pass);
-        await updateProfile(cred.user, { displayName: name });
-        await setDoc(doc(db, "users", cred.user.uid), {
-            name, phone, email, createdAt: new Date().toISOString(), role: "customer"
-        }, { merge: true });
-        isGuest = false;
-        toast("تم إنشاء الحساب بنجاح", "ok");
-        // onAuthStateChanged will enter app
-    }
-    catch (e) {
-        console.error(e);
-        const msg = e.code === "auth/email-already-in-use" ? "البريد مستخدم مسبقًا" :
-            e.code === "auth/weak-password" ? "كلمة المرور ضعيفة" :
-                e.code === "auth/invalid-email" ? "بريد غير صالح" : "تعذر إنشاء الحساب";
-        toast(msg, "err");
-    }
-    finally {
-        registering = false;
-    }
 };
 window.doLogin = async function () {
     const email = (document.getElementById("auth-email").value || "").trim();
@@ -1551,13 +1556,13 @@ window.loadMyBookings = async function () {
         window._myBookingsCache = list;
         box.innerHTML = list.map((b, i) => {
             const st = b.status || "pending";
-            const label = st === "confirmed" ? "مؤكد" : st === "cancelled" ? "ملغي" : st === "payment" || st === "payment_pending" ? "بانتظار الدفع" : "قيد المراجعة";
+            const label = st === "confirmed" ? "مؤكد" : st === "cancelled" ? "ملغي" : st === "payment" ? "بانتظار تأكيد الإدارة" : st === "payment_pending" ? "بانتظار العربون" : (b.type !== "private" ? "بانتظار العربون" : "قيد المراجعة");
             const stCls = st === "confirmed" ? "confirmed" : st === "cancelled" ? "cancelled" : "pending";
             return `<div class="trip-card" id="mbc-${i}">
         <div class="trip-head" onclick="toggleMyBooking(${i})">
           <div class="th-main">
-            <div class="trip-title"><span class="chev">▼</span><span>${b.code || "-"}</span> <span class="status st-${stCls}">${label}</span></div>
-            <div class="trip-meta">${b.tripName || ((b.from || "") + " ← " + (b.to || "")) || "حجز"} · ${b.createdAt ? new Date(b.createdAt).toLocaleDateString("ar-EG") : ""}</div>
+            <div class="trip-title"><span class="chev">▼</span><span>${esc(b.code || "-")}</span> <span class="status st-${esc(stCls)}">${label}</span></div>
+            <div class="trip-meta">${esc(b.tripName || ((b.from || "") + " ← " + (b.to || "")) || "حجز")} · ${b.createdAt ? new Date(b.createdAt).toLocaleDateString("ar-EG") : ""}</div>
           </div>
         </div>
         <div class="trip-details" id="mbd-${i}"></div>
@@ -1610,21 +1615,19 @@ window.previewLogoFile = function (input) {
     const file = input.files && input.files[0];
     if (!file)
         return;
-    if (file.size > 1.5 * 1024 * 1024)
-        return toast("الشعار كبير — أقل من 1.5 ميجا", "err");
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        window._logoDataUrl = e.target.result;
+    if (!file.type.startsWith("image/"))
+        return toast("الملف يجب أن يكون صورة", "err");
+    compressImage(file, 320, 0.9, "image/png").then(function (data) {
+        window._logoDataUrl = data;
         const prev = document.getElementById("set-logo-preview");
         if (prev) {
-            prev.src = e.target.result;
+            prev.src = data;
             prev.style.display = "block";
         }
         const urlEl = document.getElementById("set-logo-url");
         if (urlEl)
             urlEl.value = "";
-    };
-    reader.readAsDataURL(file);
+    }).catch(function () { toast("تعذر قراءة الصورة", "err"); });
 };
 window.closeModals = function () {
     document.querySelectorAll(".overlay").forEach(o => o.classList.remove("on"));
@@ -1721,27 +1724,27 @@ function renderTrips(filter = "") {
       <div class="trip-status-badge">${tag}</div>
       <div class="trip-head" onclick="toggleTrip(${idx})">
         <div class="th-main">
-          <div class="trip-title"><span class="chev">▼</span><span>${t.name || ((t.from || '') + ' ↔ ' + (t.to || ''))}</span></div>
-          <div class="trip-meta">📍 ${(t.from || '') + ' – ' + (t.to || '')}<br>🕐 ${formatTripClock(t)}${(formatTripSchedule(t) ? `<br>📅 ${formatTripSchedule(t)}` : '')}</div>
+          <div class="trip-title"><span class="chev">▼</span><span>${esc(t.name || ((t.from || '') + ' ↔ ' + (t.to || '')))}</span></div>
+          <div class="trip-meta">📍 ${esc((t.from || '') + ' – ' + (t.to || ''))}<br>🕐 ${esc(formatTripClock(t))}${(formatTripSchedule(t) ? `<br>📅 ${esc(formatTripSchedule(t))}` : '')}</div>
         </div>
         <div class="th-side">
-          <div class="price-side"><div class="p">${t.price || 0} ج.م</div><div class="l">سعر المقعد</div></div>
+          <div class="price-side"><div class="p">${esc(t.price || 0)} ج.م</div><div class="l">سعر المقعد</div></div>
           <button class="book-btn" type="button" ${closed ? 'disabled' : ''} onclick="event.stopPropagation();openBookingAt(${idx})">حجز مباشر ←</button>
         </div>
       </div>
       <div class="trip-details">
         <div class="details-grid">
-          <div class="d-item"><div class="lbl">🕐 وقت التحرك</div><div class="val">${formatTripClock(t)}</div></div>
-          <div class="d-item"><div class="lbl">📅 الأيام المجدولة</div><div class="val">${formatTripSchedule(t) || '—'}</div></div>
-          <div class="d-item"><div class="lbl">💰 العربون المطلوب</div><div class="val" style="color:#f97316">${t.deposit || 0} ج.م / مقعد</div></div>
-          <div class="d-item"><div class="lbl">🚗 نوع السيارة</div><div class="val">${t.car || '-'}</div></div>
-          ${t.supervisorName ? `<div class="d-item"><div class="lbl">👤 مشرف المتابعة</div><div class="val">${t.supervisorName}</div></div>` : ''}
-          ${t.supervisorPhone ? `<div class="d-item"><div class="lbl">💬 واتساب المشرف</div><div class="val"><a href="${waHref(t.supervisorPhone)}" target="_blank" style="color:#16a34a;font-weight:700">${t.supervisorPhone}</a></div></div>` : ''}
+          <div class="d-item"><div class="lbl">🕐 وقت التحرك</div><div class="val">${esc(formatTripClock(t))}</div></div>
+          <div class="d-item"><div class="lbl">📅 الأيام المجدولة</div><div class="val">${esc(formatTripSchedule(t) || '—')}</div></div>
+          <div class="d-item"><div class="lbl">💰 العربون المطلوب</div><div class="val" style="color:#f97316">${esc(t.deposit || 0)} ج.م / مقعد</div></div>
+          <div class="d-item"><div class="lbl">🚗 نوع السيارة</div><div class="val">${esc(t.car || '-')}</div></div>
+          ${t.supervisorName ? `<div class="d-item"><div class="lbl">👤 مشرف المتابعة</div><div class="val">${esc(t.supervisorName)}</div></div>` : ''}
+          ${t.supervisorPhone ? `<div class="d-item"><div class="lbl">💬 واتساب المشرف</div><div class="val"><a href="${esc(waHref(t.supervisorPhone))}" target="_blank" style="color:#16a34a;font-weight:700">${esc(t.supervisorPhone)}</a></div></div>` : ''}
         </div>
-        ${t.notes ? `<div class="note-box">ℹ️ ${t.notes}</div>` : ''}
-        ${t.supervisorPhone ? `<div class="note-box" style="background:#ecfdf5;border-color:#a7f3d0;color:#047857">👤 للمتابعة تواصل مع المشرف <b>${t.supervisorName || ''}</b> عبر واتساب: <a href="${waHref(t.supervisorPhone)}" target="_blank" style="color:#047857;font-weight:800">${t.supervisorPhone}</a></div>` : ''}
+        ${t.notes ? `<div class="note-box">ℹ️ ${esc(t.notes)}</div>` : ''}
+        ${t.supervisorPhone ? `<div class="note-box" style="background:#ecfdf5;border-color:#a7f3d0;color:#047857">👤 للمتابعة تواصل مع المشرف <b>${esc(t.supervisorName || '')}</b> عبر واتساب: <a href="${esc(waHref(t.supervisorPhone))}" target="_blank" style="color:#047857;font-weight:800">${esc(t.supervisorPhone)}</a></div>` : ''}
         <button class="confirm-bar" type="button" ${closed ? 'disabled' : ''} onclick="openBookingAt(${idx})">
-          ${closed ? 'الحجز مغلق لهذه الرحلة' : 'تأكيد حجز مقعد في رحلة ' + (t.name || '') + ' ←'}
+          ${esc(closed ? 'الحجز مغلق لهذه الرحلة' : 'تأكيد حجز مقعد في رحلة ' + (t.name || '') + ' ←')}
         </button>
       </div>
     </div>`;
@@ -1778,9 +1781,9 @@ window.openBooking = function (t) {
     currentTrip = t;
     document.getElementById("m-book-title").textContent = t.name || ((t.from || "") + " ↔ " + (t.to || ""));
     document.getElementById("m-book-info").innerHTML = `
-    <span>📍 المسار: ${(t.from || "") + " – " + (t.to || "")}</span>
-    <span>🕐 الوقت: ${formatTripClock(t)}</span>${formatTripSchedule(t) ? `<span>📅 ${formatTripSchedule(t)}</span>` : ""}
-    <span style="color:#059669;font-weight:700">💰 ${t.price || 0} ج.م للمقعد</span>`;
+    <span>📍 المسار: ${esc((t.from || "") + " – " + (t.to || ""))}</span>
+    <span>🕐 الوقت: ${esc(formatTripClock(t))}</span>${formatTripSchedule(t) ? `<span>📅 ${esc(formatTripSchedule(t))}</span>` : ""}
+    <span style="color:#059669;font-weight:700">💰 ${esc(t.price || 0)} ج.م للمقعد</span>`;
     document.getElementById("b-name").value = (currentUser && currentUser.displayName) || "";
     document.getElementById("b-phone").value = "";
     if (currentUser) {
@@ -1886,6 +1889,8 @@ function showSuccess(b) {
     document.getElementById("succ-code").textContent = b.code;
     document.getElementById("succ-sub").textContent = b.type === "private" ? "حجز سيارة خاصة" : "حجز مقعد في رحلة مجدولة";
     lastBooking = b;
+    const sp = document.getElementById("succ-pay");
+    if (sp) sp.innerHTML = depositNoticeHtml(b);
     document.getElementById("m-success").classList.add("on");
 }
 window.copyCode = function () {
@@ -1905,8 +1910,20 @@ window.shareWhatsApp = function () {
     if (!lastBooking)
         return;
     const b = lastBooking;
-    const txt = `تم تسجيل حجزك بنجاح ✅%0Aكود الحجز: ${b.code}%0Aالاسم: ${b.name}%0Aالمقاعد: ${b.seats || 1}%0Aالإجمالي: ${b.price || 0} ج.م%0Aالعربون: ${b.deposit || 0} ج.م%0A${b.tripName ? "الرحلة: " + b.tripName : ""}${b.tripDate ? "%0Aالتاريخ: " + tripDateLabel(b.tripDate) : ""}`;
-    window.open("https://wa.me/?text=" + txt, "_blank");
+    const lines = [
+        "تم تسجيل حجزك بنجاح ✅",
+        "كود الحجز: " + b.code,
+        "الاسم: " + (b.name || ""),
+        "المقاعد: " + (b.seats || 1),
+        "الإجمالي: " + (b.price || 0) + " ج.م",
+        "العربون: " + (b.deposit || 0) + " ج.م"
+    ];
+    if (b.tripName)
+        lines.push("الرحلة: " + b.tripName);
+    if (b.tripDate)
+        lines.push("التاريخ: " + tripDateLabel(b.tripDate));
+    lines.push("برجاء إرسال العربون لتأكيد الحجز.");
+    window.open("https://wa.me/?text=" + encodeURIComponent(lines.join("\n")), "_blank");
 };
 // ========== PRIVATE ==========
 let pvTripType = "oneway", pvDriver = "with";
@@ -1920,7 +1937,7 @@ window.initPrivateForm = function () {
     const fromCars = [...new Set(cars.map(c => (c.category || "").trim()).filter(Boolean))];
     const defaults = ["ملاكي", "ميني باص", "ميكروباص", "سيدان", "VIP"];
     const cats = [...new Set([...fromCars, ...defaults])];
-    catSel.innerHTML = '<option value="">اختر الفئة</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join("");
+    catSel.innerHTML = '<option value="">اختر الفئة</option>' + cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
     modSel.innerHTML = '<option value="">اختر الفئة أولاً</option>';
     ["pv-name", "pv-phone", "pv-from", "pv-to", "pv-notes"].forEach(id => { const el = document.getElementById(id); if (el)
         el.value = ""; });
@@ -1973,11 +1990,11 @@ window.filterModelsByCategory = function () {
     }
     const matched = cars.filter(c => (c.category || "").trim() === cat);
     if (!matched.length) {
-        modSel.innerHTML = `<option value="">لا يوجد موديل مسجّل لفئة «${cat}» — أضفه من لوحة الأدمن</option>`;
+        modSel.innerHTML = `<option value="">لا يوجد موديل مسجّل لفئة «${esc(cat)}» — أضفه من لوحة الأدمن</option>`;
         document.getElementById("pv-car-desc").style.display = "none";
         return;
     }
-    modSel.innerHTML = '<option value="">اختر الموديل</option>' + matched.map(c => `<option value="${c.model}" data-notes="${(c.notes || "").replace(/"/g, "&quot;")}" data-color="${c.color || ""}" data-plate="${c.plate || ""}">${c.model}${c.color ? " - لون " + c.color : ""}</option>`).join("");
+    modSel.innerHTML = '<option value="">اختر الموديل</option>' + matched.map(c => `<option value="${esc(c.model)}" data-notes="${esc(c.notes || "")}" data-color="${esc(c.color || "")}" data-plate="${esc(c.plate || "")}">${esc(c.model)}${esc(c.color ? " - لون " + c.color : "")}</option>`).join("");
     document.getElementById("pv-car-desc").style.display = "none";
 };
 window.showSelectedCarDesc = function () {
@@ -1995,11 +2012,11 @@ window.showSelectedCarDesc = function () {
     const img = opt.dataset.img || "";
     box.style.display = "block";
     box.innerHTML = `<div style="font-weight:700;margin-bottom:6px">📄 وصف ومواصفات السيارة المحددة:</div>
-    ${img ? `<img src="${img}" alt="" style="width:100%;max-height:160px;object-fit:cover;border-radius:12px;margin-bottom:8px;border:1px solid #e2e8f0">` : ""}
-    <div>${notes || "—"}</div>
+    ${img ? `<img src="${esc(safeImg(img))}" alt="" style="width:100%;max-height:160px;object-fit:cover;border-radius:12px;margin-bottom:8px;border:1px solid #e2e8f0">` : ""}
+    <div>${esc(notes || "—")}</div>
     <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
-      ${color ? `<span style="background:#e2e8f0;padding:3px 10px;border-radius:999px;font-size:.78rem">اللون: ${color}</span>` : ""}
-      ${plate ? `<span style="background:#e2e8f0;padding:3px 10px;border-radius:999px;font-size:.78rem">اللوحة: ${plate}</span>` : ""}
+      ${color ? `<span style="background:#e2e8f0;padding:3px 10px;border-radius:999px;font-size:.78rem">اللون: ${esc(color)}</span>` : ""}
+      ${plate ? `<span style="background:#e2e8f0;padding:3px 10px;border-radius:999px;font-size:.78rem">اللوحة: ${esc(plate)}</span>` : ""}
     </div>`;
 };
 window.setPvTripType = function (v) {
@@ -2048,8 +2065,10 @@ window.submitPrivate = async function () {
     phone = normalizePhone(phone);
     if (!isValidEgPhone(phone))
         return toast("رقم هاتف غير صالح (مثال: 01012345678)", "err");
-    if (!category || !model)
-        return toast("اختر نوع وموديل السيارة", "err");
+    if (!category)
+        return toast("اختر نوع السيارة", "err");
+    if (!model && cars.some(c => (c.category || "").trim() === category))
+        return toast("اختر موديل السيارة", "err");
     if (!date)
         return toast("اختر تاريخ الذهاب", "err");
     if (pvTripType === "round" && !dateReturn)
@@ -2091,17 +2110,25 @@ function paySettings() {
 }
 function renderTrackCard(b, docId) {
     const st = b.status || "pending";
-    const isPay = st === "payment" || st === "payment_pending";
     const isOk = st === "confirmed";
     const isCancel = st === "cancelled";
-    const deposit = b.deposit || b.price || 50;
-    const total = b.price || 0;
+    const isSent = st === "payment";
+    const isUnpaid = st === "pending" || st === "payment_pending";
+    const total = Number(b.price) || 0;
+    const deposit = Number(b.deposit) || 0;
+    const canPay = isUnpaid && total > 0;
     const pay = paySettings();
     let statusBanner = "";
-    if (isPay) {
+    if (isSent) {
         statusBanner = `<div style="background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border-radius:14px;padding:14px 16px;margin-bottom:14px">
       <div style="font-size:.8rem;opacity:.9;margin-bottom:4px">حالة الحجز الحالية</div>
-      <div style="font-weight:800;font-size:1.05rem">⏳ في انتظار تأكيدك وسداد العربون</div>
+      <div style="font-weight:800;font-size:1.05rem">⏳ تم إرسال إيصال العربون — بانتظار تأكيد الإدارة</div>
+    </div>`;
+    }
+    else if (st === "payment_pending") {
+        statusBanner = `<div style="background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border-radius:14px;padding:14px 16px;margin-bottom:14px">
+      <div style="font-size:.8rem;opacity:.9;margin-bottom:4px">حالة الحجز الحالية</div>
+      <div style="font-weight:800;font-size:1.05rem">⏳ في انتظار سداد العربون لتأكيد الحجز</div>
     </div>`;
     }
     else if (isOk) {
@@ -2117,86 +2144,76 @@ function renderTrackCard(b, docId) {
     }
     else {
         statusBanner = `<div style="background:#fef3c7;color:#b45309;border-radius:14px;padding:14px 16px;margin-bottom:14px">
-      <div style="font-weight:800;font-size:1.05rem">📋 طلب جديد — قيد المراجعة</div>
+      <div style="font-weight:800;font-size:1.05rem">${b.type === "private" && !total ? "📋 طلب جديد — قيد المراجعة والتسعير" : "📋 حجز مسجّل — بانتظار سداد العربون"}</div>
     </div>`;
     }
-    const payBlock = isPay ? `
+    const noticeBlock = isUnpaid ? depositNoticeHtml(b) : "";
+    const payBlock = canPay ? `
     <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:14px;padding:14px;margin-bottom:14px">
-      <div style="font-weight:700;margin-bottom:10px;color:#047857">تكلفة الرحلة المعتمدة:</div>
+      <div style="font-weight:700;margin-bottom:10px;color:#047857">بعد تحويل العربون:</div>
       <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px">
         <div style="flex:1;min-width:120px;background:#fff;border-radius:12px;padding:12px;text-align:center;border:1px solid #d1fae5">
-          <div style="font-size:.75rem;color:#64748b">إجمالي تكلفة المشوار</div>
-          <div style="font-weight:800;font-size:1.15rem;color:#0f172a">${total ? total + " ج.م" : "حسب الاتفاق"}</div>
+          <div style="font-size:.75rem;color:#64748b">إجمالي التكلفة</div>
+          <div style="font-weight:800;font-size:1.15rem;color:#0f172a">${total} ج.م</div>
         </div>
         <div style="flex:1;min-width:120px;background:#fff;border-radius:12px;padding:12px;text-align:center;border:1px solid #d1fae5">
-          <div style="font-size:.75rem;color:#64748b">العربون المطلوب للتأكيد</div>
-          <div style="font-weight:800;font-size:1.15rem;color:#f97316">${deposit} ج.م</div>
+          <div style="font-size:.75rem;color:#64748b">العربون المطلوب</div>
+          <div style="font-weight:800;font-size:1.15rem;color:#f97316">${deposit ? deposit + " ج.م" : "حسب الإدارة"}</div>
         </div>
       </div>
-      <button type="button" class="btn btn-green" style="width:100%;justify-content:center;padding:13px;margin-bottom:12px" onclick="confirmDeposit('${docId}')">✓ تم التأكيد والموافقة على السعر — دفع العربون</button>
-      <div style="background:#fff;border-radius:12px;padding:12px;border:1px dashed #94a3b8">
-        <div style="font-weight:700;margin-bottom:8px;font-size:.9rem">العربون المطلوب لتأكيد المقعد: <span style="color:#f97316">${deposit} ج.م</span></div>
-        <div style="font-size:.8rem;color:#64748b;margin-bottom:8px">يرجى تحويل العربون ثم إرفاق صورة الإيصال:</div>
-        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:10px;margin-bottom:10px;font-size:.85rem">
-          <b>بيانات التحويل (المنفذ):</b><br>
-          المسؤول: <b>${pay.contact_name || "أ/ محمد فوزى"}</b><br>
-          واتساب: <b>${pay.phone || "01112221764"}</b>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.85rem;margin-bottom:10px">
-          <div style="background:#f8fafc;padding:10px;border-radius:10px"><b>إنستاباي</b><br><span style="color:#2563eb;font-weight:700">${pay.instapay || "—"}</span></div>
-          <div style="background:#f8fafc;padding:10px;border-radius:10px"><b>فودافون كاش</b><br><span style="color:#2563eb;font-weight:700">${pay.vodafone || "01112221764"}</span></div>
-        </div>
-        <label style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;border:2px dashed #cbd5e1;border-radius:12px;cursor:pointer;background:#f8fafc">
-          <span style="font-size:1.4rem">📷</span>
-          <span style="font-weight:600;font-size:.88rem;color:#475569">اضغط لتصوير أو اختيار صورة الإيصال</span>
-          <input type="file" accept="image/*" style="display:none" onchange="uploadReceipt('${docId}',this)">
-        </label>
-        <div id="receipt-preview-${docId}" style="margin-top:10px"></div>
-        ${b.receipt ? `<div style="margin-top:8px;font-size:.82rem;color:#059669">✓ تم رفع إيصال مسبقاً — بانتظار مراجعة الإدارة</div>` : ""}
-      </div>
+      <label style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;border:2px dashed #cbd5e1;border-radius:12px;cursor:pointer;background:#f8fafc">
+        <span style="font-size:1.4rem">📷</span>
+        <span style="font-weight:600;font-size:.88rem;color:#475569">اضغط لتصوير أو اختيار صورة إيصال التحويل</span>
+        <input type="file" accept="image/*" style="display:none" onchange="pickReceipt(${jsq(docId)},this)">
+      </label>
+      <div id="receipt-preview-${esc(docId)}" style="margin-top:10px"></div>
+      <button type="button" id="dep-btn-${esc(docId)}" class="btn btn-green" disabled style="width:100%;justify-content:center;padding:13px;margin-top:10px;opacity:.5" onclick="submitDeposit(${jsq(docId)})">✓ تم دفع العربون — إرسال للإدارة</button>
     </div>` : "";
+    const sentBlock = isSent && getReceiptUrl(b) ? `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px;margin-bottom:12px;font-size:.85rem;color:#9a3412">✓ تم استلام إيصال العربون وسيقوم الأدمن بمراجعته وتأكيد حجزك قريباً.<br><img src="${esc(getReceiptUrl(b))}" alt="إيصال" style="margin-top:8px;max-width:100%;max-height:140px;border-radius:10px;border:1px solid #e2e8f0"></div>` : "";
     return `<div class="panel" style="border-radius:18px;padding:18px">
     ${statusBanner}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
       <div>
         <div style="font-size:.78rem;color:#64748b">رقم كود الحجز</div>
-        <div style="font-size:1.5rem;font-weight:800;letter-spacing:1px;color:#2563eb">${b.code}</div>
+        <div style="font-size:1.5rem;font-weight:800;letter-spacing:1px;color:#2563eb">${esc(b.code)}</div>
       </div>
-      <button type="button" class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText('${b.code}').then(()=>toast('تم نسخ الكود','ok'))">📋 نسخ الرقم</button>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(${jsq(b.code)}).then(()=>toast('تم نسخ الكود','ok'))">📋 نسخ الرقم</button>
     </div>
+    ${noticeBlock}
     ${payBlock}
+    ${sentBlock}
     ${isOk ? `<div style="background:#ecfdf5;border-radius:12px;padding:12px;margin-bottom:12px;color:#047857">
       <div style="font-weight:800;margin-bottom:8px">✓ حجزك مؤكد</div>
-      ${b.driver ? `<div style="margin-bottom:6px">السائق: <b>${b.driver}</b>${b.driverPhone ? ` — <a href="tel:${b.driverPhone}">${b.driverPhone}</a> · <a href="${waHref(b.driverPhone)}" target="_blank">واتساب</a>` : ""}</div>` : `<div style="color:#64748b;margin-bottom:6px">السائق سيُحدد قريباً</div>`}
-      ${(b.carModel || b.car) ? `<div>السيارة: <b>${b.carCategory || ""} ${b.carModel || b.car || ""}</b></div>` : ""}
-      ${b.carImage ? `<img src="${b.carImage}" alt="سيارة" style="margin-top:8px;max-width:100%;max-height:140px;border-radius:12px;object-fit:cover">` : ""}
+      ${b.driver ? `<div style="margin-bottom:6px">السائق: <b>${esc(b.driver)}</b>${b.driverPhone ? ` — <a href="tel:${esc(b.driverPhone)}">${esc(b.driverPhone)}</a> · <a href="${esc(waHref(b.driverPhone))}" target="_blank">واتساب</a>` : ""}</div>` : `<div style="color:#64748b;margin-bottom:6px">السائق سيُحدد قريباً</div>`}
+      ${(b.carModel || b.car) ? `<div>السيارة: <b>${esc(b.carCategory || "")} ${esc(b.carModel || b.car || "")}</b></div>` : ""}
+      ${b.carImage ? `<img src="${esc(safeImg(b.carImage))}" alt="سيارة" style="margin-top:8px;max-width:100%;max-height:140px;border-radius:12px;object-fit:cover">` : ""}
     </div>` : ""}
     ${b.supervisorPhone ? `<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px;margin-bottom:12px;color:#166534">
       <div style="font-weight:800;margin-bottom:6px">👤 مشرف المتابعة</div>
-      <div>${b.supervisorName ? `<b>${b.supervisorName}</b> — ` : ""}<a href="tel:${b.supervisorPhone}">${b.supervisorPhone}</a>
-      · <a href="${waHref(b.supervisorPhone)}" target="_blank" style="color:#16a34a;font-weight:700">💬 واتساب المشرف</a></div>
+      <div>${b.supervisorName ? `<b>${esc(b.supervisorName)}</b> — ` : ""}<a href="tel:${esc(b.supervisorPhone)}">${esc(b.supervisorPhone)}</a>
+      · <a href="${esc(waHref(b.supervisorPhone))}" target="_blank" style="color:#16a34a;font-weight:700">💬 واتساب المشرف</a></div>
     </div>` : ""}
     ${(b.passengerNotes || b.paymentNotes) ? `<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px;margin-bottom:12px;font-size:.88rem;color:#1e40af">
-      <b>تعليمات الإدارة:</b><br>${b.passengerNotes || ""}${b.passengerNotes && b.paymentNotes ? "<br>" : ""}${b.paymentNotes || ""}
+      <b>تعليمات الإدارة:</b><br>${esc(b.passengerNotes || "")}${b.passengerNotes && b.paymentNotes ? "<br>" : ""}${esc(b.paymentNotes || "")}
     </div>` : ""}
     <div style="background:#f8fafc;border-radius:12px;padding:14px;margin-bottom:12px">
       <div style="font-weight:700;margin-bottom:8px">تفاصيل الرحلة والراكب</div>
       <div class="card-meta" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <div><span style="color:#94a3b8">اسم الراكب</span><br><b>${b.name || "-"}</b></div>
-        <div><span style="color:#94a3b8">رقم الهاتف</span><br><b>${b.phone || "-"}</b></div>
-        <div><span style="color:#94a3b8">خط السير</span><br><b>${b.tripName || ((b.from || "") + " ← " + (b.to || "")) || "-"}</b></div>
-        ${b.tripDate ? `<div><span style="color:#94a3b8">تاريخ الرحلة</span><br><b>📅 ${tripDateLabel(b.tripDate)}</b></div>` : ""}
-        <div><span style="color:#94a3b8">عدد المقاعد</span><br><b>${b.seats || 1} فرد</b></div>
-        ${b.date ? `<div><span style="color:#94a3b8">الموعد</span><br><b>${b.date}${b.dateReturn ? " → " + b.dateReturn : ""}</b></div>` : ""}
-        ${(b.carModel || b.car) ? `<div><span style="color:#94a3b8">السيارة</span><br><b>${b.carCategory || ""} ${b.carModel || b.car}</b></div>` : ""}
-        ${b.price ? `<div><span style="color:#94a3b8">السعر</span><br><b>${b.price} ج.م</b></div>` : ""}
-        ${b.deposit ? `<div><span style="color:#94a3b8">العربون</span><br><b>${b.deposit} ج.م</b></div>` : ""}
+        <div><span style="color:#94a3b8">اسم الراكب</span><br><b>${esc(b.name || "-")}</b></div>
+        <div><span style="color:#94a3b8">رقم الهاتف</span><br><b>${esc(b.phone || "-")}</b></div>
+        <div><span style="color:#94a3b8">خط السير</span><br><b>${esc(b.tripName || ((b.from || "") + " ← " + (b.to || "")) || "-")}</b></div>
+        ${b.tripDate ? `<div><span style="color:#94a3b8">تاريخ الرحلة</span><br><b>📅 ${esc(tripDateLabel(b.tripDate))}</b></div>` : ""}
+        <div><span style="color:#94a3b8">عدد المقاعد</span><br><b>${esc(b.seats || 1)} فرد</b></div>
+        ${b.date ? `<div><span style="color:#94a3b8">الموعد</span><br><b>${esc(b.date)}${esc(b.dateReturn ? " → " + b.dateReturn : "")}</b></div>` : ""}
+        ${(b.carModel || b.car) ? `<div><span style="color:#94a3b8">السيارة</span><br><b>${esc(b.carCategory || "")} ${esc(b.carModel || b.car)}</b></div>` : ""}
+        ${b.price ? `<div><span style="color:#94a3b8">السعر</span><br><b>${esc(b.price)} ج.م</b></div>` : ""}
+        ${b.deposit ? `<div><span style="color:#94a3b8">العربون</span><br><b>${esc(b.deposit)} ج.م</b></div>` : ""}
       </div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      ${!isCancel && !isOk ? `<button type="button" class="btn btn-ghost" style="flex:1;justify-content:center;color:#dc2626;border:1px solid #fecaca" onclick="cancelMyBooking('${docId}')">✕ إلغاء هذا الطلب</button>` : ""}
-      <a class="btn btn-ghost" style="flex:1;justify-content:center" href="${waHref((pay.phone || ""), "استفسار عن الحجز " + b.code)}" target="_blank">💬 دعم الإدارة</a>
-      <button type="button" class="btn btn-ghost" style="flex:1;justify-content:center" onclick="shareBookingWA('${b.code}','${b.name || ""}')">↗ مشاركة الكود عبر واتساب</button>
+      ${!isCancel && !isOk ? `<button type="button" class="btn btn-ghost" style="flex:1;justify-content:center;color:#dc2626;border:1px solid #fecaca" onclick="cancelMyBooking(${jsq(docId)})">✕ إلغاء هذا الطلب</button>` : ""}
+      <a class="btn btn-ghost" style="flex:1;justify-content:center" href="${esc(waHref((pay.phone || ""), "استفسار عن الحجز " + b.code))}" target="_blank">💬 دعم الإدارة</a>
+      <button type="button" class="btn btn-ghost" style="flex:1;justify-content:center" onclick="shareBookingWA(${jsq(b.code)},${jsq(b.name || "")})">↗ مشاركة الكود عبر واتساب</button>
     </div>
   </div>`;
 }
@@ -2231,70 +2248,65 @@ window.trackBooking = async function () {
         box.innerHTML = '<div style="color:#dc2626;padding:14px">خطأ في البحث</div>';
     }
 };
-window.confirmDeposit = async function (id) {
-    try {
-        const snap = await getDoc(doc(db, "bookings", id));
-        if (!snap.exists())
-            return toast("الحجز غير موجود", "err");
-        const b = snap.data();
-        if (b.status === "cancelled")
-            return toast("الحجز ملغي", "err");
-        if (!(Number(b.price) > 0))
-            return toast("السعر لم يُحدد بعد من الإدارة", "err");
-        await updateDoc(doc(db, "bookings", id), {
-            customer_confirmed: true,
-            customerConfirmed: true,
-            customer_confirmed_at: new Date().toISOString(),
-            status: b.status === "pending" ? "payment_pending" : (b.status || "payment_pending"),
-            updatedAt: new Date().toISOString()
-        });
-        toast("تم تسجيل موافقتك — يمكنك الآن رفع صورة الإيصال", "ok");
-        trackBooking();
-    }
-    catch (e) {
-        toast("خطأ", "err");
-    }
-};
-window.uploadReceipt = async function (id, input) {
+window._rcptData = {};
+window.pickReceipt = function (id, input) {
     const file = input.files && input.files[0];
     if (!file)
         return;
     if (!file.type.startsWith("image/"))
         return toast("الملف يجب أن يكون صورة", "err");
-    if (file.size > 3 * 1024 * 1024)
-        return toast("الصورة كبيرة — أقل من 3 ميجا", "err");
+    compressImage(file, 1000, 0.7).then(function (dataUrl) {
+        if (dataUrl.length > 900000)
+            return toast("الصورة كبيرة جداً — صوّر الإيصال بدقة أقل", "err");
+        window._rcptData[id] = dataUrl;
+        const prev = document.getElementById("receipt-preview-" + id);
+        if (prev)
+            prev.innerHTML = `<img src="${dataUrl}" style="max-width:100%;max-height:180px;border-radius:12px;border:1px solid #e2e8f0"><div style="color:#047857;font-size:.82rem;margin-top:6px;font-weight:600">تم اختيار الصورة — اضغط «تم دفع العربون» للإرسال</div>`;
+        const btn = document.getElementById("dep-btn-" + id);
+        if (btn) {
+            btn.disabled = false;
+            btn.style.opacity = "1";
+        }
+    }).catch(function () { toast("تعذر قراءة الصورة", "err"); });
+};
+window.submitDeposit = async function (id) {
+    const dataUrl = window._rcptData[id];
+    if (!dataUrl)
+        return toast("ارفع صورة إيصال التحويل أولاً", "err");
     try {
         const snap = await getDoc(doc(db, "bookings", id));
         if (!snap.exists())
             return toast("الحجز غير موجود", "err");
         const b = snap.data();
         if (b.status === "cancelled")
-            return toast("لا يمكن رفع إيصال لحجز ملغي", "err");
-        if (!(b.customer_confirmed || b.customerConfirmed))
-            return toast("يجب الموافقة على السعر أولاً قبل رفع الإيصال", "err");
+            return toast("لا يمكن إرسال عربون لحجز ملغي", "err");
+        if (b.status === "confirmed")
+            return toast("الحجز مؤكد بالفعل", "ok");
+        if (!(Number(b.price) > 0))
+            return toast("السعر لم يُحدد بعد من الإدارة", "err");
+        if (!confirm("تأكيد أنك قمت بتحويل العربون وإرسال صورة الإيصال للإدارة؟"))
+            return;
+        await updateDoc(doc(db, "bookings", id), {
+            receipt: dataUrl,
+            payment_proof: dataUrl,
+            customer_confirmed: true,
+            customerConfirmed: true,
+            customer_confirmed_at: new Date().toISOString(),
+            depositSentAt: new Date().toISOString(),
+            status: "payment", // بانتظار تأكيد الأدمن
+            updatedAt: new Date().toISOString()
+        });
+        delete window._rcptData[id];
+        toast("تم إرسال العربون — بانتظار تأكيد الإدارة", "ok");
+        if (currentUser && typeof loadMyBookings === "function")
+            loadMyBookings();
+        else
+            trackBooking();
     }
-    catch (e) { }
-    const reader = new FileReader();
-    reader.onload = async function (e) {
-        const dataUrl = e.target.result;
-        try {
-            // نخزن في receipt و payment_proof للتوافق — يُفضّل لاحقاً Firebase Storage
-            await updateDoc(doc(db, "bookings", id), {
-                receipt: dataUrl,
-                payment_proof: dataUrl,
-                status: "payment", // بانتظار مراجعة الدفع من الإدارة — ليس تأكيداً نهائياً
-                updatedAt: new Date().toISOString()
-            });
-            const prev = document.getElementById("receipt-preview-" + id);
-            if (prev)
-                prev.innerHTML = `<img src="${dataUrl}" style="max-width:100%;max-height:180px;border-radius:12px;margin-top:8px;border:1px solid #e2e8f0"><div style="color:#059669;font-size:.85rem;margin-top:6px;font-weight:600">✓ تم رفع الإيصال — بانتظار مراجعة الإدارة</div>`;
-            toast("تم رفع الإيصال — بانتظار اعتماد الإدارة", "ok");
-        }
-        catch (err) {
-            toast("تعذر حفظ الإيصال", "err");
-        }
-    };
-    reader.readAsDataURL(file);
+    catch (e) {
+        console.error(e);
+        toast("تعذر إرسال الإيصال — تحقق من الاتصال", "err");
+    }
 };
 window.cancelMyBooking = async function (id) {
     var _a, _b;
@@ -2410,9 +2422,6 @@ window.importBackup = async function (input) {
         toast("ملف النسخة غير صالح", "err");
     }
 };
-window.resetDemoData = async function () {
-    return restoreDemoData();
-};
 async function deleteCollectionDocs(colName) {
     const snap = await getDocs(collection(db, colName));
     const batchSize = 40;
@@ -2439,33 +2448,12 @@ window.clearAllDemoData = async function () {
         cars = [];
         supervisors = [];
         allAdminBookings = [];
-        try { localStorage.setItem("aman_skip_demo_seed", "1"); } catch (e) {}
         toast("تم الحذف: حجوزات " + n1 + " · رحلات " + n2 + " · سائقين " + n3 + " · سيارات " + n4 + " · مشرفين " + n5, "ok");
         setTimeout(() => location.reload(), 800);
     }
     catch (e) {
         console.error(e);
         toast("تعذر حذف بعض البيانات — تحقق من صلاحيات Firestore", "err");
-    }
-};
-window.restoreDemoData = async function () {
-    if (!confirm("استعادة البيانات التجريبية الافتراضية (رحلات + سائقين + سيارات)؟\nلن تُحذف الحجوزات الحالية تلقائياً."))
-        return;
-    if (!confirm("تأكيد: زرع البيانات التجريبية الآن؟"))
-        return;
-    try {
-        toast("جاري الاستعادة...", "ok");
-        // أعد زرع الرحلات/السائقين/السيارات دائماً كنسخ تجريبية جديدة
-        await Promise.all(DEFAULT_TRIPS.map(t => addDoc(collection(db, "trips"), Object.assign({}, t)).catch(() => { })));
-        await Promise.all(DEFAULT_DRIVERS.map(d => addDoc(collection(db, "drivers"), Object.assign({}, d)).catch(() => { })));
-        await Promise.all(DEFAULT_CARS.map(c => addDoc(collection(db, "cars"), Object.assign({}, c)).catch(() => { })));
-        try { localStorage.removeItem("aman_skip_demo_seed"); } catch (e) {}
-        toast("تمت استعادة البيانات التجريبية", "ok");
-        setTimeout(() => location.reload(), 800);
-    }
-    catch (e) {
-        console.error(e);
-        toast("تعذر الاستعادة — تحقق من صلاحيات Firestore", "err");
     }
 };
 // ========== STAFF LOGIN ==========
@@ -2487,8 +2475,8 @@ window.staffLogin = async function () {
             ok = h === found.passwordHash;
         }
         else {
-            // ترحيل قديم: 1234 فقط كقيمة افتراضية للسائقين بلا كلمة مرور مخزنة — يُنصح بتحديثها
-            ok = pass === "1234";
+            toast("لا توجد كلمة مرور لهذا الحساب — اطلب من الأدمن تعيينها من بيانات السائق", "err");
+            return;
         }
         if (!ok) {
             toast("كلمة المرور غير صحيحة", "err");
@@ -2516,8 +2504,20 @@ window.toggleSidebar = function (force) {
 };
 window.logoutAdmin = function () {
     document.getElementById("view-admin").classList.add("hidden");
-    document.getElementById("view-customer").classList.remove("hidden");
     toggleSidebar(false);
+    enterAppAsCustomer();
+};
+window.adminSignOut = async function () {
+    try {
+        await signOut(auth);
+    }
+    catch (e) { }
+    currentUser = null;
+    isGuest = false;
+    document.getElementById("view-admin").classList.add("hidden");
+    toggleSidebar(false);
+    showAuthScreen();
+    toast("تم تسجيل الخروج", "ok");
 };
 window.adminTab = function (tab) {
     document.querySelectorAll("#admin-side .side-link[data-tab]").forEach(el => el.classList.toggle("active", el.dataset.tab === tab));
@@ -2664,19 +2664,20 @@ function renderDashBookings(list, filter) {
         const st = b.status || "pending";
         const stLabel = st === "confirmed" ? "مؤكد" : st === "cancelled" ? "ملغي" : (st === "payment" || st === "payment_pending") ? "بانتظار دفع" : "انتظار";
         const id = b.id || b.firestoreId || "";
-        return `<div class="admin-trip bk bk-${st}">
+        return `<div class="admin-trip bk bk-${esc(st)}">
       <div class="top-row" style="margin-bottom:0">
         <div>
-          <div class="card-title">${b.code || "-"} — ${b.name || ""}</div>
-          <div class="card-meta">${b.tripName || ((b.from || "") + " ← " + (b.to || "")) || "-"}${b.tripDate ? " · 📅 " + tripDateLabel(b.tripDate) : ""} · ${b.phone || ""} · مقاعد: ${b.seats || 1}${b.supervisorName ? " · 👤 " + b.supervisorName : ""}</div>
+          <div class="card-title">${esc(b.code || "-")} — ${esc(b.name || "")}</div>
+          <div class="card-meta">${esc(b.tripName || ((b.from || "") + " ← " + (b.to || "")) || "-")}${esc(b.tripDate ? " · 📅 " + tripDateLabel(b.tripDate) : "")} · ${esc(b.phone || "")} · مقاعد: ${esc(b.seats || 1)}${esc(b.supervisorName ? " · 👤 " + b.supervisorName : "")}</div>
         </div>
-        <span class="status st-${st}">${stLabel}</span>
+        <span class="status st-${esc(st)}">${stLabel}</span>
       </div>
       <div class="actions-bot" style="margin-top:10px">
-        <button type="button" class="btn btn-indigo btn-sm" onclick="manageBooking('${id}')">إدارة / تعيين</button>
-        ${st !== "confirmed" && st !== "cancelled" ? `<button type="button" class="btn btn-green btn-sm" onclick="updStatus('${id}','confirmed')">✓ تأكيد</button>` : ""}
-        ${st !== "cancelled" ? `<button type="button" class="btn btn-ghost btn-sm" style="color:#dc2626" onclick="updStatus('${id}','cancelled')">إلغاء</button>` : ""}
-        ${b.phone ? `<a class="btn btn-ghost btn-sm" href="${waHref(b.phone)}" target="_blank">💬 واتساب</a>` : ""}
+        <button type="button" class="btn btn-indigo btn-sm" onclick="manageBooking(${jsq(id)})">إدارة / تعيين</button>
+        ${st !== "confirmed" && st !== "cancelled" ? `<button type="button" class="btn btn-green btn-sm" onclick="updStatus(${jsq(id)},'confirmed')">✓ تأكيد</button>` : ""}
+        ${st !== "cancelled" ? `<button type="button" class="btn btn-ghost btn-sm" style="color:#dc2626" onclick="updStatus(${jsq(id)},'cancelled')">إلغاء</button>` : ""}
+        ${needsDepositReminder(b) && b.phone ? `<button type="button" class="btn btn-ghost btn-sm" style="color:#c2410c;border-color:#fed7aa;background:#fff7ed" onclick="remindDeposit(${jsq(id)})">🔔 تذكير بالعربون${b.reminderCount ? " (" + b.reminderCount + ")" : ""}</button>` : ""}
+        ${b.phone ? `<a class="btn btn-ghost btn-sm" href="${esc(waHref(b.phone))}" target="_blank">💬 واتساب</a>` : ""}
       </div>
     </div>`;
     }).join("");
@@ -2693,9 +2694,9 @@ function renderDashTrips() {
         return `<div class="admin-trip" id="dtrip-${i}">
       <div class="top-row" onclick="toggleAdminTripFold(${i}, this)">
         <div>
-          <div class="card-title" style="font-size:1rem">${t.name || ((t.from || "") + " ↔ " + (t.to || ""))}</div>
-          <div class="card-meta">🕐 ${formatTripClock(t)} · 💰 ${t.price || 0} ج.م · سعة: ${t.seats || "-"}
-          ${formatTripSchedule(t) ? " · 📅 " + formatTripSchedule(t) : ""}${t.driver ? " · 👨‍✈️ " + t.driver : ""}${t.supervisorName ? " · 👤 مشرف: " + t.supervisorName : ""}</div>
+          <div class="card-title" style="font-size:1rem">${esc(t.name || ((t.from || "") + " ↔ " + (t.to || "")))}</div>
+          <div class="card-meta">🕐 ${esc(formatTripClock(t))} · 💰 ${esc(t.price || 0)} ج.م · سعة: ${esc(t.seats || "-")}
+          ${esc(formatTripSchedule(t) ? " · 📅 " + formatTripSchedule(t) : "")}${esc(t.driver ? " · 👨‍✈️ " + t.driver : "")}${esc(t.supervisorName ? " · 👤 مشرف: " + t.supervisorName : "")}</div>
           ${seatsInfoHtml(t)}
           <div class="fold-hint"><span class="fh-chev" style="display:inline-block;transition:.2s">▼</span> اضغط لإظهار الإجراءات</div>
         </div>
@@ -2712,6 +2713,30 @@ function renderDashTrips() {
     </div>`;
     }).join("");
 }
+window.remindDeposit = async function (id) {
+    const b = (allAdminBookings || []).find(x => x.id === id);
+    if (!b)
+        return toast("الحجز غير محمّل — أعد فتح القائمة", "err");
+    if (!b.phone)
+        return toast("لا يوجد رقم هاتف للعميل", "err");
+    const pay = paySettings();
+    const dep = Number(b.deposit) > 0 ? b.deposit + " ج.م" : "المبلغ الذي حددته الإدارة";
+    const link = location.origin + location.pathname + "?track=" + encodeURIComponent(b.code);
+    const txt = "مرحباً " + (b.name || "") + "،\nتذكير بخصوص حجزك رقم " + b.code
+        + (b.tripName ? " (" + b.tripName + (b.tripDate ? " - " + tripDateLabel(b.tripDate) : "") + ")" : "")
+        + ".\nلتأكيد الحجز برجاء تحويل العربون (" + dep + ") على:\n• إنستاباي: " + (pay.instapay || "-")
+        + "\n• فودافون كاش: " + (pay.vodafone || "-")
+        + "\nثم افتح الرابط التالي وارفع صورة التحويل واضغط (تم دفع العربون):\n" + link;
+    window.open(waHref(b.phone, txt), "_blank");
+    try {
+        const n = (Number(b.reminderCount) || 0) + 1;
+        await updateDoc(doc(db, "bookings", id), { reminderCount: n, lastReminderAt: new Date().toISOString() });
+        b.reminderCount = n;
+        if (typeof renderFilteredBookings === "function")
+            renderFilteredBookings();
+    }
+    catch (e) { }
+};
 window.manageBooking = async function (id) {
     if (!id) return toast("معرف الحجز غير صالح", "err");
     try {
@@ -2777,31 +2802,32 @@ function renderFilteredBookings() {
     }
     box.innerHTML = list.map(b => {
         const isPriv = b.type === "private";
-        return `<div class="admin-trip bk bk-${b.status || "pending"}">
+        return `<div class="admin-trip bk bk-${esc(b.status || "pending")}">
       <div class="top-row">
         <div style="text-align:left">
           <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-wrap:wrap">
-            <span class="badge-pill ${b.status === "confirmed" ? "badge-open" : b.status === "cancelled" ? "badge-closed" : "badge-active"}">${statusLabel(b.status)}</span>
-            <b style="font-size:1rem;color:#2563eb">${b.code}</b>
+            <span class="badge-pill ${esc(b.status === "confirmed" ? "badge-open" : b.status === "cancelled" ? "badge-closed" : "badge-active")}">${esc(statusLabel(b.status))}</span>
+            <b style="font-size:1rem;color:#2563eb">${esc(b.code)}</b>
           </div>
-          <div style="font-weight:800;font-size:1.05rem;margin-top:4px">${b.name}</div>
-          <div class="card-meta">${b.phone}</div>
+          <div style="font-weight:800;font-size:1.05rem;margin-top:4px">${esc(b.name)}</div>
+          <div class="card-meta">${esc(b.phone)}</div>
         </div>
         <div style="text-align:right">
-          <div class="card-meta">${isPriv ? "سيارة خاصة" : ((b.seats || 1) + " فرد")}</div>
+          <div class="card-meta">${esc(isPriv ? "سيارة خاصة" : ((b.seats || 1) + " فرد"))}</div>
           <div class="card-meta" style="font-size:.75rem">${b.createdAt ? new Date(b.createdAt).toLocaleString("ar-EG") : ""}</div>
         </div>
       </div>
       <div class="card-meta" style="margin-bottom:10px;text-align:left">
-        ${b.tripName || ""}${b.tripDate ? " · 📅 " + tripDateLabel(b.tripDate) : ""}${(b.tripName && b.from) ? " · " : ""}${b.from ? (b.from + " ← " + b.to) : ""}
-        ${b.price ? " · " + b.price + " ج.م" : ""}${b.deposit ? " · عربون " + b.deposit + " ج" : ""}${b.driver ? " · سائق: " + b.driver : ""}
-        ${b.notes ? "<br>📝 " + b.notes : ""}
-        ${getReceiptUrl(b) ? `<div style="margin-top:8px"><a href="${getReceiptUrl(b)}" target="_blank"><img src="${getReceiptUrl(b)}" alt="إيصال" style="max-height:80px;border-radius:8px;border:1px solid #e2e8f0"></a> <span style="color:#059669;font-size:.78rem">إيصال مرفوع</span></div>` : ""}
+        ${esc(b.tripName || "")}${esc(b.tripDate ? " · 📅 " + tripDateLabel(b.tripDate) : "")}${esc((b.tripName && b.from) ? " · " : "")}${esc(b.from ? (b.from + " ← " + b.to) : "")}
+        ${esc(b.price ? " · " + b.price + " ج.م" : "")}${esc(b.deposit ? " · عربون " + b.deposit + " ج" : "")}${esc(b.driver ? " · سائق: " + b.driver : "")}
+        ${b.notes ? "<br>📝 " + esc(b.notes) : ""}
+        ${getReceiptUrl(b) ? `<div style="margin-top:8px"><a href="${esc(getReceiptUrl(b))}" target="_blank"><img src="${esc(getReceiptUrl(b))}" alt="إيصال" style="max-height:80px;border-radius:8px;border:1px solid #e2e8f0"></a> <span style="color:#059669;font-size:.78rem">إيصال مرفوع</span></div>` : ""}
       </div>
       <div class="actions-bot" style="justify-content:stretch;gap:8px">
-        <a class="icon-btn" href="${waHref(b.phone)}" target="_blank" title="واتساب">💬</a>
-        ${b.status !== "cancelled" ? `<button type="button" class="btn-seat-rem" style="color:#dc2626;border-color:#fecaca" onclick="updStatus('${b.id}','cancelled')">✕ إلغاء</button>` : ""}
-        <button type="button" class="btn btn-indigo" style="flex:1;justify-content:center;padding:10px" onclick="manageBooking('${b.id}')">🔄 تحديث الحالة وتعيين السائق</button>
+        <a class="icon-btn" href="${esc(waHref(b.phone))}" target="_blank" title="واتساب">💬</a>
+        ${needsDepositReminder(b) ? `<button type="button" class="btn-seat-rem" style="color:#c2410c;border-color:#fed7aa;background:#fff7ed" onclick="remindDeposit(${jsq(b.id)})">🔔 تذكير بالعربون${b.reminderCount ? " (" + b.reminderCount + ")" : ""}</button>` : ""}
+        ${b.status !== "cancelled" ? `<button type="button" class="btn-seat-rem" style="color:#dc2626;border-color:#fecaca" onclick="updStatus(${jsq(b.id)},'cancelled')">✕ إلغاء</button>` : ""}
+        <button type="button" class="btn btn-indigo" style="flex:1;justify-content:center;padding:10px" onclick="manageBooking(${jsq(b.id)})">🔄 تحديث الحالة وتعيين السائق</button>
       </div>
     </div>`;
     }).join("");
@@ -2859,25 +2885,25 @@ window.openStatusDriver = function (id) {
         toast("الحجز غير محمّل — أعد فتح القائمة", "err");
         return;
     }
-    const drvOpts = drivers.map(d => `<option value="${d.name}" data-id="${d.firestoreId || d.id || ""}" data-phone="${d.phone || ""}" ${b.driver === d.name ? "selected" : ""}>${d.name} — ${d.phone || ""}</option>`).join("");
-    const carOpts = cars.map(c => `<option value="${c.model}" data-id="${c.firestoreId || c.id || ""}" data-cat="${c.category || ""}" data-img="${(c.image || "").replace(/"/g, "&quot;")}" ${b.carModel === c.model || b.car === c.model ? "selected" : ""}>${c.category ? c.category + " · " : ""}${c.model}</option>`).join("");
-    const svOpts = supervisors.map(s => `<option value="${s.id || s.firestoreId || s.name}" data-name="${s.name || ""}" data-phone="${s.phone || ""}" ${(b.supervisorId === (s.id || s.firestoreId) || b.supervisorName === s.name) ? "selected" : ""}>${s.name} — ${s.phone || ""}</option>`).join("");
+    const drvOpts = drivers.map(d => `<option value="${esc(d.name)}" data-id="${esc(d.firestoreId || d.id || "")}" data-phone="${esc(d.phone || "")}" ${esc(b.driver === d.name ? "selected" : "")}>${esc(d.name)} — ${esc(d.phone || "")}</option>`).join("");
+    const carOpts = cars.map(c => `<option value="${esc(c.model)}" data-id="${esc(c.firestoreId || c.id || "")}" data-cat="${esc(c.category || "")}" data-img="${esc(c.image || "")}" ${esc(b.carModel === c.model || b.car === c.model ? "selected" : "")}>${esc(c.category ? c.category + " · " : "")}${esc(c.model)}</option>`).join("");
+    const svOpts = supervisors.map(s => `<option value="${esc(s.id || s.firestoreId || s.name)}" data-name="${esc(s.name || "")}" data-phone="${esc(s.phone || "")}" ${esc((b.supervisorId === (s.id || s.firestoreId) || b.supervisorName === s.name) ? "selected" : "")}>${esc(s.name)} — ${esc(s.phone || "")}</option>`).join("");
     const receipt = getReceiptUrl(b);
     document.getElementById("form-title").textContent = "تحديث الحجز — " + b.code;
     document.getElementById("form-body").innerHTML = `
     <div class="fg"><label>الحالة</label>
       <select id="sd-status">
-        <option value="pending" ${b.status === "pending" ? "selected" : ""}>طلب جديد / انتظار مراجعة</option>
-        <option value="payment_pending" ${b.status === "payment_pending" || b.status === "payment" ? "selected" : ""}>بانتظار موافقة الراكب / العربون</option>
-        <option value="confirmed" ${b.status === "confirmed" ? "selected" : ""}>مؤكدة</option>
-        <option value="cancelled" ${b.status === "cancelled" ? "selected" : ""}>ملغية</option>
+        <option value="pending" ${esc(b.status === "pending" ? "selected" : "")}>طلب جديد / انتظار مراجعة</option>
+        <option value="payment_pending" ${esc(b.status === "payment_pending" || b.status === "payment" ? "selected" : "")}>بانتظار موافقة الراكب / العربون</option>
+        <option value="confirmed" ${esc(b.status === "confirmed" ? "selected" : "")}>مؤكدة</option>
+        <option value="cancelled" ${esc(b.status === "cancelled" ? "selected" : "")}>ملغية</option>
       </select>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="fg" style="margin:0"><label>السعر (ج)</label><input id="sd-price" type="number" min="0" value="${(_a = b.price) !== null && _a !== void 0 ? _a : ""}" placeholder=""></div>
-      <div class="fg" style="margin:0"><label>العربون (ج)</label><input id="sd-deposit" type="number" min="0" value="${(_b = b.deposit) !== null && _b !== void 0 ? _b : ""}" placeholder=""></div>
+      <div class="fg" style="margin:0"><label>السعر (ج)</label><input id="sd-price" type="number" min="0" value="${esc((_a = b.price) !== null && _a !== void 0 ? _a : "")}" placeholder=""></div>
+      <div class="fg" style="margin:0"><label>العربون (ج)</label><input id="sd-deposit" type="number" min="0" value="${esc((_b = b.deposit) !== null && _b !== void 0 ? _b : "")}" placeholder=""></div>
     </div>
-    <div class="fg"><label>تعليمات الدفع</label><textarea id="sd-pay-notes" rows="2" placeholder="">${b.paymentNotes || b.payNotes || ""}</textarea></div>
+    <div class="fg"><label>تعليمات الدفع</label><textarea id="sd-pay-notes" rows="2" placeholder="">${esc(b.paymentNotes || b.payNotes || "")}</textarea></div>
     <div class="fg"><label>تعيين سائق</label>
       <select id="sd-driver"><option value="">— بدون —</option>${drvOpts}</select>
     </div>
@@ -2887,15 +2913,15 @@ window.openStatusDriver = function (id) {
     <div class="fg"><label>تعيين سيارة</label>
       <select id="sd-car"><option value="">— بدون —</option>${carOpts}</select>
     </div>
-    <div class="fg"><label>ملاحظات للراكب</label><input id="sd-notes-public" value="${b.passengerNotes || ""}" placeholder=""></div>
-    <div class="fg"><label>ملاحظات داخلية</label><input id="sd-notes" value="${b.adminNotes || ""}" placeholder=""></div>
+    <div class="fg"><label>ملاحظات للراكب</label><input id="sd-notes-public" value="${esc(b.passengerNotes || "")}" placeholder=""></div>
+    <div class="fg"><label>ملاحظات داخلية</label><input id="sd-notes" value="${esc(b.adminNotes || "")}" placeholder=""></div>
     ${receipt ? `<div class="fg"><label>إيصال الدفع المرفوع</label>
-      <a href="${receipt}" target="_blank"><img src="${receipt}" alt="إيصال" style="max-width:100%;max-height:160px;border-radius:12px;border:1px solid #e2e8f0"></a>
+      <a href="${esc(receipt)}" target="_blank"><img src="${esc(receipt)}" alt="إيصال" style="max-width:100%;max-height:160px;border-radius:12px;border:1px solid #e2e8f0"></a>
       <div style="font-size:.8rem;color:#64748b;margin-top:4px">اضغط الصورة لفتحها بحجم أكبر</div>
     </div>` : `<div class="fg" style="background:#f8fafc;padding:10px;border-radius:10px;font-size:.85rem;color:#64748b">لم يُرفع إيصال بعد</div>`}
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-      <a class="btn btn-green btn-sm" target="_blank" href="${waHref((b.phone || ""), "مرحباً " + (b.name || "") + "، بخصوص حجزك " + b.code + (b.price ? ("\nالسعر الإجمالي: " + b.price + " ج.م") : "") + (b.deposit ? ("\nالعربون: " + b.deposit + " ج.م") : "") + "\nيرجى تأكيد الموافقة ورفع إيصال التحويل من شاشة متابعة الحجز.")}">💬 إرسال السعر/العربون واتساب</a>
-      <a class="btn btn-ghost btn-sm" target="_blank" href="${waHref((b.phone || ""), "تم تأكيد حجزك " + b.code + " بنجاح ✅" + (b.driver ? ("\nالسائق: " + b.driver) : "") + (b.carModel || b.car ? ("\nالسيارة: " + (b.carModel || b.car)) : ""))}">✅ رسالة تأكيد</a>
+      <a class="btn btn-green btn-sm" target="_blank" href="${esc(waHref((b.phone || ""), "مرحباً " + (b.name || "") + "، بخصوص حجزك " + b.code + (b.price ? ("\nالسعر الإجمالي: " + b.price + " ج.م") : "") + (b.deposit ? ("\nالعربون: " + b.deposit + " ج.م") : "") + "\nيرجى تأكيد الموافقة ورفع إيصال التحويل من شاشة متابعة الحجز."))}">💬 إرسال السعر/العربون واتساب</a>
+      <a class="btn btn-ghost btn-sm" target="_blank" href="${esc(waHref((b.phone || ""), "تم تأكيد حجزك " + b.code + " بنجاح ✅" + (b.driver ? ("\nالسائق: " + b.driver) : "") + (b.carModel || b.car ? ("\nالسيارة: " + (b.carModel || b.car)) : "")))}">✅ رسالة تأكيد</a>
     </div>`;
     document.getElementById("form-save-btn").onclick = async () => {
         var _a, _b, _c;
@@ -2984,7 +3010,7 @@ window.exportBackup = function () {
 // ========== MANUAL BOOKING (admin) ==========
 window.openManualBooking = function () {
     document.getElementById("form-title").textContent = "إضافة حجز يدوي (خارج التطبيق)";
-    const tripOpts = trips.map(t => `<option value="${t.id}">${t.name || (t.from + " ↔ " + t.to)} </option>`).join("");
+    const tripOpts = trips.map(t => `<option value="${esc(t.id)}">${esc(t.name || (t.from + " ↔ " + t.to))} </option>`).join("");
     document.getElementById("form-body").innerHTML = `
     <div class="fg"><label>الرحلة (اختياري للحجز الخاص)</label>
       <select id="mb-trip"><option value="">— حجز خاص / بدون رحلة —</option>${tripOpts}</select>
@@ -3050,9 +3076,9 @@ function renderAdminTrips() {
         return `<div class="admin-trip" id="atrip-${i}">
       <div class="top-row" onclick="toggleAdminTripFold(${i}, this)">
         <div>
-          <div class="card-title" style="font-size:1.05rem;margin-bottom:6px">${t.name || ((t.from || "") + " ↔ " + (t.to || ""))}</div>
-          <div class="card-meta">🕐 ${formatTripClock(t)} ${t.repeat ? "🔁" : ""} · 💰 ${t.price || 0} ج.م · سعة: ${t.seats || "-"}
-          ${formatTripSchedule(t) ? " · 📅 " + formatTripSchedule(t) : ""}${t.driver ? " · 👨‍✈️ " + t.driver : ""}${t.supervisorName ? " · 👤 مشرف: " + t.supervisorName + (t.supervisorPhone ? " (" + t.supervisorPhone + ")" : "") : ""}</div>
+          <div class="card-title" style="font-size:1.05rem;margin-bottom:6px">${esc(t.name || ((t.from || "") + " ↔ " + (t.to || "")))}</div>
+          <div class="card-meta">🕐 ${esc(formatTripClock(t))} ${t.repeat ? "🔁" : ""} · 💰 ${esc(t.price || 0)} ج.م · سعة: ${esc(t.seats || "-")}
+          ${esc(formatTripSchedule(t) ? " · 📅 " + formatTripSchedule(t) : "")}${esc(t.driver ? " · 👨‍✈️ " + t.driver : "")}${esc(t.supervisorName ? " · 👤 مشرف: " + t.supervisorName + (t.supervisorPhone ? " (" + t.supervisorPhone + ")" : "") : "")}</div>
           ${seatsInfoHtml(t)}
           <div class="fold-hint"><span class="fh-chev" style="display:inline-block;transition:.2s">▼</span> اضغط لإظهار الإجراءات</div>
         </div>
@@ -3110,13 +3136,13 @@ window.editTrip = function (i) {
     openTripForm(t, i);
 };
 function driverOptions(cur) {
-    const o = drivers.map(d => `<option value="${d.name}" data-id="${d.firestoreId || d.id || ""}" data-phone="${d.phone || ""}" ${cur === d.name ? "selected" : ""}>${d.name} — ${d.phone || ""}</option>`).join("");
-    const stale = cur && !drivers.some(d => d.name === cur) ? `<option value="${cur}" selected>⚠ ${cur} (غير مسجّل)</option>` : "";
+    const o = drivers.map(d => `<option value="${esc(d.name)}" data-id="${esc(d.firestoreId || d.id || "")}" data-phone="${esc(d.phone || "")}" ${esc(cur === d.name ? "selected" : "")}>${esc(d.name)} — ${esc(d.phone || "")}</option>`).join("");
+    const stale = cur && !drivers.some(d => d.name === cur) ? `<option value="${esc(cur)}" selected>⚠ ${esc(cur)} (غير مسجّل)</option>` : "";
     return `<option value="">— بدون سائق —</option>${o}${stale}`;
 }
 function carOptions(cur) {
-    const o = cars.map(c => `<option value="${c.model}" data-id="${c.firestoreId || c.id || ""}" data-cap="${Number(c.seats || c.capacity) || 0}" ${cur === c.model ? "selected" : ""}>${c.category ? c.category + " · " : ""}${c.model}${c.plate ? " — " + c.plate : ""}</option>`).join("");
-    const stale = cur && !cars.some(c => c.model === cur) ? `<option value="${cur}" selected>⚠ ${cur} (غير مسجّلة)</option>` : "";
+    const o = cars.map(c => `<option value="${esc(c.model)}" data-id="${esc(c.firestoreId || c.id || "")}" data-cap="${esc(Number(c.seats || c.capacity) || 0)}" ${esc(cur === c.model ? "selected" : "")}>${esc(c.category ? c.category + " · " : "")}${esc(c.model)}${esc(c.plate ? " — " + c.plate : "")}</option>`).join("");
+    const stale = cur && !cars.some(c => c.model === cur) ? `<option value="${esc(cur)}" selected>⚠ ${esc(cur)} (غير مسجّلة)</option>` : "";
     return `<option value="">— بدون سيارة —</option>${o}${stale}`;
 }
 function tripConflict(field, value, timeRaw, days, self) {
@@ -3145,17 +3171,17 @@ window.openTripForm = function (editTrip = null, editIdx = -1) {
     const selectedDays = editTrip ? (editTrip.days || []) : [];
     document.getElementById("form-body").innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="fg" style="margin:0"><label>من *</label><input id="f-from" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.from) || ""}" placeholder=""></div>
-      <div class="fg" style="margin:0"><label>إلى *</label><input id="f-to" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.to) || ""}" placeholder=""></div>
+      <div class="fg" style="margin:0"><label>من *</label><input id="f-from" value="${esc((editTrip === null || editTrip === void 0 ? void 0 : editTrip.from) || "")}" placeholder=""></div>
+      <div class="fg" style="margin:0"><label>إلى *</label><input id="f-to" value="${esc((editTrip === null || editTrip === void 0 ? void 0 : editTrip.to) || "")}" placeholder=""></div>
     </div>
-    <div class="fg" style="margin-top:12px"><label>اسم الرحلة</label><input id="f-name" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.name) || ""}" placeholder=""></div>
-    <div class="fg"><label>محطات إضافية</label><input id="f-stops" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.stops) || ""}" placeholder=""></div>
+    <div class="fg" style="margin-top:12px"><label>اسم الرحلة</label><input id="f-name" value="${esc((editTrip === null || editTrip === void 0 ? void 0 : editTrip.name) || "")}" placeholder=""></div>
+    <div class="fg"><label>محطات إضافية</label><input id="f-stops" value="${esc((editTrip === null || editTrip === void 0 ? void 0 : editTrip.stops) || "")}" placeholder=""></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
-      <div class="fg" style="margin:0"><label>سعر التذكرة للفرد (ج) *</label><input id="f-price" type="number" value="${(_a = editTrip === null || editTrip === void 0 ? void 0 : editTrip.price) !== null && _a !== void 0 ? _a : 150}"></div>
-      <div class="fg" style="margin:0"><label>العربون المطلوب للفرد (ج)</label><input id="f-deposit" type="number" value="${(_b = editTrip === null || editTrip === void 0 ? void 0 : editTrip.deposit) !== null && _b !== void 0 ? _b : 50}"></div>
+      <div class="fg" style="margin:0"><label>سعر التذكرة للفرد (ج) *</label><input id="f-price" type="number" value="${esc((_a = editTrip === null || editTrip === void 0 ? void 0 : editTrip.price) !== null && _a !== void 0 ? _a : 150)}"></div>
+      <div class="fg" style="margin:0"><label>العربون المطلوب للفرد (ج)</label><input id="f-deposit" type="number" value="${esc((_b = editTrip === null || editTrip === void 0 ? void 0 : editTrip.deposit) !== null && _b !== void 0 ? _b : 50)}"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="fg" style="margin:0"><label>سعة الرحلة (للأدمن فقط) *</label><input id="f-seats" type="number" value="${(_c = editTrip === null || editTrip === void 0 ? void 0 : editTrip.seats) !== null && _c !== void 0 ? _c : 4}"></div>
+      <div class="fg" style="margin:0"><label>سعة الرحلة (للأدمن فقط) *</label><input id="f-seats" type="number" value="${esc((_c = editTrip === null || editTrip === void 0 ? void 0 : editTrip.seats) !== null && _c !== void 0 ? _c : 4)}"></div>
       <div class="fg" style="margin:0;font-size:.78rem;color:#64748b;display:flex;align-items:flex-end">لا يظهر عدد المقاعد للراكب — يُحسب لك من الحجوزات المدفوع عربونها.</div>
     </div>
     <div class="fg"><label>جدول أيام الأسبوع</label>
@@ -3174,17 +3200,17 @@ window.openTripForm = function (editTrip = null, editIdx = -1) {
         <span>تكرار أسبوعي ثابت لهذه الرحلة<br><small style="font-weight:400;color:#64748b">تتكرر الرحلة تلقائياً كل أسبوع</small></span>
       </label>
     </div>
-    <div class="fg"><label>موعد وساعة التحرك</label><input id="f-time" type="time" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.timeRaw) || "07:30"}"></div>
-    <div class="fg"><label>نص الموعد المعروض (يمكن تعديله يدوياً)</label><input id="f-time-label" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.time) || ""}" placeholder=""></div>
+    <div class="fg"><label>موعد وساعة التحرك</label><input id="f-time" type="time" value="${esc((editTrip === null || editTrip === void 0 ? void 0 : editTrip.timeRaw) || "07:30")}"></div>
+    <div class="fg"><label>نص الموعد المعروض (يمكن تعديله يدوياً)</label><input id="f-time-label" value="${esc((editTrip === null || editTrip === void 0 ? void 0 : editTrip.time) || "")}" placeholder=""></div>
     <div class="fg"><label>السائق (من المسجّلين فقط)</label><select id="f-driver">${driverOptions(editTrip && editTrip.driver)}</select></div>
     <div class="fg"><label>المشرف (للمتابعة عبر واتساب)</label>
       <select id="f-supervisor">
         <option value="">— بدون مشرف —</option>
-        ${supervisors.map(s => `<option value="${s.id || s.firestoreId || s.name}" data-name="${s.name || ""}" data-phone="${s.phone || ""}" ${((editTrip && (editTrip.supervisorId === (s.id || s.firestoreId) || editTrip.supervisorName === s.name)) ? "selected" : "")}>${s.name} — ${s.phone || ""}</option>`).join("")}
+        ${supervisors.map(s => `<option value="${esc(s.id || s.firestoreId || s.name)}" data-name="${esc(s.name || "")}" data-phone="${esc(s.phone || "")}" ${esc(((editTrip && (editTrip.supervisorId === (s.id || s.firestoreId) || editTrip.supervisorName === s.name)) ? "selected" : ""))}>${esc(s.name)} — ${esc(s.phone || "")}</option>`).join("")}
       </select>
     </div>
     <div class="fg"><label>السيارة (من المسجّلة فقط)</label><select id="f-car">${carOptions(editTrip && editTrip.car)}</select></div>
-    <div class="fg"><label>ملاحظات</label><input id="f-notes" value="${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.notes) || ""}" placeholder=""></div>
+    <div class="fg"><label>ملاحظات</label><input id="f-notes" value="${esc((editTrip === null || editTrip === void 0 ? void 0 : editTrip.notes) || "")}" placeholder=""></div>
     <div class="fg"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="f-closed" style="width:auto" ${(editTrip === null || editTrip === void 0 ? void 0 : editTrip.closed) ? "checked" : ""}> إغلاق الحجز (مكتمل العدد)</label></div>
   `;
     window.updateDaysLabel = function () {
@@ -3247,7 +3273,7 @@ window.openTripForm = function (editTrip = null, editIdx = -1) {
             driver: drvSel.value, driverId: (drvOpt && drvOpt.dataset.id) || "", driverPhone: (drvOpt && drvOpt.dataset.phone) || "",
             car: carSel.value, carId: (carOpt && carOpt.dataset.id) || "",
             notes: document.getElementById("f-notes").value.trim(),
-            closed,
+            closed, is_booking_closed: closed,
             supervisorId, supervisorName, supervisorPhone
         };
         if (isEdit && editIdx >= 0) {
@@ -3304,12 +3330,12 @@ function renderAdminDrivers() {
     <div class="admin-trip" style="padding:14px 16px">
       <div class="top-row" style="margin-bottom:0">
         <div>
-          <div class="card-title">${d.name}${d.username ? ` <span class="badge">@${d.username}</span>` : ""}</div>
-          <div class="card-meta">${d.phone}${d.notes ? " · " + d.notes : ""}${d.passwordHash ? "" : " · ⚠ بلا كلمة مرور مشفّرة"}</div>
+          <div class="card-title">${esc(d.name)}${d.username ? ` <span class="badge">@${esc(d.username)}</span>` : ""}</div>
+          <div class="card-meta">${esc(d.phone)}${esc(d.notes ? " · " + d.notes : "")}${d.passwordHash ? "" : " · ⚠ بلا كلمة مرور مشفّرة"}</div>
         </div>
         <div class="actions-bot" style="margin:0">
-          ${d.phone ? `<a class="icon-btn" href="tel:${d.phone}" title="اتصال">📞</a>
-          <a class="icon-btn" href="${waHref(d.phone)}" target="_blank" title="واتساب">💬</a>` : ""}
+          ${d.phone ? `<a class="icon-btn" href="tel:${esc(d.phone)}" title="اتصال">📞</a>
+          <a class="icon-btn" href="${esc(waHref(d.phone))}" target="_blank" title="واتساب">💬</a>` : ""}
           <button type="button" class="icon-btn danger" title="حذف" onclick="delDriver(${i})">🗑️</button>
           <button type="button" class="icon-btn edit" title="تعديل" onclick="editDriver(${i})">✏️</button>
         </div>
@@ -3338,11 +3364,11 @@ window.openDriverForm = function (editD = null, editIdx = -1) {
     const isEdit = !!editD;
     document.getElementById("form-title").textContent = isEdit ? "تعديل سائق" : "إضافة سائق";
     document.getElementById("form-body").innerHTML = `
-    <div class="fg"><label>الاسم *</label><input id="f-name" value="${(editD === null || editD === void 0 ? void 0 : editD.name) || ""}"></div>
-    <div class="fg"><label>الموبايل *</label><input id="f-phone" type="tel" value="${(editD === null || editD === void 0 ? void 0 : editD.phone) || ""}" placeholder=""></div>
-    <div class="fg"><label>اسم المستخدم للدخول</label><input id="f-username" value="${(editD === null || editD === void 0 ? void 0 : editD.username) || ""}" placeholder=""></div>
+    <div class="fg"><label>الاسم *</label><input id="f-name" value="${esc((editD === null || editD === void 0 ? void 0 : editD.name) || "")}"></div>
+    <div class="fg"><label>الموبايل *</label><input id="f-phone" type="tel" value="${esc((editD === null || editD === void 0 ? void 0 : editD.phone) || "")}" placeholder=""></div>
+    <div class="fg"><label>اسم المستخدم للدخول</label><input id="f-username" value="${esc((editD === null || editD === void 0 ? void 0 : editD.username) || "")}" placeholder=""></div>
     <div class="fg"><label>كلمة مرور الدخول ${isEdit ? "(اتركها فارغة لعدم التغيير)" : "*"}</label><input id="f-pass" type="password" placeholder=""></div>
-    <div class="fg"><label>ملاحظات</label><input id="f-notes" value="${(editD === null || editD === void 0 ? void 0 : editD.notes) || ""}"></div>
+    <div class="fg"><label>ملاحظات</label><input id="f-notes" value="${esc((editD === null || editD === void 0 ? void 0 : editD.notes) || "")}"></div>
     <p style="font-size:.78rem;color:#64748b">كلمة المرور تُخزَّن كنص مشفّر (SHA-256) وليست كنص صريح. للأمان الكامل فعّل Firebase Authentication لاحقاً.</p>`;
     document.getElementById("form-save-btn").onclick = async () => {
         const name = document.getElementById("f-name").value.trim();
@@ -3394,12 +3420,12 @@ function renderAdminSupervisors() {
     <div class="admin-trip" style="padding:14px 16px">
       <div class="top-row" style="margin-bottom:0">
         <div>
-          <div class="card-title">👤 ${s.name || "-"}</div>
-          <div class="card-meta">${s.phone || ""}${s.notes ? " · " + s.notes : ""}</div>
+          <div class="card-title">👤 ${esc(s.name || "-")}</div>
+          <div class="card-meta">${esc(s.phone || "")}${esc(s.notes ? " · " + s.notes : "")}</div>
         </div>
         <div class="actions-bot" style="margin:0">
-          ${s.phone ? `<a class="icon-btn" href="tel:${s.phone}" title="اتصال">📞</a>
-          <a class="icon-btn" href="${waHref(s.phone)}" target="_blank" title="واتساب">💬</a>` : ""}
+          ${s.phone ? `<a class="icon-btn" href="tel:${esc(s.phone)}" title="اتصال">📞</a>
+          <a class="icon-btn" href="${esc(waHref(s.phone))}" target="_blank" title="واتساب">💬</a>` : ""}
           <button type="button" class="icon-btn danger" title="حذف" onclick="delSupervisor(${i})">🗑️</button>
           <button type="button" class="icon-btn edit" title="تعديل" onclick="editSupervisor(${i})">✏️</button>
         </div>
@@ -3427,9 +3453,9 @@ window.openSupervisorForm = function (editS = null, editIdx = -1) {
     const isEdit = !!editS;
     document.getElementById("form-title").textContent = isEdit ? "تعديل مشرف" : "إضافة مشرف";
     document.getElementById("form-body").innerHTML = `
-    <div class="fg"><label>اسم المشرف *</label><input id="f-name" value="${(editS && editS.name) || ""}" placeholder=""></div>
-    <div class="fg"><label>رقم الواتساب *</label><input id="f-phone" type="tel" value="${(editS && editS.phone) || ""}" placeholder=""></div>
-    <div class="fg"><label>ملاحظات</label><input id="f-notes" value="${(editS && editS.notes) || ""}" placeholder=""></div>
+    <div class="fg"><label>اسم المشرف *</label><input id="f-name" value="${esc((editS && editS.name) || "")}" placeholder=""></div>
+    <div class="fg"><label>رقم الواتساب *</label><input id="f-phone" type="tel" value="${esc((editS && editS.phone) || "")}" placeholder=""></div>
+    <div class="fg"><label>ملاحظات</label><input id="f-notes" value="${esc((editS && editS.notes) || "")}" placeholder=""></div>
     <p style="font-size:.78rem;color:#64748b">رقم الواتساب يظهر للراكب على الرحلة المسندة لهذا المشرف لمتابعة الحجز مباشرة.</p>`;
     document.getElementById("form-save-btn").textContent = "حفظ المشرف";
     document.getElementById("form-save-btn").onclick = async () => {
@@ -3465,10 +3491,10 @@ function renderAdminCars() {
     <div class="admin-trip" style="padding:14px 16px">
       <div class="top-row" style="margin-bottom:0;align-items:center">
         <div style="display:flex;align-items:center;gap:12px;flex:1">
-          ${c.image ? `<img src="${c.image}" alt="" style="width:56px;height:56px;border-radius:12px;object-fit:cover;border:1px solid #e2e8f0">` : `<div style="width:56px;height:56px;border-radius:12px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:1.4rem">🚗</div>`}
+          ${c.image ? `<img src="${esc(safeImg(c.image))}" alt="" style="width:56px;height:56px;border-radius:12px;object-fit:cover;border:1px solid #e2e8f0">` : `<div style="width:56px;height:56px;border-radius:12px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:1.4rem">🚗</div>`}
           <div>
-            <div class="card-title">${c.category ? c.category + " · " : ""}${c.model || "-"}</div>
-            <div class="card-meta">${c.color || ""} · ${c.plate || ""}${c.notes ? " · " + c.notes : ""}</div>
+            <div class="card-title">${esc(c.category ? c.category + " · " : "")}${esc(c.model || "-")}</div>
+            <div class="card-meta">${esc(c.color || "")} · ${esc(c.plate || "")}${esc(c.notes ? " · " + c.notes : "")}</div>
           </div>
         </div>
         <div class="actions-bot" style="margin:0">
@@ -3500,12 +3526,12 @@ window.openCarForm = function (editC = null, editIdx = -1) {
     window._carImageData = (editC === null || editC === void 0 ? void 0 : editC.image) || "";
     document.getElementById("form-title").textContent = isEdit ? "تعديل سيارة في الأسطول" : "إضافة سيارة للأسطول";
     document.getElementById("form-body").innerHTML = `
-    <div class="fg"><label>الفئة *</label><input id="f-category" value="${(editC === null || editC === void 0 ? void 0 : editC.category) || ""}" placeholder=""></div>
-    <div class="fg"><label>الموديل *</label><input id="f-model" value="${(editC === null || editC === void 0 ? void 0 : editC.model) || ""}" placeholder=""></div>
-    <div class="fg"><label>الوصف (للمستفيد)</label><input id="f-notes" value="${(editC === null || editC === void 0 ? void 0 : editC.notes) || ""}" placeholder=""></div>
+    <div class="fg"><label>الفئة *</label><input id="f-category" value="${esc((editC === null || editC === void 0 ? void 0 : editC.category) || "")}" placeholder=""></div>
+    <div class="fg"><label>الموديل *</label><input id="f-model" value="${esc((editC === null || editC === void 0 ? void 0 : editC.model) || "")}" placeholder=""></div>
+    <div class="fg"><label>الوصف (للمستفيد)</label><input id="f-notes" value="${esc((editC === null || editC === void 0 ? void 0 : editC.notes) || "")}" placeholder=""></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="fg" style="margin:0"><label>اللون</label><input id="f-color" value="${(editC === null || editC === void 0 ? void 0 : editC.color) || ""}" placeholder=""></div>
-      <div class="fg" style="margin:0"><label>رقم اللوحة</label><input id="f-plate" value="${(editC === null || editC === void 0 ? void 0 : editC.plate) || ""}" placeholder=""></div>
+      <div class="fg" style="margin:0"><label>اللون</label><input id="f-color" value="${esc((editC === null || editC === void 0 ? void 0 : editC.color) || "")}" placeholder=""></div>
+      <div class="fg" style="margin:0"><label>رقم اللوحة</label><input id="f-plate" value="${esc((editC === null || editC === void 0 ? void 0 : editC.plate) || "")}" placeholder=""></div>
     </div>
     <div class="fg" style="margin-top:12px">
       <label>صورة السيارة (رفع من الاستوديو أو التقاط بالكاميرا)</label>
@@ -3519,7 +3545,7 @@ window.openCarForm = function (editC = null, editIdx = -1) {
           <input type="file" accept="image/*" onchange="previewCarImage(this)">
         </label>
       </div>
-      <img id="car-img-preview" class="car-preview ${(editC === null || editC === void 0 ? void 0 : editC.image) ? "on" : ""}" src="${(editC === null || editC === void 0 ? void 0 : editC.image) || ""}" alt="معاينة">
+      <img id="car-img-preview" class="car-preview ${esc(safeImg((editC === null || editC === void 0 ? void 0 : editC.image) ? "on" : ""))}" src="${esc(safeImg((editC === null || editC === void 0 ? void 0 : editC.image) || ""))}" alt="معاينة">
     </div>`;
     document.getElementById("form-save-btn").textContent = "حفظ السيارة";
     document.getElementById("form-save-btn").onclick = async () => {
@@ -3562,20 +3588,16 @@ window.previewCarImage = function (input) {
     const file = input.files && input.files[0];
     if (!file)
         return;
-    if (file.size > 2 * 1024 * 1024) {
-        toast("الصورة كبيرة — اختر أقل من 2 ميجا", "err");
-        return;
-    }
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        window._carImageData = e.target.result;
+    if (!file.type.startsWith("image/"))
+        return toast("الملف يجب أن يكون صورة", "err");
+    compressImage(file, 800, 0.75).then(function (data) {
+        window._carImageData = data;
         const img = document.getElementById("car-img-preview");
         if (img) {
-            img.src = e.target.result;
+            img.src = data;
             img.classList.add("on");
         }
-    };
-    reader.readAsDataURL(file);
+    }).catch(function () { toast("تعذر قراءة الصورة", "err"); });
 };
 window.saveSettings = async function () {
     var _a, _b, _c, _d, _e;
@@ -3645,21 +3667,21 @@ async function loadDriverTrips() {
     if (car) {
         html += `<div class="panel" style="margin-bottom:14px"><h3>سيارتك</h3>
       <div style="display:flex;gap:12px;align-items:center">
-        ${car.image ? `<img src="${car.image}" style="width:72px;height:72px;border-radius:12px;object-fit:cover">` : `<div style="width:72px;height:72px;border-radius:12px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:1.6rem">🚗</div>`}
-        <div><b>${car.category || ""} ${car.model || ""}</b><div class="card-meta">${car.color || ""} · ${car.plate || ""}<br>${car.notes || ""}</div></div>
+        ${car.image ? `<img src="${esc(safeImg(car.image))}" style="width:72px;height:72px;border-radius:12px;object-fit:cover">` : `<div style="width:72px;height:72px;border-radius:12px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:1.6rem">🚗</div>`}
+        <div><b>${esc(car.category || "")} ${esc(car.model || "")}</b><div class="card-meta">${esc(car.color || "")} · ${esc(car.plate || "")}<br>${esc(car.notes || "")}</div></div>
       </div></div>`;
     }
     html += `<div class="panel"><h3>الركاب المؤكدون (${confirmed.length})</h3>`;
     if (!confirmed.length)
         html += '<div style="color:#94a3b8;padding:10px">لا يوجد ركاب مؤكدون حالياً</div>';
     else
-        html += confirmed.map(p => `<div class="card" style="margin-bottom:8px"><div class="card-info"><div class="card-title">${p.name} <span class="status st-confirmed">مؤكد</span></div>
-    <div class="card-meta">${p.phone} · مقاعد: ${p.seats || 1}${p.tripName ? " · " + p.tripName : ""}${p.tripDate ? " · 📅 " + tripDateLabel(p.tripDate) : ""}${p.notes ? " · 📝 " + p.notes : ""}</div></div>
-    <div style="display:flex;gap:6px"><a class="btn btn-ghost btn-sm" href="tel:${p.phone}">📞</a>
-    <a class="btn btn-ghost btn-sm" href="${waHref(p.phone)}" target="_blank">واتساب</a></div></div>`).join("");
+        html += confirmed.map(p => `<div class="card" style="margin-bottom:8px"><div class="card-info"><div class="card-title">${esc(p.name)} <span class="status st-confirmed">مؤكد</span></div>
+    <div class="card-meta">${esc(p.phone)} · مقاعد: ${esc(p.seats || 1)}${esc(p.tripName ? " · " + p.tripName : "")}${esc(p.tripDate ? " · 📅 " + tripDateLabel(p.tripDate) : "")}${esc(p.notes ? " · 📝 " + p.notes : "")}</div></div>
+    <div style="display:flex;gap:6px"><a class="btn btn-ghost btn-sm" href="tel:${esc(p.phone)}">📞</a>
+    <a class="btn btn-ghost btn-sm" href="${esc(waHref(p.phone))}" target="_blank">واتساب</a></div></div>`).join("");
     html += "</div>";
     if (myTrips.length) {
-        html += `<div class="panel" style="margin-top:14px"><h3>رحلات مرتبطة</h3>` + myTrips.map(t => `<div class="card-meta" style="margin-bottom:8px"><b>${t.name}</b><br>🕐 ${t.time || "-"} · 📍 ${t.from || ""} ← ${t.to || ""}</div>`).join("") + "</div>";
+        html += `<div class="panel" style="margin-top:14px"><h3>رحلات مرتبطة</h3>` + myTrips.map(t => `<div class="card-meta" style="margin-bottom:8px"><b>${esc(t.name)}</b><br>🕐 ${esc(t.time || "-")} · 📍 ${esc(t.from || "")} ← ${esc(t.to || "")}</div>`).join("") + "</div>";
     }
     box.innerHTML = html;
 }
@@ -3701,6 +3723,21 @@ async function loadDriverTrips() {
         }
     });
 })();
+// منع الضغط المزدوج (تكرار الحجز)
+["submitBooking", "submitPrivate"].forEach(fn => {
+    const orig = window[fn];
+    window[fn] = async function () {
+        if (window["__busy_" + fn])
+            return;
+        window["__busy_" + fn] = true;
+        try {
+            await orig();
+        }
+        finally {
+            window["__busy_" + fn] = false;
+        }
+    };
+});
 // ========== INIT ==========
 function init() {
     trips = []; drivers = []; cars = [];
@@ -3742,7 +3779,6 @@ function init() {
         }
     });
     renderTrips();
-    const skipSeed = (function () { try { return localStorage.getItem("aman_skip_demo_seed") === "1"; } catch (e) { return false; } })();
     getDocs(collection(db, "trips")).then(snap => {
         if (!snap.empty) {
             trips = snap.docs.map(d => {
