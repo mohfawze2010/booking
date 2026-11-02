@@ -187,7 +187,7 @@ body.has-bottom-nav{padding-bottom:72px}
 @media(max-width:768px){.wa-float.is-visible{bottom:88px}}
 .stat{cursor:pointer}
 #view-auth{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;background:linear-gradient(180deg,#eff6ff 0%,#f0f7ff 40%,#eef2f7 100%);position:relative}
-.auth-card{background:#fff;border-radius:24px;padding:32px 26px 24px;width:100%;max-width:400px;box-shadow:0 12px 40px rgba(15,23,42,.08),0 2px 8px rgba(15,23,42,.04);position:relative;z-index:2;text-align:center}
+.auth-card{background:#fff;border-radius:24px;padding:28px 20px 20px;width:100%;max-width:320px;box-shadow:0 12px 40px rgba(15,23,42,.08),0 2px 8px rgba(15,23,42,.04);position:relative;z-index:2;text-align:center;margin-inline:auto}
 .auth-card h1{font-size:1.45rem;font-weight:800;text-align:center;margin:0 0 4px;color:#1e40af;letter-spacing:-.02em}
 .auth-card .auth-tag{display:inline-block;font-size:.78rem;color:#64748b;margin-bottom:10px}
 .auth-card .sub{text-align:center;color:#94a3b8;font-size:.9rem;margin:0 0 22px;line-height:1.6}
@@ -211,14 +211,16 @@ body.has-bottom-nav{padding-bottom:72px}
 .auth-card .fg{text-align:right;margin-bottom:12px}
 .auth-card .fg label{display:none}
 .auth-card .fg input{
-  background:#fff;border:1.5px solid #94a3b8;border-radius:12px;padding:14px 16px;
-  font-size:.95rem;width:100%;text-align:right;direction:rtl
+  background:#fff;border:1.5px solid #94a3b8;border-radius:10px;padding:11px 12px;
+  font-size:.9rem;width:100%;max-width:100%;text-align:right;direction:rtl;box-sizing:border-box
 }
+.auth-card .fg{max-width:280px;margin-left:auto;margin-right:auto}
+.auth-card .btn-login-main,.auth-card .btn-guest{max-width:280px;margin-left:auto;margin-right:auto}
 .auth-card .fg input:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.12);background:#fff}
 .auth-card .btn-login-main{
-  width:100%;justify-content:center;padding:14px;margin-top:6px;margin-bottom:12px;
+  width:100%;justify-content:center;padding:12px;margin-top:6px;margin-bottom:12px;
   background:#2563eb;color:#fff;border:none;border-radius:12px;font-family:inherit;
-  font-weight:800;font-size:1.05rem;cursor:pointer;box-shadow:0 4px 14px rgba(37,99,235,.35)
+  font-weight:800;font-size:.98rem;cursor:pointer;box-shadow:0 4px 14px rgba(37,99,235,.35)
 }
 .auth-card .btn-login-main:hover{background:#1e40af}
 .auth-card .btn-guest{
@@ -963,12 +965,14 @@ body.has-bottom-nav #pwa-banner{bottom:calc(84px + env(safe-area-inset-bottom))}
     return t;
 };
 import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, query, where, doc, updateDoc, deleteDoc, getDoc, runTransaction, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, query, where, doc, updateDoc, deleteDoc, getDoc, runTransaction, setDoc, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile, GoogleAuthProvider, signInWithPopup, signInWithRedirect } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getStorage, ref as storageRef, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 const firebaseConfig = { apiKey: "AIzaSyAsBftTHVS1DLUypVHD33F_SN-kNeUz_KY", authDomain: "booking-6adaf.firebaseapp.com", projectId: "booking-6adaf", storageBucket: "booking-6adaf.firebasestorage.app", messagingSenderId: "612487831903", appId: "1:612487831903:web:621db120123e12644756ea", measurementId: "G-JDB27JZ0WD" };
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+const storage = getStorage(app);
 let currentUser = null; // Firebase user
 let registering = false;
 let isGuest = false;
@@ -988,6 +992,15 @@ function jsq(v) {
 function safeImg(u) {
     u = String(u || "");
     return /^(data:image\/(?!svg)[a-z0-9.+-]+;base64,|https?:\/\/)/i.test(u) ? u : "";
+}
+// رفع إيصال إلى Firebase Storage وإرجاع رابط التحميل (بدل تخزين base64 في Firestore)
+async function uploadReceiptToStorage(bookingId, dataUrl) {
+    if (!dataUrl || !String(dataUrl).startsWith("data:image/")) return "";
+    const path = "receipts/" + bookingId + "/" + Date.now() + ".jpg";
+    const r = storageRef(storage, path);
+    // data_url format
+    await uploadString(r, dataUrl, "data_url", { contentType: "image/jpeg", cacheControl: "public,max-age=31536000" });
+    return await getDownloadURL(r);
 }
 // ضغط الصورة قبل التخزين (حد مستند Firestore ≈ 1 ميجابايت)
 function compressImage(file, maxDim, quality, mime) {
@@ -1050,7 +1063,24 @@ function waHref(phone, text) {
 // ===== تواريخ الرحلات: الحجز خلال 7 أيام فقط من اليوم =====
 const AR_WEEKDAYS = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
 function normDay(x) { return String(x || "").replace(/[أإآ]/g, "ا").replace(/\s+/g, "").trim(); }
-function isoLocal(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+function cairoNow() {
+    // تاريخ/وقت الآن بتوقيت القاهرة (Africa/Cairo) بغض النظر عن جهاز العميل
+    try {
+        return new Date(new Date().toLocaleString("en-US", { timeZone: "Africa/Cairo" }));
+    } catch (e) {
+        return new Date();
+    }
+}
+function isoLocal(d) {
+    // يعيد YYYY-MM-DD بتوقيت القاهرة
+    const x = (d instanceof Date) ? d : cairoNow();
+    try {
+        return x.toLocaleDateString("en-CA", { timeZone: "Africa/Cairo" }); // en-CA => YYYY-MM-DD
+    } catch (e) {
+        return x.getFullYear() + "-" + String(x.getMonth() + 1).padStart(2, "0") + "-" + String(x.getDate()).padStart(2, "0");
+    }
+}
+function cairoTodayIso() { return isoLocal(cairoNow()); }
 function tripDateLabel(iso) {
     if (!iso) return "";
     const p = String(iso).split("-").map(Number);
@@ -1062,7 +1092,7 @@ function getBookableDates(t) {
     const days = (Array.isArray(t && t.days) ? t.days : []).map(normDay).filter(Boolean);
     const out = [];
     let todayPassed = false;
-    const now = new Date();
+    const now = cairoNow();
     for (let i = 0; i < 7; i++) {
         const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
         if (days.length && !days.includes(normDay(AR_WEEKDAYS[d.getDay()])))
@@ -1099,14 +1129,21 @@ window.selectBookDate = function (iso) {
 // ===== إحصاء المقاعد للأدمن فقط (من الحجوزات التي دُفع عربونها) =====
 async function refreshTripBookings() {
     try {
-        const snap = await getDocs(collection(db, "bookings"));
+        // استخدم الكاش إن كان حديثاً، وإلا حمّل بحد أقصى 300
+        if (allAdminBookings && allAdminBookings.length) return;
+        let snap;
+        try {
+            snap = await getDocs(query(collection(db, "bookings"), orderBy("createdAt", "desc"), limit(300)));
+        } catch (eIdx) {
+            snap = await getDocs(collection(db, "bookings"));
+        }
         allAdminBookings = sortNewest(snap.docs.map(d => (Object.assign({ id: d.id }, d.data()))));
     }
     catch (e) { }
 }
 function tripSeatStats(t) {
     const ids = [t.firestoreId, t.id].filter(Boolean);
-    const today = isoLocal(new Date());
+    const today = cairoTodayIso();
     let paidSeats = 0, paidCount = 0, incoming = 0;
     const byDate = {};
     (allAdminBookings || []).forEach(b => {
@@ -1153,7 +1190,8 @@ function needsDepositReminder(b) {
 function getReceiptUrl(b) {
     if (!b)
         return "";
-    return safeImg(b.payment_proof || b.receipt || b.receiptUrl || "");
+    // فضّل رابط Storage ثم الحقول القديمة
+    return safeImg(b.receiptUrl || b.payment_proof || b.receipt || "");
 }
 function isTripClosed(t) {
     return !!(t && (t.is_booking_closed || t.closed));
@@ -1861,6 +1899,25 @@ window.submitBooking = async function () {
         return toast("لا توجد مواعيد متاحة هذا الأسبوع — احجز في الأسبوع القادم", "err");
     if (!getBookableDates(currentTrip).dates.some(x => x.iso === tripDate))
         return toast("اختر تاريخاً صالحاً خلال الأسبوع", "err");
+    // منع تكرار الحجز لنفس الرقم على نفس الرحلة والتاريخ
+    try {
+        const tripIds = [currentTrip.firestoreId, currentTrip.id].filter(Boolean);
+        const dupSnap = await getDocs(query(
+            collection(db, "bookings"),
+            where("phone", "==", phone),
+            where("tripDate", "==", tripDate)
+        ));
+        const hasDup = dupSnap.docs.some(d => {
+            const x = d.data();
+            if (x.status === "cancelled") return false;
+            return tripIds.includes(x.tripId);
+        });
+        if (hasDup)
+            return toast("يوجد حجز سابق لنفس الرقم على هذه الرحلة وهذا التاريخ", "err");
+    } catch (eDup) {
+        console.warn("duplicate check failed", eDup);
+        // نكمل لو فشل الفحص (صلاحيات/انترنت) حتى لا نمنع الحجز كلياً
+    }
     const c = code();
     const booking = {
         code: c, type: "scheduled", tripDate, tripDateLabel: tripDateLabel(tripDate), tripId: currentTrip.firestoreId || currentTrip.id, tripName: currentTrip.name,
@@ -2312,12 +2369,35 @@ window.submitDeposit = async function (id) {
             updatedAt: new Date().toISOString()
         };
         if (dataUrl) {
-            upd.receipt = dataUrl;
-            upd.payment_proof = dataUrl;
+            // رفع الإيصال إلى Storage بدل حفظ base64 داخل Firestore (يوفر قراءات/حجم)
+            try {
+                const url = await uploadReceiptToStorage(id, dataUrl);
+                if (url) {
+                    upd.receiptUrl = url;
+                    upd.payment_proof = url;
+                    upd.receipt = url; // توافق خلفي للعرض
+                } else {
+                    // fallback لو فشل الرفع: لا نحفظ base64 الضخم
+                    console.warn("Storage upload returned empty URL");
+                }
+            } catch (eUp) {
+                console.error("Storage upload failed", eUp);
+                // لا نمنع إرسال العربون لو فشل الرفع — الأدمن يشوف الحالة بدون صورة
+                toast("تم تسجيل الدفع لكن رفع الصورة فشل — تأكد من قواعد Storage", "err");
+            }
         }
         await updateDoc(doc(db, "bookings", id), upd);
         delete window._rcptData[id];
         toast("تم إرسال العربون — بانتظار تأكيد الإدارة", "ok");
+        // تنبيه الأدمن عبر واتساب (أبسط حل بدون Cloud Functions)
+        try {
+            const s = window.APP_SETTINGS || {};
+            const adminPhone = s.support_phone || s.phone || "";
+            const msg = "تم دفع العربون لحجز " + (b.code || id) + "\nالاسم: " + (b.name || "") + "\nالهاتف: " + (b.phone || "") + "\nالمقاعد: " + (b.seats || 1) + (b.tripName ? "\nالرحلة: " + b.tripName : "") + (b.tripDate ? "\nالتاريخ: " + tripDateLabel(b.tripDate) : "");
+            if (adminPhone && confirm("تم التسجيل. هل تريد إرسال تنبيه واتساب للإدارة الآن؟")) {
+                window.open(waHref(adminPhone, msg), "_blank");
+            }
+        } catch (eWa) {}
         if (currentUser && typeof loadMyBookings === "function")
             loadMyBookings();
         else
@@ -2532,19 +2612,25 @@ window.adminTab = function (tab) {
 };
 async function refreshAdminStats() {
     try {
-        const snap = await getDocs(collection(db, "bookings"));
-        const list = snap.docs.map(d => (Object.assign({ id: d.id }, d.data())));
-        // الأرقام يجب أن تطابق نفس فلاتر العرض عند الضغط على الكارت
-        const confirmed = list.filter(b => normalizeBookingStatus(b.status) === "confirmed").length;
-        const waitingPay = list.filter(b => normalizeBookingStatus(b.status) === "payment_pending").length;
-        const newRequests = list.filter(b => normalizeBookingStatus(b.status) === "pending").length;
+        // إعادة استخدام الكاش إن وُجد لتقليل القراءات المتكررة
+        if (!allAdminBookings || !allAdminBookings.length) {
+            let snap;
+            try {
+                snap = await getDocs(query(collection(db, "bookings"), orderBy("createdAt", "desc"), limit(300)));
+            } catch (eIdx) {
+                snap = await getDocs(collection(db, "bookings"));
+            }
+            allAdminBookings = sortNewest(snap.docs.map(d => Object.assign({ id: d.id }, d.data())));
+        }
+        const list = allAdminBookings || [];
+        const confirmed = list.filter(b => normalizeBookingStatus(b.status) === "confirmed" && !isBookingExpired(b)).length;
+        const waitingPay = list.filter(b => normalizeBookingStatus(b.status) === "payment_pending" && !isBookingExpired(b)).length;
+        const newRequests = list.filter(b => normalizeBookingStatus(b.status) === "pending" && !isBookingExpired(b)).length;
         const el = (id) => document.getElementById(id);
-        if (el("s-bookings")) el("s-bookings").textContent = list.length;
+        if (el("s-bookings")) el("s-bookings").textContent = list.filter(b => !isBookingExpired(b)).length;
         if (el("s-confirmed")) el("s-confirmed").textContent = confirmed;
-        if (el("s-pending")) el("s-pending").textContent = waitingPay; // بانتظار العربون
-        if (el("s-new")) el("s-new").textContent = newRequests; // طلبات جديدة
-        allAdminBookings = sortNewest(list);
-        // لا نعرض القوائم تلقائياً — تظهر فقط عند الضغط على الاختصار أو كارت الإحصاء
+        if (el("s-pending")) el("s-pending").textContent = waitingPay;
+        if (el("s-new")) el("s-new").textContent = newRequests;
     }
     catch (e) { }
 }
@@ -2789,11 +2875,23 @@ window.setBkFilter = function (f) {
     renderFilteredBookings();
 };
 window.filterAdminBookings = function () { renderFilteredBookings(); };
-function statusLabel(st) {
+function statusLabel(st, b) {
+    if (b && isBookingExpired(b)) return "منتهية";
     return st === "confirmed" ? "مؤكدة" : st === "cancelled" ? "ملغية" : st === "payment" || st === "payment_pending" ? "عربون" : "طلب جديد";
 }
-function statusClass(st) {
+function statusClass(st, b) {
+    if (b && isBookingExpired(b)) return "st-closed";
     return st === "confirmed" ? "st-confirmed" : st === "cancelled" ? "st-cancelled" : st === "payment" || st === "payment_pending" ? "st-pending" : "st-pending";
+}
+
+function isBookingExpired(b) {
+    // حجز منتهي: تاريخ الرحلة عدّى وما زال غير مؤكد/ملغي
+    if (!b || !b.tripDate) return false;
+    const st = normalizeBookingStatus(b.status);
+    if (st === "confirmed" || st === "cancelled") return false;
+    try {
+        return b.tripDate < cairoTodayIso();
+    } catch (e) { return false; }
 }
 function renderFilteredBookings() {
     var _a;
@@ -2802,8 +2900,14 @@ function renderFilteredBookings() {
         return;
     const q = (((_a = document.getElementById("bk-search")) === null || _a === void 0 ? void 0 : _a.value) || "").trim();
     let list = sortNewest(allAdminBookings);
+    // إخفاء الحجوزات المنتهية (تاريخ عدّى وغير مؤكدة) من القائمة الافتراضية لتقليل الزحمة
+    if (bkFilter === "all" || !bkFilter) {
+        list = list.filter(b => !isBookingExpired(b));
+    } else if (bkFilter === "expired") {
+        list = list.filter(b => isBookingExpired(b));
+    }
     if (bkFilter === "pending")
-        list = list.filter(b => normalizeBookingStatus(b.status) === "pending");
+        list = list.filter(b => normalizeBookingStatus(b.status) === "pending" && !isBookingExpired(b));
     else if (bkFilter === "payment")
         list = list.filter(b => normalizeBookingStatus(b.status) === "payment_pending");
     else if (bkFilter === "confirmed")
@@ -2822,7 +2926,7 @@ function renderFilteredBookings() {
       <div class="top-row">
         <div style="text-align:left">
           <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-wrap:wrap">
-            <span class="badge-pill ${esc(b.status === "confirmed" ? "badge-open" : b.status === "cancelled" ? "badge-closed" : "badge-active")}">${esc(statusLabel(b.status))}</span>
+            <span class="badge-pill ${esc(b.status === "confirmed" ? "badge-open" : b.status === "cancelled" ? "badge-closed" : "badge-active")}">${esc(statusLabel(b.status, b))}</span>
             <b style="font-size:1rem;color:#2563eb">${esc(b.code)}</b>
           </div>
           <div style="font-weight:800;font-size:1.05rem;margin-top:4px">${esc(b.name)}</div>
@@ -2854,8 +2958,24 @@ window.loadAdminBookings = async function () {
     if (box)
         box.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8">جاري التحميل...</div>';
     try {
-        const snap = await getDocs(collection(db, "bookings"));
-        allAdminBookings = snap.docs.map(d => (Object.assign({ id: d.id }, d.data()))).sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+        // قراءة محدودة: أحدث 300 حجز فقط (بدل المجموعة كاملة) لتقليل الاستهلاك
+        let snap;
+        try {
+            snap = await getDocs(query(collection(db, "bookings"), orderBy("createdAt", "desc"), limit(300)));
+        } catch (eIdx) {
+            // لو مفيش index أو حقول ناقصة — fallback
+            console.warn("ordered bookings query failed, fallback", eIdx);
+            snap = await getDocs(collection(db, "bookings"));
+        }
+        allAdminBookings = snap.docs.map(d => {
+            const data = d.data() || {};
+            // لا نحتفظ بنسخ base64 ضخمة في الذاكرة إن وُجد رابط
+            if (data.receiptUrl && data.receipt && String(data.receipt).startsWith("data:")) {
+                data.receipt = data.receiptUrl;
+                data.payment_proof = data.receiptUrl;
+            }
+            return Object.assign({ id: d.id }, data);
+        }).sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
         renderFilteredBookings();
     }
     catch (e) {
@@ -2934,12 +3054,38 @@ function openScheduledConfirm(b) {
     const carTxt = [a.carCategory, a.carModel].filter(Boolean).join(" ");
     const missing = !a.driver || !a.car || !a.supervisorName;
     const isOkNow = b.status === "confirmed";
+    // تحذير سعة السيارة: مجموع المقاعد المؤكدة لنفس الرحلة+التاريخ + هذا الحجز
+    const cap = Number((t && t.seats) || 0);
+    const thisSeats = Number(b.seats) || 1;
+    let confirmedSeatsOther = 0;
+    if (cap > 0 && b.tripDate) {
+        const ids = t ? [t.firestoreId, t.id].filter(Boolean) : [];
+        (allAdminBookings || []).forEach(x => {
+            if (x.id === b.id) return;
+            if (x.type === "private") return;
+            if (!ids.includes(x.tripId)) return;
+            if (x.tripDate !== b.tripDate) return;
+            const st = normalizeBookingStatus(x.status);
+            if (st === "confirmed" || String(x.status) === "payment")
+                confirmedSeatsOther += (Number(x.seats) || 1);
+        });
+    }
+    const totalIfConfirm = confirmedSeatsOther + thisSeats;
+    const overCap = cap > 0 && totalIfConfirm > cap;
+    const seatWarn = overCap
+        ? `<div style="background:#fef2f2;border:2px solid #ef4444;color:#991b1b;border-radius:12px;padding:12px;margin-bottom:12px;font-size:.9rem;font-weight:700">
+            ⚠ تحذير السعة: بعد التأكيد سيصبح عدد المقاعد ${totalIfConfirm} من أصل سعة ${cap}.
+            (مؤكد حالياً: ${confirmedSeatsOther} + هذا الحجز: ${thisSeats}). تجاوزت السعة!
+          </div>`
+        : (cap > 0 ? `<div style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;border-radius:10px;padding:10px;margin-bottom:10px;font-size:.82rem">
+            🪑 السعة: ${confirmedSeatsOther} مؤكد + ${thisSeats} هذا الحجز = ${totalIfConfirm} / ${cap}
+          </div>` : "");
     document.getElementById("form-title").textContent = (isOkNow ? "بيانات الحجز — " : "تأكيد الحجز — ") + b.code;
     document.getElementById("form-body").innerHTML = `
     <div style="background:#f8fafc;border-radius:12px;padding:12px;margin-bottom:12px;font-size:.88rem">
       ${row("الراكب", esc(b.name || "-"))}
       ${row("الهاتف", esc(b.phone || "-"))}
-      ${row("الرحلة", esc(b.tripName || t.name || "-"))}
+      ${row("الرحلة", esc(b.tripName || (t && t.name) || "-"))}
       ${b.tripDate ? row("تاريخ الرحلة", "📅 " + esc(tripDateLabel(b.tripDate))) : ""}
       ${row("🕐 الموعد", esc(formatTripClock(t)))}
       ${row("المقاعد", esc(b.seats || 1))}
@@ -2947,6 +3093,7 @@ function openScheduledConfirm(b) {
       ${row("العربون", esc(b.deposit || 0) + " ج.م")}
       ${row("حالة الدفع", receipt ? "إيصال مرفق ✓" : (b.status === "payment" ? "العميل أبلغ بالدفع (بدون إيصال)" : "لم يُبلَّغ بالدفع بعد"))}
     </div>
+    ${seatWarn}
     ${receipt ? `<div class="fg"><a href="${esc(receipt)}" target="_blank"><img src="${esc(receipt)}" alt="إيصال" style="max-width:100%;max-height:150px;border-radius:12px;border:1px solid #e2e8f0"></a></div>` : ""}
     <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:12px;margin-bottom:12px;font-size:.88rem;color:#065f46">
       <div style="font-weight:800;margin-bottom:6px">${isOkNow ? "البيانات الظاهرة للعميل" : "ستظهر هذه البيانات للعميل تلقائياً عند التأكيد"}</div>
@@ -2964,6 +3111,8 @@ function openScheduledConfirm(b) {
     btn.textContent = isOkNow ? "تحديث بيانات العميل من الرحلة" : "✓ تأكيد الحجز";
     btn.onclick = async () => {
         try {
+            if (overCap && !confirm("⚠ تحذير: التأكيد سيتجاوز سعة السيارة (" + totalIfConfirm + " / " + cap + "). هل تريد المتابعة رغم ذلك؟"))
+                return;
             const payload = Object.assign({ status: "confirmed", updatedAt: new Date().toISOString() }, a);
             await updateDoc(doc(db, "bookings", b.id), payload);
             toast("تم تأكيد الحجز وظهرت البيانات للعميل", "ok");
@@ -3897,8 +4046,18 @@ async function loadDriverTrips() {
     const dName = currentDriver.name || "";
     let bookings = [];
     try {
-        const snap = await getDocs(collection(db, "bookings"));
-        bookings = snap.docs.map(d => (Object.assign({ id: d.id }, d.data())));
+        // فضّل الكاش إن وُجد (من جلسة أدمن سابقة نادرة) وإلا قراءة محدودة
+        if (allAdminBookings && allAdminBookings.length) {
+            bookings = allAdminBookings;
+        } else {
+            let snap;
+            try {
+                snap = await getDocs(query(collection(db, "bookings"), orderBy("createdAt", "desc"), limit(300)));
+            } catch (eIdx) {
+                snap = await getDocs(collection(db, "bookings"));
+            }
+            bookings = snap.docs.map(d => (Object.assign({ id: d.id }, d.data())));
+        }
     }
     catch (e) { }
     const isSv = window.staffRole === "supervisor";
